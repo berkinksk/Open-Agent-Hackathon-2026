@@ -1,0 +1,7 @@
+{
+  "epss_this_cycle": 0.1,
+  "epss_this_cycle_internet": 0.05,
+  "sla_days": { "patch_now": 7, "this_cycle": 30, "monitor_review": 90 },
+  "rubric_auto_min": 7,
+  "max_critic_rounds": 2
+}

@@ -1,0 +1,19 @@
+{
+  "name": "exposureledger",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agents that turn a messy software inventory into a dated, evidence-backed patch list.",
+  "license": "MIT",
+  "engines": { "node": ">=25" },
+  "scripts": {
+    "start": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env src/server.ts",
+    "cli": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env src/cli.ts",
+    "setup": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/setup.ts",
+    "test": "node --experimental-transform-types --no-warnings --test \"test/**/*.test.ts\"",
+    "verify:engine": "node --experimental-transform-types --no-warnings scripts/verify-engine.ts",
+    "verify": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/verify.ts",
+    "eval": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/eval.ts",
+    "snapshot": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/snapshot.ts"
+  }
+}
