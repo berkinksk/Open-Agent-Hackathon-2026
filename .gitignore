@@ -150,3 +150,4 @@ vite.config.ts.timestamp-*
 
 # ExposureLedger runtime outputs
 output/
+!.env.docker.example
