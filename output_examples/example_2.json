@@ -1,0 +1,1680 @@
+{
+  "run_id": "example-2",
+  "mode": "live",
+  "status": "success",
+  "started_at": "2026-10-27T04:16:12.791Z",
+  "finished_at": "2026-10-27T04:16:21.251Z",
+  "as_of": "2026-10-27",
+  "timing_ms": {
+    "discovery": 120,
+    "kev_pairs": 311,
+    "normalise": 52,
+    "facts": 1845,
+    "nvd": 1,
+    "jury": 5582,
+    "critic": 17,
+    "analyst": 2,
+    "federated_join": 481,
+    "verifier": 446,
+    "world_model": 23,
+    "total": 8460
+  },
+  "summary": {
+    "patch_now": 5,
+    "this_cycle": 0,
+    "monitor": 1,
+    "ask_owner": 0
+  },
+  "lines": [
+    {
+      "row_id": "J01",
+      "asset_id": "webmail-01",
+      "asset_name": "webmail-01",
+      "internet_facing": true,
+      "software": "Zimbra Collaboration Suite 8.8.15 (webmail)",
+      "resolution": {
+        "row_id": "J01",
+        "status": "matched",
+        "vendor": "Synacor",
+        "product": "Zimbra Collaboration Suite",
+        "family": "synacor:zimbra-collaboration-suite",
+        "version": "8.8.15",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "J01",
+            "juror": "bolt",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite",
+            "product_type": "server",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J01",
+            "juror": "lightning",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite",
+            "product_type": "server",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J01",
+            "juror": "normaliser",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite",
+            "product_type": "unknown",
+            "confidence": 0.81
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J01",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 58 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Synacor Zimbra Collaboration Suite 8.8.15 inside the affected ranges of 9 KEV-listed CVEs, most recently CVE-2026-73570, which CISA KEV lists as exploited in the wild (added 2026-08-21); 2 other cited KEV CVEs are not version-checked, counted fail-closed; it is outside the ranges of 7 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2022-08-25) passed 1524 days ago, and EPSS for CVE-2024-45519 is 0.99907.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-73570",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Zimbra Collaboration Suite (ZCS) OS Command Injection Vulnerability",
+            "date_added": "2026-08-21",
+            "due_date": "2026-08-24",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Zimbra Collaboration Suite (ZCS) contains an OS command injection vulnerability which could allow an unauthenticated attacker to send specially crafted SMTP requests that may result in execution of arbitrary operating system commands as the Zimbra user.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Security_Advisories ; https://blog.zimbra.com/2026/07/patch-release-update-zimbra-10-1-20/ ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-73570",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-48700",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Cross-site Scripting Vulnerability",
+            "date_added": "2026-04-20",
+            "due_date": "2026-04-23",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability that could allow attackers to execute arbitrary JavaScript within the user's session, potentially leading to unauthorized access to sensitive information.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Security_Advisories ; https://nvd.nist.gov/vuln/detail/CVE-2025-48700",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-7796",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Server-Side Request Forgery Vulnerability",
+            "date_added": "2026-02-17",
+            "due_date": "2026-03-10",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains a server-side request forgery vulnerability if WebEx zimlet installed and zimlet JSP is enabled.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Releases/8.8.15/P7 ; https://nvd.nist.gov/vuln/detail/CVE-2020-7796",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-34192",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability",
+            "date_added": "2025-02-25",
+            "due_date": "2025-03-18",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting (XSS) vulnerability that allows a remote authenticated attacker to execute arbitrary code via a crafted script to the /h/autoSaveDraft function.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Security_Advisories ; https://nvd.nist.gov/vuln/detail/CVE-2023-34192",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-45519",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Command Execution Vulnerability",
+            "date_added": "2024-10-03",
+            "due_date": "2024-10-24",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains an unspecified vulnerability in the postjournal service that may allow an unauthenticated user to execute commands.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Security_Advisories ; https://nvd.nist.gov/vuln/detail/CVE-2024-45519",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-41352",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability",
+            "date_added": "2022-10-20",
+            "due_date": "2022-11-10",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) allows an attacker to upload arbitrary files using cpio package to gain incorrect access to any other user accounts.",
+            "notes": "https://wiki.zimbra.com/wiki/Security_Center;  https://nvd.nist.gov/vuln/detail/CVE-2022-41352",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-27925",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability",
+            "date_added": "2022-08-11",
+            "due_date": "2022-09-01",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains flaw in the mboximport functionality, allowing an authenticated attacker to upload arbitrary files to perform remote code execution. This vulnerability was chained with CVE-2022-37042 which allows for unauthenticated remote code execution.",
+            "notes": "https://blog.zimbra.com/2022/08/authentication-bypass-in-mailboximportservlet-vulnerability/;  https://nvd.nist.gov/vuln/detail/CVE-2022-27925",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-37042",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Authentication Bypass Vulnerability",
+            "date_added": "2022-08-11",
+            "due_date": "2022-09-01",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains an authentication bypass vulnerability in MailboxImportServlet. This vulnerability was chained with CVE-2022-27925 which allows for unauthenticated remote code execution.",
+            "notes": "https://blog.zimbra.com/2022/08/authentication-bypass-in-mailboximportservlet-vulnerability/;  https://nvd.nist.gov/vuln/detail/CVE-2022-37042",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-27924",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Command Injection Vulnerability",
+            "date_added": "2022-08-04",
+            "due_date": "2022-08-25",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) allows an attacker to inject memcache commands into a targeted instance which causes an overwrite of arbitrary cached entries.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Releases/9.0.0/P24.1#Security_Fixes;  https://nvd.nist.gov/vuln/detail/CVE-2022-27924",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-27443",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability",
+            "date_added": "2025-05-19",
+            "due_date": "2025-06-09",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Zimbra Collaboration contains a cross-site scripting (XSS) vulnerability in the CalendarInvite feature of the Zimbra webmail classic user interface. An attacker can exploit this vulnerability via an email message containing a crafted calendar header, leading to the execution of arbitrary JavaScript code.",
+            "notes": "https://wiki.zimbra.com/wiki/Zimbra_Releases/8.8.15/P46#Security_Fixes ; https://wiki.zimbra.com/wiki/Zimbra_Releases/9.0.0/P39#Security_Fixes ; https://wiki.zimbra.com/wiki/Zimbra_Releases/10.0.7#Security_Fixes ; https://nvd.nist.gov/vuln/detail/CVE-2024-27443",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-37580",
+            "vendor": "Synacor",
+            "product": "Zimbra Collaboration Suite (ZCS)",
+            "vulnerability_name": "Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability",
+            "date_added": "2023-07-27",
+            "due_date": "2023-08-17",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability impacting the confidentiality and integrity of data.",
+            "notes": "https://wiki.zimbra.com/wiki/Security_Center ;  https://nvd.nist.gov/vuln/detail/CVE-2023-37580",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2022-08-25",
+        "overdue_days": 1524
+      },
+      "epss": {
+        "max": 0.99907,
+        "cve_id": "CVE-2024-45519",
+        "percentile": 0.99967
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Zimbra Collaboration Suite 8.8.15 (webmail)",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Synacor Zimbra Collaboration Suite",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Synacor Zimbra Collaboration Suite",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-73570",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-48700",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-7796",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-27443",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-34192",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-45519",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-37580",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-41352",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-27925",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-37042",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-27924",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99907",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 8.8.15 outside the affected ranges of 7 KEV CVE(s) of the family, so they are not cited: CVE-2025-66376, CVE-2025-68645, CVE-2025-27915, CVE-2019-9621 and 3 more",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "kev_cves_not_version_checked",
+          "value": "2 other cited KEV CVE(s) of the family were not version-checked in this run (not looked up in NVD, or no NVD range places the version); counted fail-closed, they stay cited and count toward the due date, overdue days and EPSS: CVE-2024-27443, CVE-2023-37580",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 8.8.15 inside 9 cited KEV CVE(s): CVE-2026-73570, CVE-2025-48700, CVE-2020-7796, CVE-2023-34192 and 5 more; 2 more cited CVE(s) not version-checked count fail-closed; the due date, overdue days and EPSS come from these 11 cited CVE(s), none from the 7 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 8.8.15 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-73570: cpe:2.3:a:synacor:zimbra_collaboration_suite:*:*:*:*:*:*:*:* < 10.1.20",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-48700: cpe:2.3:a:synacor:zimbra_collaboration_suite:*:*:*:*:*:*:*:* >= 10.0.0 < 10.0.12",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-48700: cpe:2.3:a:synacor:zimbra_collaboration_suite:*:*:*:*:*:*:*:* >= 10.1.0 < 10.1.4",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-48700: cpe:2.3:a:synacor:zimbra_collaboration_suite:8.8.15:-:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J01)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J01)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J01)",
+          "field": "kev_family_spellings",
+          "value": "synacor:zimbra-collaboration-suite: Synacor /  Zimbra Collaboration Suite (ZCS) | Synacor / Zimbra Collaboration Suite | Synacor / Zimbra Collaboration Suite (ZCS)",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "J02",
+      "asset_id": "branch-fw-01",
+      "asset_name": "branch-fw-01",
+      "internet_facing": true,
+      "software": "Fortinet FortiGate firewall, FortiOS 7.2.4",
+      "resolution": {
+        "row_id": "J02",
+        "status": "matched",
+        "vendor": "Fortinet",
+        "product": "FortiOS",
+        "family": "fortinet:fortios",
+        "version": "7.2.4",
+        "product_type": "network_appliance",
+        "votes": [
+          {
+            "row_id": "J02",
+            "juror": "bolt",
+            "vendor": "Fortinet",
+            "product": "FortiOS",
+            "product_type": "network_appliance",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J02",
+            "juror": "lightning",
+            "vendor": "Fortinet",
+            "product": "FortiOS",
+            "product_type": "network_appliance",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J02",
+            "juror": "normaliser",
+            "vendor": "Fortinet",
+            "product": "FortiOS",
+            "product_type": "network_appliance",
+            "confidence": 0.72
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J02",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 18 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Fortinet FortiOS 7.2.4 inside the affected ranges of 3 KEV-listed CVEs, most recently CVE-2025-68686, which CISA KEV lists as exploited in the wild (added 2026-07-27); it is outside the ranges of 12 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2023-07-04) passed 1211 days ago, and EPSS for CVE-2023-27997 is 0.85689.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-68686",
+            "vendor": "Fortinet",
+            "product": "FortiOS",
+            "vulnerability_name": "Fortinet FortiOS Exposure of Sensitive Information to an Unauthorized Actor Vulnerability",
+            "date_added": "2026-07-27",
+            "due_date": "2026-08-10",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Fortinet FortiOS contains an exposure of sensitive information to an unauthorized actor vulnerability. This may allow a remote unauthenticated attacker to bypass the patch developed for the symbolic link persistency mechanism observed in some post-exploit cases, via crafted HTTP requests. An attacker would need first to have compromised the product via another vulnerability, at filesystem level.",
+            "notes": "https://fortiguard.fortinet.com/psirt/FG-IR-25-934 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2025-68686",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-21762",
+            "vendor": "Fortinet",
+            "product": "FortiOS",
+            "vulnerability_name": "Fortinet FortiOS Out-of-Bound Write Vulnerability",
+            "date_added": "2024-02-09",
+            "due_date": "2024-02-16",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Fortinet FortiOS contains an out-of-bound write vulnerability that allows a remote unauthenticated attacker to execute code or commands via specially crafted HTTP requests.",
+            "notes": "https://fortiguard.fortinet.com/psirt/FG-IR-24-015 ;   https://nvd.nist.gov/vuln/detail/CVE-2024-21762",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-27997",
+            "vendor": "Fortinet",
+            "product": "FortiOS and FortiProxy SSL-VPN",
+            "vulnerability_name": "Fortinet FortiOS and FortiProxy SSL-VPN Heap-Based Buffer Overflow Vulnerability",
+            "date_added": "2023-06-13",
+            "due_date": "2023-07-04",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Fortinet FortiOS and FortiProxy SSL-VPN contain a heap-based buffer overflow vulnerability which can allow an unauthenticated, remote attacker to execute code or commands via specifically crafted requests.",
+            "notes": "https://www.fortiguard.com/psirt/FG-IR-23-097;  https://nvd.nist.gov/vuln/detail/CVE-2023-27997",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2023-07-04",
+        "overdue_days": 1211
+      },
+      "epss": {
+        "max": 0.85689,
+        "cve_id": "CVE-2023-27997",
+        "percentile": 0.99723
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Fortinet FortiGate firewall, FortiOS 7.2.4",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Fortinet FortiOS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Fortinet FortiOS",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-68686",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-21762",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-27997",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.85689",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 7.2.4 outside the affected ranges of 12 KEV CVE(s) of the family, so they are not cited: CVE-2019-6693, CVE-2025-24472, CVE-2024-55591, CVE-2022-41328 and 8 more",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 7.2.4 inside 3 cited KEV CVE(s): CVE-2025-68686, CVE-2024-21762, CVE-2023-27997; the due date, overdue days and EPSS come from these 3 cited CVE(s), none from the 12 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 7.2.4 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-68686: cpe:2.3:o:fortinet:fortios:*:*:*:*:*:*:*:* >= 6.4.0 < 7.4.7",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-68686: cpe:2.3:o:fortinet:fortios:*:*:*:*:*:*:*:* >= 7.6.0 < 7.6.2",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2024-21762: cpe:2.3:o:fortinet:fortios:*:*:*:*:*:*:*:* >= 6.0.0 < 6.0.18",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2024-21762: cpe:2.3:o:fortinet:fortios:*:*:*:*:*:*:*:* >= 6.2.0 < 6.2.16",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J02)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J02)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J02)",
+          "field": "kev_family_spellings",
+          "value": "fortinet:fortios: Fortinet / FortiOS | Fortinet / FortiOS and FortiADC | Fortinet / FortiOS and FortiProxy | Fortinet / FortiOS and FortiProxy SSL-VPN",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "J03",
+      "asset_id": "wiki-01",
+      "asset_name": "wiki-01",
+      "internet_facing": true,
+      "software": "Atlassian Confluence Data Center 8.5.1",
+      "resolution": {
+        "row_id": "J03",
+        "status": "matched",
+        "vendor": "Atlassian",
+        "product": "Confluence Data Center and Server",
+        "family": "atlassian:confluence-data-center",
+        "version": "8.5.1",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "J03",
+            "juror": "bolt",
+            "vendor": "Atlassian",
+            "product": "Confluence Data Center and Server",
+            "product_type": "server",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J03",
+            "juror": "lightning",
+            "vendor": "Atlassian",
+            "product": "Confluence Data Center and Server",
+            "product_type": "server",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J03",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "server",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J03",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 18 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Atlassian Confluence Data Center and Server 8.5.1 inside the affected ranges of 3 KEV-listed CVEs, most recently CVE-2023-22527, which CISA KEV lists as exploited in the wild (added 2024-01-24). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2023-10-13) passed 1110 days ago, and EPSS for CVE-2023-22518 is 0.99999.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2023-22527",
+            "vendor": "Atlassian",
+            "product": "Confluence Data Center and Server",
+            "vulnerability_name": "Atlassian Confluence Data Center and Server Template Injection Vulnerability",
+            "date_added": "2024-01-24",
+            "due_date": "2024-02-14",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Atlassian Confluence Data Center and Server contain an unauthenticated OGNL template injection vulnerability that can lead to remote code execution.",
+            "notes": "https://confluence.atlassian.com/security/cve-2023-22527-rce-remote-code-execution-vulnerability-in-confluence-data-center-and-confluence-server-1333990257.html;  https://nvd.nist.gov/vuln/detail/CVE-2023-22527",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-22518",
+            "vendor": "Atlassian",
+            "product": "Confluence Data Center and Server",
+            "vulnerability_name": "Atlassian Confluence Data Center and Server Improper Authorization Vulnerability",
+            "date_added": "2023-11-07",
+            "due_date": "2023-11-28",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Atlassian Confluence Data Center and Server contain an improper authorization vulnerability that can result in significant data loss when exploited by an unauthenticated attacker. There is no impact on confidentiality since the attacker cannot exfiltrate any data.",
+            "notes": "https://confluence.atlassian.com/security/cve-2023-22518-improper-authorization-vulnerability-in-confluence-data-center-and-server-1311473907.html;  https://nvd.nist.gov/vuln/detail/CVE-2023-22518",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-22515",
+            "vendor": "Atlassian",
+            "product": "Confluence Data Center and Server",
+            "vulnerability_name": "Atlassian Confluence Data Center and Server Broken Access Control Vulnerability",
+            "date_added": "2023-10-05",
+            "due_date": "2023-10-13",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable. Check all affected Confluence instances for evidence of compromise per vendor instructions and report any positive findings to CISA.",
+            "short_description": "Atlassian Confluence Data Center and Server contains a broken access control vulnerability that allows an attacker to create unauthorized Confluence administrator accounts and access Confluence.",
+            "notes": "https://confluence.atlassian.com/security/cve-2023-22515-privilege-escalation-vulnerability-in-confluence-data-center-and-server-1295682276.html;  https://nvd.nist.gov/vuln/detail/CVE-2023-22515",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2023-10-13",
+        "overdue_days": 1110
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2023-22518",
+        "percentile": 0.99996
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Atlassian Confluence Data Center 8.5.1",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Atlassian Confluence Data Center and Server",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-22527",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-22518",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-22515",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 8.5.1 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-22527: cpe:2.3:a:atlassian:confluence_data_center:*:*:*:*:*:*:*:* >= 8.0.0 < 8.5.4",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-22527: cpe:2.3:a:atlassian:confluence_data_center:8.7.0:*:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-22518: cpe:2.3:a:atlassian:confluence_data_center:*:*:*:*:*:*:*:* >= 1.0 < 7.19.16",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-22518: cpe:2.3:a:atlassian:confluence_data_center:*:*:*:*:*:*:*:* >= 7.20.0 < 8.3.4",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J03)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J03)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J03)",
+          "field": "kev_family_spellings",
+          "value": "atlassian:confluence-data-center: Atlassian / Confluence Data Center and Server",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "J04",
+      "asset_id": "build-01",
+      "asset_name": "build-01",
+      "internet_facing": false,
+      "software": "Jenkins 2.440 (build server)",
+      "resolution": {
+        "row_id": "J04",
+        "status": "matched",
+        "vendor": "Jenkins",
+        "product": "Jenkins",
+        "family": "jenkins:jenkins",
+        "version": "2.440",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "J04",
+            "juror": "bolt",
+            "vendor": "Jenkins",
+            "product": "Jenkins",
+            "product_type": "server",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J04",
+            "juror": "lightning",
+            "vendor": "Jenkins",
+            "product": "Jenkins",
+            "product_type": "server",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J04",
+            "juror": "normaliser",
+            "vendor": "Jenkins",
+            "product": "Jenkins",
+            "product_type": "server",
+            "confidence": 0.95
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J04",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Jenkins Jenkins 2.440 inside the affected range of CVE-2024-23897, which CISA KEV lists as exploited in the wild (added 2024-08-19); it is outside the ranges of 3 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2024-09-09) passed 778 days ago, and EPSS for CVE-2024-23897 is 0.99999.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2024-23897",
+            "vendor": "Jenkins",
+            "product": "Jenkins Command Line Interface (CLI)",
+            "vulnerability_name": "Jenkins Command Line Interface (CLI) Path Traversal Vulnerability",
+            "date_added": "2024-08-19",
+            "due_date": "2024-09-09",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Jenkins Command Line Interface (CLI) contains a path traversal vulnerability that allows attackers limited read access to certain files, which can lead to code execution.",
+            "notes": "https://www.jenkins.io/security/advisory/2024-01-24/#SECURITY-3314; https://nvd.nist.gov/vuln/detail/CVE-2024-23897",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2024-09-09",
+        "overdue_days": 778
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2024-23897",
+        "percentile": 0.99995
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Jenkins 2.440 (build server)",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Jenkins Jenkins",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Jenkins Jenkins",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-23897",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 2.440 outside the affected ranges of 3 KEV CVE(s) of the family, so they are not cited: CVE-2017-1000353, CVE-2015-5317, CVE-2018-1000861",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 2.440 inside 1 cited KEV CVE(s): CVE-2024-23897; the due date, overdue days and EPSS come from these 1 cited CVE(s), none from the 3 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 2.440 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2024-23897: cpe:2.3:a:jenkins:jenkins:*:*:*:*:lts:*:*:* < 2.426.3",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2024-23897: cpe:2.3:a:jenkins:jenkins:*:*:*:*:-:*:*:* < 2.442",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2017-1000353: cpe:2.3:a:jenkins:jenkins:*:*:*:*:-:*:*:* <= 2.56",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2017-1000353: cpe:2.3:a:jenkins:jenkins:*:*:*:*:lts:*:*:* <= 2.46.1",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J04)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J04)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J04)",
+          "field": "kev_family_spellings",
+          "value": "jenkins:jenkins: Jenkins / Jenkins | Jenkins / Jenkins Command Line Interface (CLI) | Jenkins / Jenkins Stapler Web Framework | Jenkins / Jenkins User Interface (UI)",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "J06",
+      "asset_id": "admin-pc-01",
+      "asset_name": "admin-pc-01",
+      "internet_facing": false,
+      "software": "Notepad++ 8.6.2",
+      "resolution": {
+        "row_id": "J06",
+        "status": "matched",
+        "vendor": "Notepad++",
+        "product": "Notepad++",
+        "family": "notepad++:notepad++",
+        "version": "8.6.2",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "J06",
+            "juror": "bolt",
+            "vendor": "Notepad++",
+            "product": "Notepad++",
+            "product_type": "client",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J06",
+            "juror": "lightning",
+            "vendor": "Notepad++",
+            "product": "Notepad++",
+            "product_type": "client",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J06",
+            "juror": "normaliser",
+            "vendor": "Notepad++",
+            "product": "Notepad++",
+            "product_type": "client",
+            "confidence": 0.95
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J06",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Notepad++ Notepad++ 8.6.2 inside the affected range of CVE-2025-15556, which CISA KEV lists as exploited in the wild (added 2026-02-12). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2026-03-05) passed 236 days ago, and EPSS for CVE-2025-15556 is 0.01772, low, but the KEV listing decides under your rules.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-15556",
+            "vendor": "Notepad++",
+            "product": "Notepad++",
+            "vulnerability_name": "Notepad++ Download of Code Without Integrity Check Vulnerability",
+            "date_added": "2026-02-12",
+            "due_date": "2026-03-05",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Notepad++ when using the WinGUp updater, contains a download of code without integrity check vulnerability that could allow an attacker to intercept or redirect update traffic to download and execute an attacker-controlled installer. This could lead to arbitrary code execution with the privileges of the user.",
+            "notes": "https://notepad-plus-plus.org/news/clarification-security-incident/ ; https://community.notepad-plus-plus.org/topic/27298/notepad-v8-8-9-vulnerability-fix ; https://nvd.nist.gov/vuln/detail/CVE-2025-15556",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2026-03-05",
+        "overdue_days": 236
+      },
+      "epss": {
+        "max": 0.01772,
+        "cve_id": "CVE-2025-15556",
+        "percentile": 0.78008
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Notepad++ 8.6.2",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Notepad++ Notepad++",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Notepad++ Notepad++",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-15556",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.01772",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "kev_epss_disagreement",
+          "value": "KEV lists exploitation; EPSS 0.01772 is below 0.1",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 8.6.2 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-15556: cpe:2.3:a:notepad-plus-plus:notepad\\+\\+:*:*:*:*:*:*:*:* < 8.8.9",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J06)",
+          "field": "provenance",
+          "value": "7 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J06)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J06)",
+          "field": "kev_family_spellings",
+          "value": "notepad++:notepad++: Notepad++ / Notepad++",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "J05",
+      "asset_id": "admin-pc-01",
+      "asset_name": "admin-pc-01",
+      "internet_facing": false,
+      "software": "OpenSSH 9.6p1 client",
+      "resolution": {
+        "row_id": "J05",
+        "status": "no_match",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": "9.6p1",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "J05",
+            "juror": "bolt",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0,
+            "receipt_id": "rcpt_req_wgdf1rso"
+          },
+          {
+            "row_id": "J05",
+            "juror": "lightning",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0,
+            "receipt_id": "rcpt_req_6451x5o4"
+          },
+          {
+            "row_id": "J05",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "J05",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "No CISA KEV product matches \"OpenSSH 9.6p1 client\". Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [],
+        "earliest_due": null,
+        "overdue_days": null
+      },
+      "epss": null,
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "OpenSSH 9.6p1 client",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wgdf1rso",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_6451x5o4",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "none",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevPairs",
+          "field": "match",
+          "value": "none",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: nothing above, so review every 90 days",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J05)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:jury, request:inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(J05)",
+          "field": "resolves_to <- agent:jury",
+          "value": "no_match by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    }
+  ],
+  "owner_questions": [],
+  "receipts": [
+    {
+      "call_id": "ns-97edd9e08047",
+      "agent": "jury.bolt",
+      "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "response_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "receipt_id": "rcpt_req_wgdf1rso",
+      "latency_ms": 4735,
+      "prompt_tokens": 863,
+      "completion_tokens": 223,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-8136b4fe052b",
+      "agent": "jury.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_6451x5o4",
+      "latency_ms": 5576,
+      "prompt_tokens": 903,
+      "completion_tokens": 365,
+      "status": "ok"
+    }
+  ],
+  "trace_file": "logs/trace-example-2.jsonl",
+  "report_file": "output/report-example-2.html",
+  "manifest": {
+    "engine": "world-model",
+    "engine_source": "Meterless/Meterless@1742dec engines/world-model/reference (Apache-2.0, vendored unmodified)",
+    "sources": [
+      {
+        "name": "Inventory (request rows)",
+        "object": "run request",
+        "live": false,
+        "as_of": "2026-10-27"
+      },
+      {
+        "name": "CISA KEV",
+        "object": "el.kev",
+        "live": true,
+        "as_of": "2026.10.26"
+      },
+      {
+        "name": "FIRST EPSS",
+        "object": "EL_EPSS.el_epss_<batch>",
+        "live": true,
+        "as_of": "2026-10-26"
+      },
+      {
+        "name": "NIST NVD",
+        "object": "EL_NVD.el_nvd_<cve> (41 cached 2026-10-27)",
+        "live": false,
+        "as_of": "2026-10-27"
+      }
+    ],
+    "models": {
+      "bolt": "nvidia/nemotron-3.5-bolt-e4b",
+      "lightning": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "ultra": "nvidia/nemotron-3-ultra-550b-a55b"
+    },
+    "helpers_live": [
+      "normaliser",
+      "resolver_jury",
+      "zetaris.discovery",
+      "critic",
+      "critic.ultra_review",
+      "nvdCves",
+      "zetaris.naive_join",
+      "verifier",
+      "world_model",
+      "world-model.ingestRun",
+      "world-model.explain",
+      "world-model.reviewQueue",
+      "world-model.writeAudit",
+      "world-model.stats",
+      "world-model.persist",
+      "report"
+    ],
+    "helpers_dormant": [
+      "nvdProduct (the this_cycle bucket needs it: empty in this build)",
+      "world-model.evidence",
+      "world-model.factsAsOf",
+      "world-model.autoMerges",
+      "world-model.auditLines",
+      "world-model.engine.ingest (10-step stream pipeline; runs only in verify:engine)",
+      "world-model.engine.approveMerge (operator approval; the review queue is shown, not auto-approved)",
+      "world-model.engine.view(snapshot).entityAt (returns empty attrs; factsAsOf is used instead)"
+    ],
+    "policy": {
+      "epss_this_cycle": 0.1,
+      "epss_this_cycle_internet": 0.05,
+      "sla_days": {
+        "patch_now": 7,
+        "this_cycle": 30,
+        "monitor_review": 90
+      },
+      "rubric_auto_min": 7,
+      "max_critic_rounds": 2
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "inventory": [
+    { "row_id": "J01", "asset_id": "webmail-01", "asset_name": "webmail-01", "asset_type": "server", "internet_facing": true, "owner_team": "IT", "software": "Zimbra Collaboration Suite 8.8.15 (webmail)" },
+    { "row_id": "J02", "asset_id": "branch-fw-01", "asset_name": "branch-fw-01", "asset_type": "firewall", "internet_facing": true, "owner_team": "IT", "software": "Fortinet FortiGate firewall, FortiOS 7.2.4" },
+    { "row_id": "J03", "asset_id": "wiki-01", "asset_name": "wiki-01", "asset_type": "server", "internet_facing": true, "owner_team": "Operations", "software": "Atlassian Confluence Data Center 8.5.1" },
+    { "row_id": "J04", "asset_id": "build-01", "asset_name": "build-01", "asset_type": "server", "internet_facing": false, "owner_team": "IT", "software": "Jenkins 2.440 (build server)" },
+    { "row_id": "J05", "asset_id": "admin-pc-01", "asset_name": "admin-pc-01", "asset_type": "desktop", "internet_facing": false, "owner_team": "IT", "software": "OpenSSH 9.6p1 client" },
+    { "row_id": "J06", "asset_id": "admin-pc-01", "asset_name": "admin-pc-01", "asset_type": "desktop", "internet_facing": false, "owner_team": "IT", "software": "Notepad++ 8.6.2" }
+  ]
+}

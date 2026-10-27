@@ -1,0 +1,1611 @@
+{
+  "run_id": "example-3",
+  "mode": "live",
+  "status": "success",
+  "started_at": "2026-10-27T04:16:21.553Z",
+  "finished_at": "2026-10-27T04:16:52.613Z",
+  "as_of": "2026-10-27",
+  "timing_ms": {
+    "discovery": 120,
+    "kev_pairs": 273,
+    "normalise": 51,
+    "facts": 1817,
+    "nvd": 2,
+    "jury": 22645,
+    "critic": 6233,
+    "analyst": 1,
+    "federated_join": 499,
+    "verifier": 456,
+    "world_model": 21,
+    "total": 31060
+  },
+  "summary": {
+    "patch_now": 4,
+    "this_cycle": 0,
+    "monitor": 2,
+    "ask_owner": 0
+  },
+  "lines": [
+    {
+      "row_id": "R002",
+      "asset_id": "asset-R002",
+      "asset_name": "asset-R002",
+      "internet_facing": true,
+      "software": "Roundcube Webmail 1.6.5",
+      "resolution": {
+        "row_id": "R002",
+        "status": "matched",
+        "vendor": "Roundcube",
+        "product": "Roundcube Webmail",
+        "family": "roundcube:webmail",
+        "version": "1.6.5",
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R002",
+            "juror": "bolt",
+            "vendor": "Roundcube",
+            "product": "Roundcube Webmail",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R002",
+            "juror": "lightning",
+            "vendor": "Roundcube",
+            "product": "Roundcube Webmail",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R002",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "unknown",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R002",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 23 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Roundcube Roundcube Webmail 1.6.5 inside the affected ranges of 4 KEV-listed CVEs, most recently CVE-2025-49113, which CISA KEV lists as exploited in the wild (added 2026-02-20); it is outside the ranges of 7 other KEV CVEs. Patch by 2026-10-30 under your 3-day rule; the US federal due date (2024-11-14) passed 712 days ago, and EPSS for CVE-2025-49113 is 0.99707.",
+      "decision": "patch_now",
+      "target_date": "2026-10-30",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-49113",
+            "vendor": "Roundcube",
+            "product": "Webmail",
+            "vulnerability_name": "RoundCube Webmail Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2026-02-20",
+            "due_date": "2026-03-13",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "RoundCube Webmail contains a deserialization of untrusted data vulnerability that allows remote code execution by authenticated users because the _from parameter in a URL is not validated in program/actions/settings/upload.php.",
+            "notes": "https://roundcube.net/news/2025/06/01/security-updates-1.6.11-and-1.5.10 ; https://github.com/roundcube/roundcubemail/releases/tag/1.5.10 ; https://github.com/roundcube/roundcubemail/releases/tag/1.6.11 ; https://nvd.nist.gov/vuln/detail/CVE-2025-49113",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-68461",
+            "vendor": "Roundcube",
+            "product": "Webmail",
+            "vulnerability_name": "RoundCube Webmail Cross-site Scripting Vulnerability",
+            "date_added": "2026-02-20",
+            "due_date": "2026-03-13",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "RoundCube Webmail contains a cross-site scripting vulnerability via the animate tag in an SVG document.",
+            "notes": "https://roundcube.net/news/2025/12/13/security-updates-1.6.12-and-1.5.12 ; https://github.com/roundcube/roundcubemail/commit/bfa032631c36b900e7444dfa278340b33cbf7cdb ; https://nvd.nist.gov/vuln/detail/CVE-2025-68461",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-42009",
+            "vendor": "Roundcube",
+            "product": "Webmail",
+            "vulnerability_name": "RoundCube Webmail Cross-Site Scripting Vulnerability",
+            "date_added": "2025-06-09",
+            "due_date": "2025-06-30",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "RoundCube Webmail contains a cross-site scripting vulnerability. This vulnerability could allow a remote attacker to steal and send emails of a victim via a crafted e-mail message that abuses a Desanitization issue in message_body() in program/actions/mail/show.php.",
+            "notes": "https://roundcube.net/news/2024/08/04/security-updates-1.6.8-and-1.5.8 ; https://nvd.nist.gov/vuln/detail/CVE-2024-42009",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-37383",
+            "vendor": "Roundcube",
+            "product": "Webmail",
+            "vulnerability_name": "RoundCube Webmail Cross-Site Scripting (XSS) Vulnerability",
+            "date_added": "2024-10-24",
+            "due_date": "2024-11-14",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "RoundCube Webmail contains a cross-site scripting (XSS) vulnerability in the handling of SVG animate attributes that allows a remote attacker to run malicious JavaScript code.",
+            "notes": "https://github.com/roundcube/roundcubemail/releases/tag/1.5.7, https://github.com/roundcube/roundcubemail/releases/tag/1.6.7 ; https://nvd.nist.gov/vuln/detail/CVE-2024-37383",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2024-11-14",
+        "overdue_days": 712
+      },
+      "epss": {
+        "max": 0.99707,
+        "cve_id": "CVE-2025-49113",
+        "percentile": 0.99951
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Roundcube Webmail 1.6.5",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Roundcube Roundcube Webmail",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-49113",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-68461",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-42009",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-37383",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99707",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 3 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 1.6.5 outside the affected ranges of 7 KEV CVE(s) of the family, so they are not cited: CVE-2020-13965, CVE-2023-43770, CVE-2023-5631, CVE-2020-12641 and 3 more",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 1.6.5 inside 4 cited KEV CVE(s): CVE-2025-49113, CVE-2025-68461, CVE-2024-42009, CVE-2024-37383; the due date, overdue days and EPSS come from these 4 cited CVE(s), none from the 7 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 1.6.5 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-49113: cpe:2.3:a:roundcube:webmail:*:*:*:*:*:*:*:* < 1.5.10",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-49113: cpe:2.3:a:roundcube:webmail:*:*:*:*:*:*:*:* >= 1.6.0 < 1.6.11",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-68461: cpe:2.3:a:roundcube:webmail:*:*:*:*:*:*:*:* < 1.5.12",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-68461: cpe:2.3:a:roundcube:webmail:*:*:*:*:*:*:*:* >= 1.6.0 < 1.6.12",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R002)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R002)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_gyvvanmp, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R002)",
+          "field": "kev_family_spellings",
+          "value": "roundcube:webmail: Roundcube / Roundcube Webmail | Roundcube / Webmail",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R003",
+      "asset_id": "asset-R003",
+      "asset_name": "asset-R003",
+      "internet_facing": true,
+      "software": "MikroTik RouterOS 7.12 (office router)",
+      "resolution": {
+        "row_id": "R003",
+        "status": "matched",
+        "vendor": "MikroTik",
+        "product": "RouterOS",
+        "family": "mikrotik:routeros",
+        "version": "7.12",
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R003",
+            "juror": "bolt",
+            "vendor": "MikroTik",
+            "product": "RouterOS",
+            "product_type": "network_appliance",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R003",
+            "juror": "lightning",
+            "vendor": "MikroTik",
+            "product": "RouterOS",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R003",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "network_appliance",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R003",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 18 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places MikroTik RouterOS 7.12 inside the affected ranges of 3 KEV-listed CVEs, most recently CVE-2026-67279, which CISA KEV lists as exploited in the wild (added 2026-09-25); it is outside the ranges of 2 other KEV CVEs. Patch by 2026-10-30 under your 3-day rule; the US federal due date (2026-09-13) passed 44 days ago, and EPSS for CVE-2026-86060 is 0.06392.",
+      "decision": "patch_now",
+      "target_date": "2026-10-30",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-67279",
+            "vendor": "MikroTik",
+            "product": "RouterOS",
+            "vulnerability_name": "Mikrotik RouterOS Improper Enforcement of Behavioral Workflow Vulnerability",
+            "date_added": "2026-09-25",
+            "due_date": "2026-09-28",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Mikrotik RouterOS contains an improper enforcement of behavioral workflow vulnerability that could allow an unauthenticated client to open a session channel and send an exec request. This vulnerability can be chained to achieve unauthenticated exploitation of CVE-2026-86060.",
+            "notes": "https://mikrotik.com/supportsec/september-2026-vulnerability ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-67279",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-67277",
+            "vendor": "MikroTik",
+            "product": "RouterOS",
+            "vulnerability_name": "MikroTik RouterOS Missing Authentication for Critical Function Vulnerability",
+            "date_added": "2026-09-10",
+            "due_date": "2026-09-13",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "MikroTik RouterOS contains a missing authentication for critical function vulnerability which allows kernel memory disclosure and denial of service in the btest service.",
+            "notes": "https://mikrotik.com/supportsec/september-2026-vulnerability/ ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-67277",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-86060",
+            "vendor": "MikroTik",
+            "product": "RouterOS",
+            "vulnerability_name": "MikroTik RouterOS Improper Neutralization of Argument Delimiters in a Command Vulnerability",
+            "date_added": "2026-09-10",
+            "due_date": "2026-09-13",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "MikroTik RouterOS contains an improper neutralization of argument delimiters in a command vulnerability which allows an attacker to change the trusted RouterOS policy mask, leading to privilege escalation.",
+            "notes": "https://mikrotik.com/supportsec/september-2026-vulnerability ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-86060",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2026-09-13",
+        "overdue_days": 44
+      },
+      "epss": {
+        "max": 0.06392,
+        "cve_id": "CVE-2026-86060",
+        "percentile": 0.93621
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "MikroTik RouterOS 7.12 (office router)",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "MikroTik RouterOS",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-67279",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-67277",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-86060",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 3 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.06392",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 7.12 outside the affected ranges of 2 KEV CVE(s) of the family, so they are not cited: CVE-2018-7445, CVE-2018-14847",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 7.12 inside 3 cited KEV CVE(s): CVE-2026-67279, CVE-2026-67277, CVE-2026-86060; the due date, overdue days and EPSS come from these 3 cited CVE(s), none from the 2 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 7.12 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-67279: cpe:2.3:o:mikrotik:routeros:*:*:*:*:*:*:*:* >= 6.0 < 6.49.21",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-67279: cpe:2.3:o:mikrotik:routeros:*:*:*:*:*:*:*:* >= 7.0 < 7.23.4",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-67279: cpe:2.3:o:mikrotik:routeros:*:*:*:*:*:*:*:* >= 7.24 < 7.24.2",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-67277: cpe:2.3:o:mikrotik:routeros:*:*:*:*:*:*:*:* >= 6.0 < 6.49.21",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R003)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R003)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_gyvvanmp, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R003)",
+          "field": "kev_family_spellings",
+          "value": "mikrotik:routeros: MikroTik / RouterOS",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R001",
+      "asset_id": "asset-R001",
+      "asset_name": "asset-R001",
+      "internet_facing": true,
+      "software": "WordPress 6.4.3 - public charity website",
+      "resolution": {
+        "row_id": "R001",
+        "status": "matched",
+        "vendor": "WordPress",
+        "product": "Core",
+        "family": "wordpress:core",
+        "version": "6.4.3",
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R001",
+            "juror": "bolt",
+            "vendor": "WordPress",
+            "product": "Core",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R001",
+            "juror": "lightning",
+            "vendor": "WordPress",
+            "product": "Core",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R001",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "unknown",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R001",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places WordPress Core 6.4.3 inside the affected range of CVE-2026-87902, which CISA KEV lists as exploited in the wild (added 2026-09-25); it is outside the ranges of 2 other KEV CVEs. Patch by 2026-10-30 under your 3-day rule; the US federal due date (2026-09-28) passed 29 days ago, and EPSS for CVE-2026-87902 is 0.95769.",
+      "decision": "patch_now",
+      "target_date": "2026-10-30",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-87902",
+            "vendor": "WordPress",
+            "product": "Core",
+            "vulnerability_name": "WordPress Core Remote File Inclusion Vulnerability",
+            "date_added": "2026-09-25",
+            "due_date": "2026-09-28",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "WordPress Core contains a remote file inclusion vulnerability which could allow an unauthenticated attacker to make page-template resolution include a chosen readable local `.php` file outside the active theme directories, leading to remote code execution.",
+            "notes": "https://github.com/WordPress/wordpress-develop/security/advisories/GHSA-7hp8-65ch-5whp ; ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-87902",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2026-09-28",
+        "overdue_days": 29
+      },
+      "epss": {
+        "max": 0.95769,
+        "cve_id": "CVE-2026-87902",
+        "percentile": 0.99871
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "WordPress 6.4.3 - public charity website",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "WordPress Core",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-87902",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.95769",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 3 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 6.4.3 outside the affected ranges of 2 KEV CVE(s) of the family, so they are not cited: CVE-2026-60137, CVE-2026-63030",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 6.4.3 inside 1 cited KEV CVE(s): CVE-2026-87902; the due date, overdue days and EPSS come from these 1 cited CVE(s), none from the 2 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 6.4.3 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-87902: cpe:2.3:a:wordpress:wordpress:*:*:*:*:*:*:*:* < 4.7.37",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-87902: cpe:2.3:a:wordpress:wordpress:*:*:*:*:*:*:*:* >= 4.8 < 4.8.32",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-87902: cpe:2.3:a:wordpress:wordpress:*:*:*:*:*:*:*:* >= 4.9 < 4.9.33",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-87902: cpe:2.3:a:wordpress:wordpress:*:*:*:*:*:*:*:* >= 5.0 < 5.0.29",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R001)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R001)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_gyvvanmp, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R001)",
+          "field": "kev_family_spellings",
+          "value": "wordpress:core: WordPress / Core",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R004",
+      "asset_id": "asset-R004",
+      "asset_name": "asset-R004",
+      "internet_facing": false,
+      "software": "SolarWinds Web Help Desk 12.8.3",
+      "resolution": {
+        "row_id": "R004",
+        "status": "matched",
+        "vendor": "SolarWinds",
+        "product": "Web Help Desk",
+        "family": "solarwinds:web-help-desk",
+        "version": "12.8.3",
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R004",
+            "juror": "bolt",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R004",
+            "juror": "lightning",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R004",
+            "juror": "normaliser",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "product_type": "unknown",
+            "confidence": 0.91
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R004",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 28 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places SolarWinds Web Help Desk 12.8.3 inside the affected ranges of 5 KEV-listed CVEs, most recently CVE-2025-26399, which CISA KEV lists as exploited in the wild (added 2026-03-09). Patch by 2026-10-30 under your 3-day rule; the US federal due date (2024-09-05) passed 782 days ago, and EPSS for CVE-2024-28987 is 0.93299.",
+      "decision": "patch_now",
+      "target_date": "2026-10-30",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-26399",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "vulnerability_name": "SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2026-03-09",
+            "due_date": "2026-03-12",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "SolarWinds Web Help Desk contain a deserialization of untrusted data vulnerability in AjaxProxy that could allow an attacker to run commands on the host machine.",
+            "notes": "https://www.solarwinds.com/trust-center/security-advisories/cve-2025-26399 ; https://documentation.solarwinds.com/en/success_center/whd/content/release_notes/whd_12-8-7-hotfix-1_release_notes.htm ; https://nvd.nist.gov/vuln/detail/CVE-2025-26399",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-40536",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "vulnerability_name": "SolarWinds Web Help Desk Security Control Bypass Vulnerability",
+            "date_added": "2026-02-12",
+            "due_date": "2026-02-15",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "SolarWinds Web Help Desk contains a security control bypass vulnerability that could allow an unauthenticated attacker to gain access to certain restricted functionality.",
+            "notes": "https://documentation.solarwinds.com/en/success_center/whd/content/release_notes/whd_2026-1_release_notes.htm ; https://www.solarwinds.com/trust-center/security-advisories/CVE-2025-40536 ; https://nvd.nist.gov/vuln/detail/CVE-2025-40536",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-40551",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "vulnerability_name": "SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2026-02-03",
+            "due_date": "2026-02-06",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "SolarWinds Web Help Desk contains a deserialization of untrusted data vulnerability that could lead to remote code execution, which would allow an attacker to run commands on the host machine. This could be exploited without authentication.",
+            "notes": "https://www.solarwinds.com/trust-center/security-advisories/cve-2025-40551 ; https://nvd.nist.gov/vuln/detail/CVE-2025-40551",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-28987",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "vulnerability_name": "SolarWinds Web Help Desk Hardcoded Credential Vulnerability",
+            "date_added": "2024-10-15",
+            "due_date": "2024-11-05",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "SolarWinds Web Help Desk contains a hardcoded credential vulnerability that could allow a remote, unauthenticated user to access internal functionality and modify data.",
+            "notes": "https://www.solarwinds.com/trust-center/security-advisories/cve-2024-28987 ; https://nvd.nist.gov/vuln/detail/CVE-2024-28987",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-28986",
+            "vendor": "SolarWinds",
+            "product": "Web Help Desk",
+            "vulnerability_name": "SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2024-08-15",
+            "due_date": "2024-09-05",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "SolarWinds Web Help Desk contains a deserialization of untrusted data vulnerability that could allow for remote code execution.",
+            "notes": "https://www.solarwinds.com/trust-center/security-advisories/cve-2024-28986; https://nvd.nist.gov/vuln/detail/CVE-2024-28986",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2024-09-05",
+        "overdue_days": 782
+      },
+      "epss": {
+        "max": 0.93299,
+        "cve_id": "CVE-2024-28987",
+        "percentile": 0.99835
+      },
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "SolarWinds Web Help Desk 12.8.3",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "SolarWinds Web Help Desk",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "SolarWinds Web Help Desk",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-26399",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-40536",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-40551",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-28987",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-28986",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.93299",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 3 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 12.8.3 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-26399: cpe:2.3:a:solarwinds:web_help_desk:*:*:*:*:*:*:*:* <= 12.8.6",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-26399: cpe:2.3:a:solarwinds:web_help_desk:12.8.7:-:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-40536: cpe:2.3:a:solarwinds:web_help_desk:*:*:*:*:*:*:*:* < 2026.1",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-40551: cpe:2.3:a:solarwinds:web_help_desk:*:*:*:*:*:*:*:* < 2026.1",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R004)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, request:inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R004)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_gyvvanmp, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R004)",
+          "field": "kev_family_spellings",
+          "value": "solarwinds:web-help-desk: SolarWinds / Web Help Desk",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R005",
+      "asset_id": "asset-R005",
+      "asset_name": "asset-R005",
+      "internet_facing": false,
+      "software": "SharePoint Online (Microsoft 365 intranet)",
+      "resolution": {
+        "row_id": "R005",
+        "status": "no_match",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": null,
+        "product_type": "cloud_service",
+        "votes": [
+          {
+            "row_id": "R005",
+            "juror": "bolt",
+            "vendor": "Microsoft",
+            "product": "SharePoint",
+            "product_type": "cloud_service",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R005",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "SharePoint",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R005",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "cloud_service",
+            "confidence": 0.7
+          },
+          {
+            "row_id": "R005",
+            "juror": "ultra",
+            "vendor": null,
+            "product": null,
+            "product_type": "cloud_service",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_t9yxvh07"
+          }
+        ],
+        "adjudicated_by": "ultra",
+        "confidence": 0.33
+      },
+      "critic": {
+        "row_id": "R005",
+        "verdict": "approve",
+        "reasons": [
+          "ultra: Correctly identified no KEV match for SharePoint Online (Microsoft 365 intranet)",
+          "ultra: Product type cloud_service correctly distinguished from on-premises SharePoint Server",
+          "ultra: No version evidence needed as no KEV entry exists for this cloud service",
+          "ultra: Monitor rule with 90-day review is appropriate for non-KEV software",
+          "approved: rubric 7/9 after Ultra review (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 2,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 7
+        },
+        "round": 2
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "No CISA KEV product matches \"SharePoint Online (Microsoft 365 intranet)\". Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [],
+        "earliest_due": null,
+        "overdue_days": null
+      },
+      "epss": null,
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "SharePoint Online (Microsoft 365 intranet)",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_t9yxvh07",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "none",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevPairs",
+          "field": "match",
+          "value": "none",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: nothing above, so review every 90 days",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R005)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:jury, request:inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R005)",
+          "field": "resolves_to <- agent:jury",
+          "value": "no_match by ultra; receipts rcpt_req_gyvvanmp, rcpt_req_t9yxvh07, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R006",
+      "asset_id": "asset-R006",
+      "asset_name": "asset-R006",
+      "internet_facing": false,
+      "software": "Signal Desktop 7.20",
+      "resolution": {
+        "row_id": "R006",
+        "status": "no_match",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": "7.20",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "R006",
+            "juror": "bolt",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0,
+            "receipt_id": "rcpt_req_gyvvanmp"
+          },
+          {
+            "row_id": "R006",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Remote Desktop Services",
+            "product_type": "unknown",
+            "confidence": 1,
+            "receipt_id": "rcpt_req_yasuudxh"
+          },
+          {
+            "row_id": "R006",
+            "juror": "ultra",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_89vdoo71"
+          },
+          {
+            "row_id": "R006",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": "ultra",
+        "confidence": 0.67
+      },
+      "critic": {
+        "row_id": "R006",
+        "verdict": "approve",
+        "reasons": [
+          "ultra: Correctly identified no KEV match for Signal Desktop 7.20",
+          "ultra: Product type client correctly matches endpoint messaging application on desktop",
+          "ultra: Lightning incorrectly matched Microsoft Remote Desktop Services - completely different vendor/product category",
+          "ultra: Monitor rule with 90-day review appropriate for non-KEV software",
+          "approved: rubric 7/9 after Ultra review (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 2,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "No CISA KEV product matches \"Signal Desktop 7.20\". Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [],
+        "earliest_due": null,
+        "overdue_days": null
+      },
+      "epss": null,
+      "evidence": [
+        {
+          "source": "agent",
+          "query": "run_request.inventory",
+          "field": "software",
+          "value": "Signal Desktop 7.20",
+          "as_of": "2026-10-27",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_gyvvanmp",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_yasuudxh",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_89vdoo71",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "none",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevPairs",
+          "field": "match",
+          "value": "none",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: nothing above, so review every 90 days",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R006)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:jury, request:inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R006)",
+          "field": "resolves_to <- agent:jury",
+          "value": "no_match by ultra; receipts rcpt_req_89vdoo71, rcpt_req_gyvvanmp, rcpt_req_yasuudxh",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    }
+  ],
+  "owner_questions": [],
+  "receipts": [
+    {
+      "call_id": "ns-04e8c7524f3e",
+      "agent": "jury.bolt",
+      "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "response_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "receipt_id": "rcpt_req_gyvvanmp",
+      "latency_ms": 4485,
+      "prompt_tokens": 743,
+      "completion_tokens": 214,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-8537747a7f10",
+      "agent": "jury.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_yasuudxh",
+      "latency_ms": 18353,
+      "prompt_tokens": 769,
+      "completion_tokens": 225,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-bfa2f57878b5",
+      "agent": "jury.adjudicate",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_89vdoo71",
+      "latency_ms": 4284,
+      "prompt_tokens": 1205,
+      "completion_tokens": 57,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-63128817677e",
+      "agent": "critic",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_k7f3b9sc",
+      "latency_ms": 1499,
+      "prompt_tokens": 1035,
+      "completion_tokens": 123,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-a38d30cb2874",
+      "agent": "resolver.retry.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_yr26gipl",
+      "latency_ms": 2378,
+      "prompt_tokens": 1277,
+      "completion_tokens": 89,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-4cb5bf989664",
+      "agent": "resolver.retry.ultra",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_t9yxvh07",
+      "latency_ms": 1066,
+      "prompt_tokens": 1277,
+      "completion_tokens": 64,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-d578d32bdb64",
+      "agent": "critic",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_of8ns2l4",
+      "latency_ms": 1264,
+      "prompt_tokens": 1054,
+      "completion_tokens": 132,
+      "status": "ok"
+    }
+  ],
+  "trace_file": "logs/trace-example-3.jsonl",
+  "report_file": "output/report-example-3.html",
+  "manifest": {
+    "engine": "world-model",
+    "engine_source": "Meterless/Meterless@1742dec engines/world-model/reference (Apache-2.0, vendored unmodified)",
+    "sources": [
+      {
+        "name": "Inventory (request rows)",
+        "object": "run request",
+        "live": false,
+        "as_of": "2026-10-27"
+      },
+      {
+        "name": "CISA KEV",
+        "object": "el.kev",
+        "live": true,
+        "as_of": "2026.10.26"
+      },
+      {
+        "name": "FIRST EPSS",
+        "object": "EL_EPSS.el_epss_<batch>",
+        "live": true,
+        "as_of": "2026-10-26"
+      },
+      {
+        "name": "NIST NVD",
+        "object": "EL_NVD.el_nvd_<cve> (24 cached 2026-10-27)",
+        "live": false,
+        "as_of": "2026-10-27"
+      }
+    ],
+    "models": {
+      "bolt": "nvidia/nemotron-3.5-bolt-e4b",
+      "lightning": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "ultra": "nvidia/nemotron-3-ultra-550b-a55b"
+    },
+    "helpers_live": [
+      "normaliser",
+      "resolver_jury",
+      "zetaris.discovery",
+      "critic",
+      "critic.ultra_review",
+      "nvdCves",
+      "zetaris.naive_join",
+      "verifier",
+      "world_model",
+      "world-model.ingestRun",
+      "world-model.explain",
+      "world-model.reviewQueue",
+      "world-model.writeAudit",
+      "world-model.stats",
+      "world-model.persist",
+      "report"
+    ],
+    "helpers_dormant": [
+      "nvdProduct (the this_cycle bucket needs it: empty in this build)",
+      "world-model.evidence",
+      "world-model.factsAsOf",
+      "world-model.autoMerges",
+      "world-model.auditLines",
+      "world-model.engine.ingest (10-step stream pipeline; runs only in verify:engine)",
+      "world-model.engine.approveMerge (operator approval; the review queue is shown, not auto-approved)",
+      "world-model.engine.view(snapshot).entityAt (returns empty attrs; factsAsOf is used instead)"
+    ],
+    "policy": {
+      "epss_this_cycle": 0.1,
+      "epss_this_cycle_internet": 0.05,
+      "sla_days": {
+        "patch_now": 3,
+        "this_cycle": 30,
+        "monitor_review": 90
+      },
+      "rubric_auto_min": 7,
+      "max_critic_rounds": 2
+    }
+  }
+}

@@ -1,0 +1,3772 @@
+{
+  "run_id": "example-1",
+  "mode": "live",
+  "status": "success",
+  "started_at": "2026-10-27T04:15:47.356Z",
+  "finished_at": "2026-10-27T04:16:12.470Z",
+  "as_of": "2026-10-27",
+  "timing_ms": {
+    "discovery": 164,
+    "inventory": 1064,
+    "kev_pairs": 540,
+    "normalise": 58,
+    "facts": 1069,
+    "nvd": 2,
+    "jury": 16926,
+    "critic": 3798,
+    "analyst": 5,
+    "federated_join": 1387,
+    "verifier": 622,
+    "world_model": 67,
+    "total": 25113
+  },
+  "summary": {
+    "patch_now": 8,
+    "this_cycle": 0,
+    "monitor": 3,
+    "ask_owner": 1
+  },
+  "lines": [
+    {
+      "row_id": "R61",
+      "asset_id": "A08",
+      "asset_name": "public-web-01",
+      "internet_facing": true,
+      "software": "Apache HTTPD 2.4.49 / public website",
+      "resolution": {
+        "row_id": "R61",
+        "status": "matched",
+        "vendor": "Apache",
+        "product": "HTTP Server",
+        "family": "apache:http-server",
+        "version": "2.4.49",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "R61",
+            "juror": "bolt",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "product_type": "server",
+            "confidence": 0.98,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R61",
+            "juror": "lightning",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R61",
+            "juror": "normaliser",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "product_type": "server",
+            "confidence": 0.67
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R61",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 18 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Apache HTTP Server 2.4.49 inside the affected ranges of 3 KEV-listed CVEs, most recently CVE-2024-38475, which CISA KEV lists as exploited in the wild (added 2025-05-01); it is outside the ranges of 1 other KEV CVE. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2021-11-17) passed 1805 days ago, and EPSS for CVE-2021-41773 is 0.99992.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2024-38475",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "vulnerability_name": "Apache HTTP Server Improper Escaping of Output Vulnerability",
+            "date_added": "2025-05-01",
+            "due_date": "2025-05-22",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Apache HTTP Server contains an improper escaping of output vulnerability in mod_rewrite that allows an attacker to map URLs to filesystem locations that are permitted to be served by the server but are not intentionally/directly reachable by any URL, resulting in code execution or source code disclosure.",
+            "notes": "This vulnerability affects a common open-source component, third-party library, or a protocol used by different products. Please check with specific vendors for information on patching status. For more information, please see: https://httpd.apache.org/security/vulnerabilities_24.html ; https://nvd.nist.gov/vuln/detail/CVE-2024-38475",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-41773",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "vulnerability_name": "Apache HTTP Server Path Traversal Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2021-11-17",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Apache HTTP Server contains a path traversal vulnerability that allows an attacker to perform remote code execution if files outside directories configured by Alias-like directives are not under default �require all denied� or if CGI scripts are enabled. The original patch issued under this CVE ID is insufficient, please review remediation information under CVE-2021-42013.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2021-41773",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-42013",
+            "vendor": "Apache",
+            "product": "HTTP Server",
+            "vulnerability_name": "Apache HTTP Server Path Traversal Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2021-11-17",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Apache HTTP Server contains a path traversal vulnerability that allows an attacker to perform remote code execution if files outside directories configured by Alias-like directives are not under default require all denied or if CGI scripts are enabled. This CVE ID resolves an incomplete patch for CVE-2021-41773.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2021-42013",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2021-11-17",
+        "overdue_days": 1805
+      },
+      "epss": {
+        "max": 0.99992,
+        "cve_id": "CVE-2021-41773",
+        "percentile": 0.99986
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Apache HTTPD 2.4.49 / public website",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Apache HTTP Server",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Apache HTTP Server",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-38475",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-41773",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-42013",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99992",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 2.4.49 outside the affected ranges of 1 KEV CVE(s) of the family, so they are not cited: CVE-2019-0211",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 2.4.49 inside 3 cited KEV CVE(s): CVE-2024-38475, CVE-2021-41773, CVE-2021-42013; the due date, overdue days and EPSS come from these 3 cited CVE(s), none from the 1 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 2.4.49 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2024-38475: cpe:2.3:a:apache:http_server:*:*:*:*:*:*:*:* >= 2.4.0 < 2.4.60",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2021-41773: cpe:2.3:a:apache:http_server:2.4.49:*:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2021-42013: cpe:2.3:a:apache:http_server:2.4.49:*:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2021-42013: cpe:2.3:a:apache:http_server:2.4.50:*:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R61)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R61)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R61)",
+          "field": "kev_family_spellings",
+          "value": "apache:http-server: Apache / HTTP Server",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R55",
+      "asset_id": "A05",
+      "asset_name": "app-gateway-01",
+      "internet_facing": true,
+      "software": "Citrix netscaler ADC / Gateway; firmware tbc",
+      "resolution": {
+        "row_id": "R55",
+        "status": "matched",
+        "vendor": "Citrix",
+        "product": "NetScaler ADC and Gateway",
+        "family": "citrix:netscaler-adc-gateway",
+        "version": null,
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R55",
+            "juror": "bolt",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and Gateway",
+            "product_type": "unknown",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R55",
+            "juror": "lightning",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and Gateway",
+            "product_type": "unknown",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R55",
+            "juror": "normaliser",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and Gateway",
+            "product_type": "server",
+            "confidence": 0.8
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R55",
+        "verdict": "ask_owner",
+        "reasons": [
+          "no version in the row, but the KEV CVEs need a version check (which NetScaler ADC and Gateway version?)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 2,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 103 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "Citrix NetScaler ADC and Gateway is listed in CISA KEV as exploited in the wild: 20 cited CVEs, most recently CVE-2026-88779 (added 2026-10-04). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2022-04-15) passed 1656 days ago): the version is unconfirmed, so it stays patch_now until you answer the owner question.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-88779",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability",
+            "date_added": "2026-10-04",
+            "due_date": "2026-10-07",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Citrix NetScaler ADC (formerly Citrix ADC) and Citrix NetScaler Gateway (formerly Citrix Gateway) contain an improper restriction of operations within the bounds of a memory buffer vulnerability that could allow for a denial of service.",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX697174 ; https://community.citrix.com/techzone-blogs/110_security-updates/understanding-and-addressing-cve-2026-88779-in-citrix-netscaler-adc-and-citrix-netscaler-gateway/ ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-88779",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-88771",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Improper Input Validation Vulnerability",
+            "date_added": "2026-09-27",
+            "due_date": "2026-09-30",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain an improper input validation vulnerability that could allow an unauthenticated attacker to execute arbitrary commands.",
+            "notes": "Running the provided IOCs in the NetScaler console may help identify indicators of exploitation. Customers must conduct forensic triage as directed by BOD 26‑04 and follow Citrix’s published guidance for mitigations. For more information, please see: https://community.citrix.com/techzone-blogs/110_security-updates/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve-2026-88771-through-cve-2026-88778 ; https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX697096 ; https://support.citrix.com/external/article/CTX694799/steps-to-take-if-netscaler-adc-is-suspec.html ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-88772",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-88772",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability",
+            "date_added": "2026-09-27",
+            "due_date": "2026-09-30",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain an improper restriction of operations within the bounds of a memory buffer vulnerability that could allow for remote code execution or denial of service",
+            "notes": "Running the provided IOCs in the NetScaler console may help identify indicators of exploitation. Customers must conduct forensic triage as directed by BOD 26‑04 and follow Citrix’s published guidance for mitigations. For more information, please see: https://community.citrix.com/techzone-blogs/110_security-updates/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve-2026-88771-through-cve-2026-88778 ; https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX697096 ; https://support.citrix.com/external/article/CTX694799/steps-to-take-if-netscaler-adc-is-suspec.html ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-88772",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-19490",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Authentication Bypass Using an Alternate Path or Channel Vulnerability",
+            "date_added": "2026-09-09",
+            "due_date": "2026-09-12",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain an authentication-bypass vulnerability involving an alternate path or channel. When the NetScaler appliance is configured as an AAA virtual server or as a Gateway (SSL VPN, ICA Proxy, CVPN, or RDP Proxy), an unauthenticated remote threat actor may be able to bypass authentication.",
+            "notes": "https://support.citrix.com/external/article/CTX696939/netscaler-adc-and-netscaler-gateway-secu.html ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-19490",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-8452",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and NetScaler Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and NetScaler Gateway Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability",
+            "date_added": "2026-08-26",
+            "due_date": "2026-08-29",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain an improper restriction of operations within the bounds of a memory buffer vulnerability which could lead to denial of service. ",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX696604 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-8452",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-3055",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Out-of-Bounds Read Vulnerability",
+            "date_added": "2026-03-30",
+            "due_date": "2026-04-02",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC (formerly Citrix ADC), NetScaler Gateway (formerly Citrix Gateway) and NetScaler ADC FIPS and NDcPP contain an out-of-bounds reads vulnerability when configured as a SAML IDP leading to memory overread.",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX696300&articleURL=NetScaler_ADC_and_NetScaler_Gateway_Security_Bulletin_for_CVE_2026_3055_and_CVE_2026_4368 ; https://nvd.nist.gov/vuln/detail/CVE-2026-3055",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-7775",
+            "vendor": "Citrix",
+            "product": "NetScaler",
+            "vulnerability_name": "Citrix NetScaler Memory Overflow Vulnerability",
+            "date_added": "2025-08-26",
+            "due_date": "2025-08-28",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain a memory overflow vulnerability that could allow for remote code execution and/or denial of service.",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX694938 ; https://nvd.nist.gov/vuln/detail/CVE-2025-7775",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-5777",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and Gateway Out-of-Bounds Read Vulnerability",
+            "date_added": "2025-07-10",
+            "due_date": "2025-07-11",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and Gateway contain an out-of-bounds read vulnerability due to insufficient input validation. This vulnerability can lead to memory overread when the NetScaler is configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) OR AAA virtual server.",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX693420 ; https://nvd.nist.gov/vuln/detail/CVE-2025-5777",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-6543",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and Gateway Buffer Overflow Vulnerability",
+            "date_added": "2025-06-30",
+            "due_date": "2025-07-21",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and Gateway contain a buffer overflow vulnerability leading to unintended control flow and Denial of Service. NetScaler must be configured as Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) OR AAA virtual server.",
+            "notes": "https://support.citrix.com/support-home/kbsearch/article?articleNumber=CTX694788 ; https://www.netscaler.com/blog/news/netscaler-critical-security-updates-for-cve-2025-6543-and-cve-2025-5777/ ;   https://nvd.nist.gov/vuln/detail/CVE-2025-6543",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-6548",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and NetScaler Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability",
+            "date_added": "2024-01-17",
+            "due_date": "2024-01-24",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain a code injection vulnerability that allows for authenticated remote code execution on the management interface with access to NSIP, CLIP, or SNIP.",
+            "notes": "https://support.citrix.com/article/CTX584986/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve20236548-and-cve20236549;   https://nvd.nist.gov/vuln/detail/CVE-2023-6548",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-6549",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and NetScaler Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability",
+            "date_added": "2024-01-17",
+            "due_date": "2024-02-07",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain a buffer overflow vulnerability that allows for a denial-of-service when configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.",
+            "notes": "https://support.citrix.com/article/CTX584986/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve20236548-and-cve20236549;   https://nvd.nist.gov/vuln/detail/CVE-2023-6549",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-4966",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and NetScaler Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability",
+            "date_added": "2023-10-18",
+            "due_date": "2023-11-08",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations and kill all active and persistent sessions per vendor instructions [https://www.netscaler.com/blog/news/cve-2023-4966-critical-security-update-now-available-for-netscaler-adc-and-netscaler-gateway/] OR discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contain a buffer overflow vulnerability that allows for sensitive information disclosure when configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.",
+            "notes": "https://www.netscaler.com/blog/news/cve-2023-4966-critical-security-update-now-available-for-netscaler-adc-and-netscaler-gateway/, https://support.citrix.com/article/CTX579459/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve20234966-and-cve20234967 ;  https://nvd.nist.gov/vuln/detail/CVE-2023-4966",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-3519",
+            "vendor": "Citrix",
+            "product": "NetScaler ADC and NetScaler Gateway",
+            "vulnerability_name": "Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability",
+            "date_added": "2023-07-19",
+            "due_date": "2023-08-09",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Citrix NetScaler ADC and NetScaler Gateway contains a code injection vulnerability that allows for unauthenticated remote code execution.",
+            "notes": "https://support.citrix.com/article/CTX561482/citrix-adc-and-citrix-gateway-security-bulletin-for-cve20233519-cve20233466-cve20233467;  https://nvd.nist.gov/vuln/detail/CVE-2023-3519",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-27518",
+            "vendor": "Citrix",
+            "product": "Application Delivery Controller (ADC) and Gateway",
+            "vulnerability_name": "Citrix Application Delivery Controller (ADC) and Gateway Authentication Bypass Vulnerability",
+            "date_added": "2022-12-13",
+            "due_date": "2023-01-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix Application Delivery Controller (ADC) and Gateway, when configured with SAML SP or IdP configuration, contain an authentication bypass vulnerability that allows an attacker to execute code as administrator.",
+            "notes": "https://www.citrix.com/blogs/2022/12/13/critical-security-update-now-available-for-citrix-adc-citrix-gateway/;  https://nvd.nist.gov/vuln/detail/CVE-2022-27518",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2019-12989",
+            "vendor": "Citrix",
+            "product": "SD-WAN and NetScaler",
+            "vulnerability_name": "Citrix SD-WAN and NetScaler SQL Injection Vulnerability",
+            "date_added": "2022-03-25",
+            "due_date": "2022-04-15",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix SD-WAN and NetScaler SD-WAN allow SQL Injection.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2019-12989",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2019-12991",
+            "vendor": "Citrix",
+            "product": "SD-WAN and NetScaler",
+            "vulnerability_name": "Citrix SD-WAN and NetScaler Command Injection Vulnerability",
+            "date_added": "2022-03-25",
+            "due_date": "2022-04-15",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Authenticated Command Injection in Citrix SD-WAN Appliance and NetScaler SD-WAN Appliance.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2019-12991",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2019-19781",
+            "vendor": "Citrix",
+            "product": "Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance",
+            "vulnerability_name": "Citrix ADC, Gateway, and SD-WAN WANOP Appliance Code Execution Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix ADC, Citrix Gateway, and multiple Citrix SD-WAN WANOP appliance models contain an unspecified vulnerability that could allow an unauthenticated attacker to perform code execution.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2019-19781",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8193",
+            "vendor": "Citrix",
+            "product": "Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance",
+            "vulnerability_name": "Citrix ADC, Gateway, and SD-WAN WANOP Appliance Authorization Bypass Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix ADC, Citrix Gateway, and multiple Citrix SD-WAN WANOP appliance models contain an authorization bypass vulnerability that may allow unauthenticated access to certain URL endpoints. The attacker must have access to the NetScaler IP (NSIP) in order to perform exploitation.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2020-8193",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8195",
+            "vendor": "Citrix",
+            "product": "Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance",
+            "vulnerability_name": "Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix ADC, Citrix Gateway, and multiple Citrix SD-WAN WANOP appliance models contain an information disclosure vulnerability.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2020-8195",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8196",
+            "vendor": "Citrix",
+            "product": "Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance",
+            "vulnerability_name": "Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Citrix ADC, Citrix Gateway, and multiple Citrix SD-WAN WANOP appliance models contain an information disclosure vulnerability.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2020-8196",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2022-04-15",
+        "overdue_days": 1656
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2019-19781",
+        "percentile": 0.99998
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Citrix netscaler ADC / Gateway; firmware tbc",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Citrix NetScaler ADC and Gateway",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Citrix NetScaler ADC and Gateway",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-88779",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-88771",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-88772",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-19490",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-8452",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-3055",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-7775",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-5777",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-6543",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-6548",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-6549",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-4966",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-3519",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-27518",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2019-12989",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2019-12991",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2019-19781",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8193",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8195",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8196",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "critic",
+          "field": "version_unconfirmed",
+          "value": "no version in the row, but the KEV CVEs need a version check (which NetScaler ADC and Gateway version?)",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R55)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R55)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R55)",
+          "field": "kev_family_spellings",
+          "value": "citrix:netscaler-adc-gateway: Citrix / Application Delivery Controller (ADC) and Gateway | Citrix / Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance | Citrix / NetScaler | Citrix / NetScaler ADC and Gateway | Citrix / NetScaler ADC and NetScaler Gateway | Citrix / SD-WAN and NetScaler",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R24",
+      "asset_id": "A04",
+      "asset_name": "remote-01",
+      "internet_facing": true,
+      "software": "Ivanti ConnectSecure VPN appliance (build unknown)",
+      "resolution": {
+        "row_id": "R24",
+        "status": "matched",
+        "vendor": "Ivanti",
+        "product": "Connect Secure",
+        "family": "ivanti:connect-secure",
+        "version": null,
+        "product_type": "network_appliance",
+        "votes": [
+          {
+            "row_id": "R24",
+            "juror": "bolt",
+            "vendor": "Ivanti",
+            "product": "Connect Secure",
+            "product_type": "network_appliance",
+            "confidence": 0.98,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R24",
+            "juror": "lightning",
+            "vendor": "Ivanti",
+            "product": "Connect Secure",
+            "product_type": "network_appliance",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R24",
+            "juror": "normaliser",
+            "vendor": "Ivanti",
+            "product": "Connect Secure",
+            "product_type": "network_appliance",
+            "confidence": 0.8
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R24",
+        "verdict": "ask_owner",
+        "reasons": [
+          "no version in the row, but the KEV CVEs need a version check (which Connect Secure version?)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 2,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 78 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "Ivanti Connect Secure is listed in CISA KEV as exploited in the wild: 15 cited CVEs, most recently CVE-2026-104935 (added 2026-10-13). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2022-05-03) passed 1638 days ago): the version is unconfirmed, so it stays patch_now until you answer the owner question.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-104935",
+            "vendor": "Ivanti",
+            "product": "Connect Secure",
+            "vulnerability_name": "Ivanti Connect Secure Authentication Bypass by Spoofing Vulnerability",
+            "date_added": "2026-10-13",
+            "due_date": "2026-10-16",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Ivanti Connect Secure contains an authentication bypass by spoofing vulnerability that allows a remote unauthenticated attacker to execute arbitrary commands.",
+            "notes": "https:/forums.ivanti.com/s/article/Security-Advisory-Ivanti-Connect-Secure-CVE-2026-104935 ; https://nvd.nist.gov/vuln/detail/CVE-2026-104935",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-22457",
+            "vendor": "Ivanti",
+            "product": "Connect Secure, Policy Secure, and ZTA Gateways",
+            "vulnerability_name": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability",
+            "date_added": "2025-04-04",
+            "due_date": "2025-04-11",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations as set forth in the CISA instructions linked below.",
+            "short_description": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways contains a stack-based buffer overflow vulnerability that allows a remote unauthenticated attacker to achieve remote code execution. ",
+            "notes": "CISA Mitigation Instructions: https://www.cisa.gov/cisa-mitigation-instructions-cve-2025-22457 ; Additional References: https://forums.ivanti.com/s/article/April-Security-Advisory-Ivanti-Connect-Secure-Policy-Secure-ZTA-Gateways-CVE-2025-22457 ; https://nvd.nist.gov/vuln/detail/CVE-2025-22457",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-0282",
+            "vendor": "Ivanti",
+            "product": "Connect Secure, Policy Secure, and ZTA Gateways",
+            "vulnerability_name": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability",
+            "date_added": "2025-01-08",
+            "due_date": "2025-01-15",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations as set forth in the CISA instructions linked below to include conducting hunt activities, taking remediation actions if applicable, and applying updates prior to returning a device to service.",
+            "short_description": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways contain a stack-based buffer overflow which can lead to unauthenticated remote code execution.",
+            "notes": "CISA Mitigation Instructions: https://www.cisa.gov/cisa-mitigation-instructions-CVE-2025-0282 Additional References: https://forums.ivanti.com/s/article/Security-Advisory-Ivanti-Connect-Secure-Policy-Secure-ZTA-Gateways-CVE-2025-0282-CVE-2025-0283 ; https://nvd.nist.gov/vuln/detail/CVE-2025-0282",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-21893",
+            "vendor": "Ivanti",
+            "product": "Connect Secure, Policy Secure, and Neurons",
+            "vulnerability_name": "Ivanti Connect Secure, Policy Secure, and Neurons Server-Side Request Forgery (SSRF) Vulnerability",
+            "date_added": "2024-01-31",
+            "due_date": "2024-02-02",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Ivanti Connect Secure (ICS, formerly known as Pulse Connect Secure), Ivanti Policy Secure, and Ivanti Neurons contain a server-side request forgery (SSRF) vulnerability in the SAML component that allows an attacker to access certain restricted resources without authentication.",
+            "notes": "https://forums.ivanti.com/s/article/KB-CVE-2023-46805-Authentication-Bypass-CVE-2024-21887-Command-Injection-for-Ivanti-Connect-Secure-and-Ivanti-Policy-Secure-Gateways?language=en_US ; https://nvd.nist.gov/vuln/detail/CVE-2024-21893",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-46805",
+            "vendor": "Ivanti",
+            "product": "Connect Secure and Policy Secure",
+            "vulnerability_name": "Ivanti Connect Secure and Policy Secure Authentication Bypass Vulnerability",
+            "date_added": "2024-01-10",
+            "due_date": "2024-01-22",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Ivanti Connect Secure (ICS, formerly known as Pulse Connect Secure) and Ivanti Policy Secure gateways contain an authentication bypass vulnerability in the web component that allows an attacker to access restricted resources by bypassing control checks. This vulnerability can be leveraged in conjunction with CVE-2024-21887, a command injection vulnerability.",
+            "notes": "Please apply mitigations per vendor instructions. For more information, please see: https://forums.ivanti.com/s/article/KB-CVE-2023-46805-Authentication-Bypass-CVE-2024-21887-Command-Injection-for-Ivanti-Connect-Secure-and-Ivanti-Policy-Secure-Gateways?language=en_US ;  https://nvd.nist.gov/vuln/detail/CVE-2023-46805",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2024-21887",
+            "vendor": "Ivanti",
+            "product": "Connect Secure and Policy Secure",
+            "vulnerability_name": "Ivanti Connect Secure and Policy Secure Command Injection Vulnerability",
+            "date_added": "2024-01-10",
+            "due_date": "2024-01-22",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Ivanti Connect Secure (ICS, formerly known as Pulse Connect Secure) and Ivanti Policy Secure contain a command injection vulnerability in the web components of these products, which can allow an authenticated administrator to send crafted requests to execute code on affected appliances. This vulnerability can be leveraged in conjunction with CVE-2023-46805, an authenticated bypass issue.",
+            "notes": "Please apply mitigations per vendor instructions. For more information, please see: https://forums.ivanti.com/s/article/KB-CVE-2023-46805-Authentication-Bypass-CVE-2024-21887-Command-Injection-for-Ivanti-Connect-Secure-and-Ivanti-Policy-Secure-Gateways?language=en_US ; https://nvd.nist.gov/vuln/detail/CVE-2024-21887",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8218",
+            "vendor": "Pulse Secure",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Pulse Connect Secure Code Injection Vulnerability",
+            "date_added": "2022-03-07",
+            "due_date": "2022-09-07",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "A code injection vulnerability exists in Pulse Connect Secure that allows an attacker to crafted a URI to perform an arbitrary code execution via the admin web interface.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2020-8218",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2019-11510",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Arbitrary File Read Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure contains an arbitrary file read vulnerability that allows an unauthenticated remote attacker with network access via HTTPS to send a specially crafted URI.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2019-11510",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2019-11539",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure and Pulse Policy Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure and Policy Secure Command Injection Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure and Policy Secure allows an authenticated attacker from the admin web interface to inject and execute commands.",
+            "notes": "https://nvd.nist.gov/vuln/detail/CVE-2019-11539",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8243",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Code Execution Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure contains an unspecified vulnerability in the admin web interface that could allow an authenticated attacker to upload a custom template to perform code execution.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2020-8243",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2020-8260",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Code Execution Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Pulse Connect Secure contains an unspecified vulnerability that allows an authenticated attacker to perform code execution using uncontrolled gzip extraction.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2020-8260",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-22893",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Use-After-Free Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure contains a use-after-free vulnerability that allow a remote, unauthenticated attacker to execute code via license services.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2021-22893",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-22894",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Collaboration Suite Buffer Overflow Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure Collaboration Suite contains a buffer overflow vulnerabilities that allows a remote authenticated users to execute code as the root user via maliciously crafted meeting room.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2021-22894",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-22899",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Command Injection Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure contains a command injection vulnerability that allows remote authenticated users to perform remote code execution via Windows File Resource Profiles.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2021-22899",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2021-22900",
+            "vendor": "Ivanti",
+            "product": "Pulse Connect Secure",
+            "vulnerability_name": "Ivanti Pulse Connect Secure Unrestricted File Upload Vulnerability",
+            "date_added": "2021-11-03",
+            "due_date": "2022-05-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Ivanti Pulse Connect Secure contains an unrestricted file upload vulnerability that allows an authenticated administrator to perform a file write via a maliciously crafted archive upload in the administrator web interface.",
+            "notes": "Reference CISA's ED 21-03 (https://www.cisa.gov/news-events/directives/ed-21-03-mitigate-pulse-connect-secure-product-vulnerabilities) for further guidance and requirements. Note: The due date for addressing this vulnerability aligns with the requirements outlined in ED 21-03. https://nvd.nist.gov/vuln/detail/CVE-2021-22900",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2022-05-03",
+        "overdue_days": 1638
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2024-21887",
+        "percentile": 0.99999
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Ivanti ConnectSecure VPN appliance (build unknown)",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Ivanti Connect Secure",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Ivanti Connect Secure",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-104935",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-22457",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-0282",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-21893",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-46805",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2024-21887",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8218",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2019-11510",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2019-11539",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8243",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2020-8260",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-22893",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-22894",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-22899",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2021-22900",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "critic",
+          "field": "version_unconfirmed",
+          "value": "no version in the row, but the KEV CVEs need a version check (which Connect Secure version?)",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R24)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R24)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R24)",
+          "field": "kev_family_spellings",
+          "value": "ivanti:connect-secure: Ivanti / Connect Secure | Ivanti / Connect Secure and Policy Secure | Ivanti / Connect Secure, Policy Secure, and Neurons | Ivanti / Connect Secure, Policy Secure, and ZTA Gateways | Ivanti / Pulse Connect Secure | Ivanti / Pulse Connect Secure and Pulse Policy Secure (+1 more)",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R63",
+      "asset_id": "A02",
+      "asset_name": "mail-01",
+      "internet_facing": true,
+      "software": "MS Exchange Svr 2019 CU12",
+      "resolution": {
+        "row_id": "R63",
+        "status": "matched",
+        "vendor": "Microsoft",
+        "product": "Exchange Server",
+        "family": "microsoft:exchange-server",
+        "version": "2019 CU12",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "R63",
+            "juror": "bolt",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R63",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R63",
+            "juror": "normaliser",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "product_type": "server",
+            "confidence": 0.95
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R63",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 23 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Microsoft Exchange Server 2019 CU12 inside the affected ranges of 4 KEV-listed CVEs, most recently CVE-2023-21529, which CISA KEV lists as exploited in the wild (added 2026-04-13); it is outside the ranges of 14 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2022-10-21) passed 1467 days ago, and EPSS for CVE-2022-41082 is 0.9997.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2023-21529",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "vulnerability_name": "Microsoft Exchange Server Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2026-04-13",
+            "due_date": "2026-04-27",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Exchange Server contains a deserialization of untrusted data that allows an authenticated attacker to achieve remote code execution.",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2023-21529 ; https://nvd.nist.gov/vuln/detail/CVE-2023-21529",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-41080",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "vulnerability_name": "Microsoft Exchange Server Privilege Escalation Vulnerability",
+            "date_added": "2023-01-10",
+            "due_date": "2023-01-31",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Microsoft Exchange Server contains an unspecified vulnerability that allows for privilege escalation. This vulnerability is chainable with CVE-2022-41082, which allows for remote code execution.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2022-41080;  https://nvd.nist.gov/vuln/detail/CVE-2022-41080",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-41040",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "vulnerability_name": "Microsoft Exchange Server Server-Side Request Forgery Vulnerability",
+            "date_added": "2022-09-30",
+            "due_date": "2022-10-21",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Microsoft Exchange Server allows for server-side request forgery. Dubbed \"ProxyNotShell,\" this vulnerability is chainable with CVE-2022-41082 which allows for remote code execution.",
+            "notes": "https://msrc-blog.microsoft.com/2022/09/29/customer-guidance-for-reported-zero-day-vulnerabilities-in-microsoft-exchange-server/;  https://nvd.nist.gov/vuln/detail/CVE-2022-41040",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2022-41082",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "vulnerability_name": "Microsoft Exchange Server Remote Code Execution Vulnerability",
+            "date_added": "2022-09-30",
+            "due_date": "2022-10-21",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Microsoft Exchange Server contains an unspecified vulnerability that allows for authenticated remote code execution. Dubbed \"ProxyNotShell,\" this vulnerability is chainable with CVE-2022-41040 which allows for the remote code execution.",
+            "notes": "https://msrc-blog.microsoft.com/2022/09/29/customer-guidance-for-reported-zero-day-vulnerabilities-in-microsoft-exchange-server/;  https://nvd.nist.gov/vuln/detail/CVE-2022-41082",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2022-10-21",
+        "overdue_days": 1467
+      },
+      "epss": {
+        "max": 0.9997,
+        "cve_id": "CVE-2022-41082",
+        "percentile": 0.99977
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "MS Exchange Svr 2019 CU12",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Microsoft Exchange Server",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Microsoft Exchange Server",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-21529",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-41080",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-41040",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2022-41082",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.9997",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 2019 CU12 outside the affected ranges of 14 KEV CVE(s) of the family, so they are not cited: CVE-2021-31196, CVE-2024-21410, CVE-2018-8581, CVE-2021-33766 and 10 more",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 2019 CU12 inside 4 cited KEV CVE(s): CVE-2023-21529, CVE-2022-41080, CVE-2022-41040, CVE-2022-41082; the due date, overdue days and EPSS come from these 4 cited CVE(s), none from the 14 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 2019 CU12 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-21529: cpe:2.3:a:microsoft:exchange_server:2013:cumulative_update_23:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-21529: cpe:2.3:a:microsoft:exchange_server:2016:cumulative_update_23:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-21529: cpe:2.3:a:microsoft:exchange_server:2019:cumulative_update_11:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-21529: cpe:2.3:a:microsoft:exchange_server:2019:cumulative_update_12:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R63)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R63)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R63)",
+          "field": "kev_family_spellings",
+          "value": "microsoft:exchange-server: Microsoft / Exchange | Microsoft / Exchange Server",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R73",
+      "asset_id": "A01",
+      "asset_name": "erp-portal-01",
+      "internet_facing": true,
+      "software": "Apache Tomcat v9.0.54 - ERP app",
+      "resolution": {
+        "row_id": "R73",
+        "status": "matched",
+        "vendor": "Apache",
+        "product": "Tomcat",
+        "family": "apache:tomcat",
+        "version": "9.0.54",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "R73",
+            "juror": "bolt",
+            "vendor": "Apache",
+            "product": "Tomcat",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_p1e740fl"
+          },
+          {
+            "row_id": "R73",
+            "juror": "lightning",
+            "vendor": "Apache",
+            "product": "Tomcat",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_12xso1bv"
+          },
+          {
+            "row_id": "R73",
+            "juror": "normaliser",
+            "vendor": "Apache",
+            "product": "Tomcat",
+            "product_type": "server",
+            "confidence": 0.72
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R73",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places Apache Tomcat 9.0.54 inside the affected range of CVE-2025-24813, which CISA KEV lists as exploited in the wild (added 2025-04-01); it is outside the ranges of 5 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2025-04-22) passed 553 days ago, and EPSS for CVE-2025-24813 is 0.99942.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-24813",
+            "vendor": "Apache",
+            "product": "Tomcat",
+            "vulnerability_name": "Apache Tomcat Path Equivalence Vulnerability",
+            "date_added": "2025-04-01",
+            "due_date": "2025-04-22",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Apache Tomcat contains a path equivalence vulnerability that allows a remote attacker to execute code, disclose information, or inject malicious content via a partial PUT request. This vulnerability can be chained with CVE‑2026‑34486.",
+            "notes": "This vulnerability affects a common open-source component, third-party library, or a protocol used by different products. Please check with specific vendors for information on patching status. For more information, please see: https://lists.apache.org/thread/j5fkjv2k477os90nczf2v9l61fb0kkgq ; https://nvd.nist.gov/vuln/detail/CVE-2025-24813",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2025-04-22",
+        "overdue_days": 553
+      },
+      "epss": {
+        "max": 0.99942,
+        "cve_id": "CVE-2025-24813",
+        "percentile": 0.99972
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Apache Tomcat v9.0.54 - ERP app",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_p1e740fl",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_12xso1bv",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Apache Tomcat",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Apache Tomcat",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-24813",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99942",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "kev_cves_version_not_affected",
+          "value": "NVD places version 9.0.54 outside the affected ranges of 5 KEV CVE(s) of the family, so they are not cited: CVE-2026-34486, CVE-2016-8735, CVE-2017-12615, CVE-2017-12617 and 1 more",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "exposure_analyst",
+          "field": "kev_basis",
+          "value": "NVD places version 9.0.54 inside 1 cited KEV CVE(s): CVE-2025-24813; the due date, overdue days and EPSS come from these 1 cited CVE(s), none from the 5 NVD places it outside",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 9.0.54 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-24813: cpe:2.3:a:apache:tomcat:*:*:*:*:*:*:*:* < 9.0.99",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-24813: cpe:2.3:a:apache:tomcat:*:*:*:*:*:*:*:* >= 10.1.1 < 10.1.35",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-24813: cpe:2.3:a:apache:tomcat:*:*:*:*:*:*:*:* >= 11.0.1 < 11.0.3",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-24813: cpe:2.3:a:apache:tomcat:10.1.0:milestone1:*:*:*:*:*:*",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R73)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R73)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_12xso1bv, rcpt_req_p1e740fl",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R73)",
+          "field": "kev_family_spellings",
+          "value": "apache:tomcat: Apache / Tomcat",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R43",
+      "asset_id": "A02",
+      "asset_name": "mail-01",
+      "internet_facing": true,
+      "software": "Windows Server 2019 std (mail host)",
+      "resolution": {
+        "row_id": "R43",
+        "status": "matched",
+        "vendor": "Microsoft",
+        "product": "Windows",
+        "family": "microsoft:windows",
+        "version": "2019",
+        "product_type": "os",
+        "votes": [
+          {
+            "row_id": "R43",
+            "juror": "bolt",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "product_type": "os",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R43",
+            "juror": "ultra",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "product_type": "os",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_beiykd0l"
+          },
+          {
+            "row_id": "R43",
+            "juror": "normaliser",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "product_type": "os",
+            "confidence": 0.7
+          }
+        ],
+        "adjudicated_by": "ultra",
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R43",
+        "verdict": "ask_owner",
+        "reasons": [
+          "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more)",
+          "name-only match: no version evidence; the owner confirms the version (L1)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 2,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 103 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "Microsoft Windows is listed in CISA KEV as exploited in the wild: 20 cited CVEs, most recently CVE-2026-96951 (added 2026-10-13). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2025-11-14) passed 347 days ago): install the latest cumulative update; the build is unconfirmed, so it stays patch_now and one question covers every Windows Server 2019 machine.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-96951",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Command Injection Vulnerability",
+            "date_added": "2026-10-13",
+            "due_date": "2026-10-16",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Microsoft Windows Shell contains a command injection vulnerability that allows an unauthorized attacker to bypass a security feature over a network.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-96951 ; BOD 26-04: BOD 26-04: Prioritizing Security Updates Based on Risk | CISA ; Forensics Triage Requirements: BOD 26-04: Implementation Guidance for Prioritizing Security Updates Based on Risk | CISA ;  https://nvd.nist.gov/vuln/detail/CVE-2026-96951",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-81963",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Link Following Vulnerability",
+            "date_added": "2026-09-08",
+            "due_date": "2026-09-22",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Microsoft Windows Update Stack contains a link following vulnerability that allows a local attacker to escalate privileges locally up to SYSTEM.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-81963 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-81963",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-85880",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Heap-Based Buffer Overflow Vulnerability",
+            "date_added": "2026-09-08",
+            "due_date": "2026-09-22",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Microsoft Windows Advanced Local Procedure Call contains a heap-based buffer overflow vulnerability that allows an attacker to elevate privileges locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-85880 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-85880",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-33824",
+            "vendor": "Microsoft",
+            "product": "Internet Key Exchange (IKE) Service Extensions",
+            "vulnerability_name": "Microsoft Internet Key Exchange (IKE) Service Extensions Double Free Vulnerability",
+            "date_added": "2026-08-18",
+            "due_date": "2026-08-21",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Microsoft Internet Key Exchange (IKE) Service Extensions contains a double free vulnerability that could enable remote code execution.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-33824 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-33824",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-68820",
+            "vendor": "Microsoft",
+            "product": "Windows Ancillary Function Driver for WinSock ",
+            "vulnerability_name": "Microsoft Windows Ancillary Function Driver for WinSock Use-After-Free Vulnerability",
+            "date_added": "2026-08-11",
+            "due_date": "2026-08-25",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Microsoft Windows Ancillary Function Driver for WinSock contains a use-after-free vulnerability that allows an authorized attacker to elevate privileges locally.",
+            "notes": "https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2026-68820 ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-68820",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2008-4250",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Buffer Overflow Vulnerability",
+            "date_added": "2026-05-20",
+            "due_date": "2026-06-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows contains a buffer overflow vulnerability in the Windows Server Service that allows remote attackers to execute arbitrary code via a crafted RPC request that triggers an overflow during path canonicalization.",
+            "notes": "https://learn.microsoft.com/en-us/security-updates/securitybulletins/2008/ms08-067 ; https://nvd.nist.gov/vuln/detail/CVE-2008-4250",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2009-1537",
+            "vendor": "Microsoft",
+            "product": "DirectX",
+            "vulnerability_name": "Microsoft DirectX NULL Byte Overwrite Vulnerability",
+            "date_added": "2026-05-20",
+            "due_date": "2026-06-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft DirectX contains a NULL byte overwrite vulnerability in the QuickTime Movie Parser Filter in quartz.dll in DirectShow which could allow remote attackers to execute arbitrary code via a crafted QuickTime media file.",
+            "notes": "https://learn.microsoft.com/en-us/security-updates/securitybulletins/2009/ms09-028 ; https://nvd.nist.gov/vuln/detail/CVE-2009-1537",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-32202",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Protection Mechanism Failure Vulnerability",
+            "date_added": "2026-04-28",
+            "due_date": "2026-05-12",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Shell contains a protection mechanism failure vulnerability that allows an unauthorized attacker to perform spoofing over a network.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-32202 ; https://nvd.nist.gov/vuln/detail/CVE-2026-32202",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2023-36424",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Out-of-Bounds Read Vulnerability",
+            "date_added": "2026-04-13",
+            "due_date": "2026-04-27",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Common Log File System Driver contains an out-of-bounds read vulnerability that could allow a threat actor for privileges escalation",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/advisory/CVE-2023-36424 ; https://nvd.nist.gov/vuln/detail/CVE-2023-36424",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-60710",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Link Following Vulnerability",
+            "date_added": "2026-04-13",
+            "due_date": "2026-04-27",
+            "ransomware_use": "Known",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows contains a link following vulnerability that allows for privilege escalation",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-60710 ; https://nvd.nist.gov/vuln/detail/CVE-2025-60710",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2008-0015",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": " Microsoft Windows Video ActiveX Control Remote Code Execution Vulnerability",
+            "date_added": "2026-02-17",
+            "due_date": "2026-03-10",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Video ActiveX Control contains a remote code execution vulnerability. An attacker could exploit the vulnerability by constructing a specially crafted Web page. When a user views the Web page, the vulnerability could allow remote code execution. An attacker who successfully exploited this vulnerability could gain the same user rights as the logged-on user.",
+            "notes": "https://web.archive.org/web/20110305211119/https://www.microsoft.com/technet/security/bulletin/ms09-032.mspx ; https://nvd.nist.gov/vuln/detail/CVE-2008-0015",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-21510",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Shell Protection Mechanism Failure Vulnerability",
+            "date_added": "2026-02-10",
+            "due_date": "2026-03-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Shell contains a protection mechanism failure vulnerability that could allow an unauthorized attacker to bypass a security feature over a network. ",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21510 ; https://nvd.nist.gov/vuln/detail/CVE-2026-21510 ",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-21513",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft MSHTML Framework Protection Mechanism Failure Vulnerability",
+            "date_added": "2026-02-10",
+            "due_date": "2026-03-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft MSHTML Framework contains a protection mechanism failure vulnerability that could allow an unauthorized attacker to bypass a security feature over a network.",
+            "notes": "https://msrc.microsoft.com/update-guide/advisory/CVE-2026-21513 ; https://nvd.nist.gov/vuln/detail/CVE-2026-21513",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-21519",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Type Confusion Vulnerability",
+            "date_added": "2026-02-10",
+            "due_date": "2026-03-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Desktop Windows Manager contains a type confusion vulnerability that could allow an authorized attacker to elevate privileges locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21519 ; https://nvd.nist.gov/vuln/detail/CVE-2026-21519",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-21525",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows NULL Pointer Dereference Vulnerability",
+            "date_added": "2026-02-10",
+            "due_date": "2026-03-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Remote Access Connection Manager contains a NULL pointer dereference that could allow an unauthorized attacker to deny service locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21525 ; https://nvd.nist.gov/vuln/detail/CVE-2026-21525",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-21533",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Improper Privilege Management Vulnerability",
+            "date_added": "2026-02-10",
+            "due_date": "2026-03-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Remote Desktop Services contains an improper privilege management vulnerability that could allow an authorized attacker to elevate privileges locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-21533 ; https://nvd.nist.gov/vuln/detail/CVE-2026-21533",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-20805",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Information Disclosure Vulnerability",
+            "date_added": "2026-01-13",
+            "due_date": "2026-02-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Desktop Windows Manager contains an information disclosure vulnerability that allows an authorized attacker to disclose information locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2026-20805 ; https://nvd.nist.gov/vuln/detail/CVE-2026-20805",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-62221",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Use After Free Vulnerability",
+            "date_added": "2025-12-09",
+            "due_date": "2025-12-30",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Cloud Files Mini Filter Driver contains a use after free vulnerability that can allow an authorized attacker to elevate privileges locally.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2025-62221 ; https://nvd.nist.gov/vuln/detail/CVE-2025-62221",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-62215",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Race Condition Vulnerability",
+            "date_added": "2025-11-12",
+            "due_date": "2025-12-03",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Kernel contains a race condition vulnerability that allows a local attacker with low-level privileges to escalate privileges. Successful exploitation of this vulnerability could enable the attacker to gain SYSTEM-level access.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2025-62215 ; https://nvd.nist.gov/vuln/detail/CVE-2025-62215",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2025-59287",
+            "vendor": "Microsoft",
+            "product": "Windows",
+            "vulnerability_name": "Microsoft Windows Server Update Service (WSUS) Deserialization of Untrusted Data Vulnerability",
+            "date_added": "2025-10-24",
+            "due_date": "2025-11-14",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Microsoft Windows Server Update Service (WSUS) contains a deserialization of untrusted data vulnerability that allows for remote code execution.",
+            "notes": "https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2025-59287 ; https://nvd.nist.gov/vuln/detail/CVE-2025-59287",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2025-11-14",
+        "overdue_days": 347
+      },
+      "epss": {
+        "max": 0.9998,
+        "cve_id": "CVE-2025-59287",
+        "percentile": 0.99981
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Windows Server 2019 std (mail host)",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_beiykd0l",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Microsoft Windows",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Microsoft Windows",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-96951",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-81963",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-85880",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-33824",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-68820",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2008-4250",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2009-1537",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-32202",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-36424",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-60710",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2008-0015",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-21510",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-21513",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-21519",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-21525",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-21533",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-20805",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-62221",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-62215",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-59287",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "kev_cve_count",
+          "value": "239 (the 20 most recent are cited)",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.9998",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "critic",
+          "field": "version_unconfirmed",
+          "value": "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more)",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2026-96951: cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*:* < 10.0.17763.9376",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R43)",
+          "field": "provenance",
+          "value": "13 current fact(s) about this row, its asset and 3 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R43)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by ultra; receipts rcpt_req_beiykd0l, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R43)",
+          "field": "kev_family_spellings",
+          "value": "microsoft:windows: Microsoft / ATM Font Driver | Microsoft / Ancillary Function Driver (afd.sys) | Microsoft / Client-Server Run-time Subsystem (CSRSS) | Microsoft / DWM Core Library | Microsoft / DirectX | Microsoft / DirectX Graphics Kernel (DXGKRNL) (+29 more)",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R40",
+      "asset_id": "A06",
+      "asset_name": "mail-filter-01",
+      "internet_facing": true,
+      "software": "Cisco Secure Email GW (ESA) - release not noted",
+      "resolution": {
+        "row_id": "R40",
+        "status": "matched",
+        "vendor": "Cisco",
+        "product": "Secure Email Gateway",
+        "family": "cisco:secure-email-gateway",
+        "version": null,
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R40",
+            "juror": "bolt",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "network_appliance",
+            "confidence": 0.97,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R40",
+            "juror": "lightning",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "unknown",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R40",
+            "juror": "normaliser",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "server",
+            "confidence": 0.79
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R40",
+        "verdict": "ask_owner",
+        "reasons": [
+          "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 2,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 13 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "Cisco Secure Email Gateway is listed in CISA KEV as exploited in the wild: 2 cited CVEs, most recently CVE-2026-76519 (added 2026-10-14). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2026-09-17) passed 40 days ago): the version is unconfirmed, so it stays patch_now until you answer the owner question.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-76519",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "vulnerability_name": "Cisco Secure Email Gateway Relative Path Traversal Vulnerability",
+            "date_added": "2026-10-14",
+            "due_date": "2026-10-17",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Cisco Secure Email Gateway contains a relative path traversal vulnerability that could allow an unauthenticated, remote attacker to write arbitrary files on the underlying operating system.",
+            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-afw-zqYJkjxp ; ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76519",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-76461",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "vulnerability_name": "Cisco Secure Email Gateway SQL Injection Vulnerability",
+            "date_added": "2026-09-14",
+            "due_date": "2026-09-17",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Cisco AsyncOS software for Cisco Secure Email Gateway (SEG) contains a SQL injection vulnerability that could allow an unauthenticated, remote attacker to execute arbitrary commands with root privileges on the underlying operating system.",
+            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-inj-2bLVGmhX ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76461",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2026-09-17",
+        "overdue_days": 40
+      },
+      "epss": {
+        "max": 0.29543,
+        "cve_id": "CVE-2026-76461",
+        "percentile": 0.98175
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Cisco Secure Email GW (ESA) - release not noted",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Cisco Secure Email Gateway",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Cisco Secure Email Gateway",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-76519",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-76461",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.29543",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "critic",
+          "field": "version_unconfirmed",
+          "value": "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "provenance",
+          "value": "10 current fact(s) about this row, its asset and 2 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "kev_family_spellings",
+          "value": "cisco:secure-email-gateway: Cisco / Secure Email Gateway",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R44",
+      "asset_id": "A10",
+      "asset_name": "print-01",
+      "internet_facing": false,
+      "software": "PaperCut NG v22.0.4 - print management",
+      "resolution": {
+        "row_id": "R44",
+        "status": "matched",
+        "vendor": "PaperCut",
+        "product": "MF/NG",
+        "family": "papercut:mf-ng",
+        "version": "22.0.4",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "R44",
+            "juror": "bolt",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "product_type": "server",
+            "confidence": 0.98,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R44",
+            "juror": "lightning",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R44",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "server",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R44",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places PaperCut MF/NG 22.0.4 inside the affected range of CVE-2023-27350, which CISA KEV lists as exploited in the wild (added 2023-04-21). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2023-05-12) passed 1264 days ago, and EPSS for CVE-2023-27350 is 0.99999.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2023-27350",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "vulnerability_name": "PaperCut MF/NG Improper Access Control Vulnerability",
+            "date_added": "2023-04-21",
+            "due_date": "2023-05-12",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "PaperCut MF/NG contains an improper access control vulnerability within the SetupCompleted class that allows authentication bypass and code execution in the context of system.",
+            "notes": "https://www.papercut.com/kb/Main/PO-1216-and-PO-1219;  https://nvd.nist.gov/vuln/detail/CVE-2023-27350",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2023-05-12",
+        "overdue_days": 1264
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2023-27350",
+        "percentile": 0.99995
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "PaperCut NG v22.0.4 - print management",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "PaperCut MF/NG",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-27350",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 22.0.4 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 21.0.0 < 21.2.11",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 22.0.0 < 22.0.9",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_ng:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "provenance",
+          "value": "7 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "kev_family_spellings",
+          "value": "papercut:mf-ng: PaperCut / MF/NG",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R20",
+      "asset_id": "A20",
+      "asset_name": "comms-laptop-01",
+      "internet_facing": false,
+      "software": "Microsoft Word Online (browser app)",
+      "resolution": {
+        "row_id": "R20",
+        "status": "unresolved",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": null,
+        "product_type": "cloud_service",
+        "votes": [
+          {
+            "row_id": "R20",
+            "juror": "bolt",
+            "vendor": "Microsoft",
+            "product": "Word",
+            "product_type": "cloud_service",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R20",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Word",
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R20",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "cloud_service",
+            "confidence": 0.7
+          },
+          {
+            "row_id": "R20",
+            "juror": "ultra",
+            "vendor": "Microsoft",
+            "product": "Word",
+            "product_type": "cloud_service",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_qtk23u67"
+          }
+        ],
+        "adjudicated_by": "critic",
+        "confidence": 0
+      },
+      "critic": {
+        "row_id": "R20",
+        "verdict": "ask_owner",
+        "reasons": [
+          "type conflict: cloud service vs on-prem client software (\"Microsoft Word Online (browser app)\" is a cloud service; KEV \"Microsoft / Word\" is an endpoint client)",
+          "rubric 5/9 (accuracy 2, appropriateness 0, actionability 3); auto needs >= 7",
+          "still failing after 2 send-back(s) (max 2): ask the owner (L1)"
+        ],
+        "rubric": {
+          "accuracy": 2,
+          "appropriateness": 0,
+          "actionability": 3,
+          "total": 5
+        },
+        "round": 2
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "type conflict: cloud service vs on-prem client software (\"Microsoft Word Online (browser app)\" is a cloud service; KEV \"Microsoft / Word\" is an endpoint client); rubric 5/9 (accuracy 2, appropriateness 0, actionability 3); auto needs >= 7; still failing after 2 send-back(s) (max 2): ask the owner (L1). \"Microsoft Word Online (browser app)\" on comms-laptop-01 looks like a cloud service, but the KEV listing \"Microsoft / Word\" is an endpoint client. Do you run Microsoft / Word itself on comms-laptop-01?",
+      "decision": "ask_owner",
+      "target_date": null,
+      "kev": null,
+      "epss": null,
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Microsoft Word Online (browser app)",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_qtk23u67",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "ask_owner: type conflict: cloud service vs on-prem client software (\"Microsoft Word Online (browser app)\" is a cloud service; KEV \"Microsoft / Word\" is an endpoint client); rubric 5/9 (accuracy 2, appropriateness 0, actionability 3); auto needs >= 7; still failing after 2 send-back(s) (max 2): ask the owner (L1)",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R20)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:critic, zetaris:el.inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R20)",
+          "field": "resolves_to <- agent:critic",
+          "value": "unresolved by critic; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb, rcpt_req_qtk23u67",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R05",
+      "asset_id": "A11",
+      "asset_name": "fin-laptop-01",
+      "internet_facing": false,
+      "software": "7-Zip v24.09 (64 bit)",
+      "resolution": {
+        "row_id": "R05",
+        "status": "matched",
+        "vendor": "7-Zip",
+        "product": "7-Zip",
+        "family": "7-zip:7-zip",
+        "version": "24.09",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "R05",
+            "juror": "bolt",
+            "vendor": "7-Zip",
+            "product": "7-Zip",
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R05",
+            "juror": "lightning",
+            "vendor": "7-Zip",
+            "product": "7-Zip",
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R05",
+            "juror": "normaliser",
+            "vendor": "7-Zip",
+            "product": "7-Zip",
+            "product_type": "client",
+            "confidence": 0.95
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R05",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "KEV lists 1 exploited CVE for 7-Zip 7-Zip, but NVD's version ranges place version 24.09 outside all of them. Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2025-0411",
+            "vendor": "7-Zip",
+            "product": "7-Zip",
+            "vulnerability_name": "7-Zip Mark of the Web Bypass Vulnerability",
+            "date_added": "2025-02-06",
+            "due_date": "2025-02-27",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "7-Zip contains a protection mechanism failure vulnerability that allows remote attackers to bypass the Mark-of-the-Web security feature to execute arbitrary code in the context of the current user.",
+            "notes": "https://www.7-zip.org/history.txt ; https://nvd.nist.gov/vuln/detail/CVE-2025-0411",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2025-02-27",
+        "overdue_days": 607
+      },
+      "epss": {
+        "max": 0.67071,
+        "cve_id": "CVE-2025-0411",
+        "percentile": 0.99294
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "7-Zip v24.09 (64 bit)",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "7-Zip 7-Zip",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "7-Zip 7-Zip",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2025-0411",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.67071",
+          "as_of": "2026-10-26",
+          "live": true
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 24.09 is outside every NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: the installed version is outside every NVD range of the 1 KEV CVE(s) of the family; review every 90 days",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2025-0411: cpe:2.3:a:7-zip:7-zip:*:*:*:*:*:*:*:* < 24.09",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R05)",
+          "field": "provenance",
+          "value": "7 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R05)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R05)",
+          "field": "kev_family_spellings",
+          "value": "7-zip:7-zip: 7-Zip / 7-Zip",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R12",
+      "asset_id": "A30",
+      "asset_name": "it-pc-01",
+      "internet_facing": false,
+      "software": "PowerToys 0.84 - desktop utilities",
+      "resolution": {
+        "row_id": "R12",
+        "status": "no_match",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": "0.84",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "R12",
+            "juror": "bolt",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_e6w5ajhb"
+          },
+          {
+            "row_id": "R12",
+            "juror": "lightning",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0,
+            "receipt_id": "rcpt_req_bz1bytzo"
+          },
+          {
+            "row_id": "R12",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.8
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R12",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 9/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 3,
+          "actionability": 3,
+          "total": 9
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "No CISA KEV product matches \"PowerToys 0.84 - desktop utilities\". Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [],
+        "earliest_due": null,
+        "overdue_days": null
+      },
+      "epss": null,
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "PowerToys 0.84 - desktop utilities",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_e6w5ajhb",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_bz1bytzo",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "none",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevPairs",
+          "field": "match",
+          "value": "none",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: nothing above, so review every 90 days",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R12)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R12)",
+          "field": "resolves_to <- agent:jury",
+          "value": "no_match by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R71",
+      "asset_id": "A19",
+      "asset_name": "ops-laptop-03",
+      "internet_facing": false,
+      "software": "Veeam Agent for Microsoft Windows 6.1",
+      "resolution": {
+        "row_id": "R71",
+        "status": "no_match",
+        "vendor": null,
+        "product": null,
+        "family": null,
+        "version": "6.1",
+        "product_type": "client",
+        "votes": [
+          {
+            "row_id": "R71",
+            "juror": "bolt",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0,
+            "receipt_id": "rcpt_req_p1e740fl"
+          },
+          {
+            "row_id": "R71",
+            "juror": "lightning",
+            "vendor": "Veeam",
+            "product": "Backup & Replication",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_12xso1bv"
+          },
+          {
+            "row_id": "R71",
+            "juror": "ultra",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_beiykd0l"
+          },
+          {
+            "row_id": "R71",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "client",
+            "confidence": 0.8
+          }
+        ],
+        "adjudicated_by": "ultra",
+        "confidence": 0.67
+      },
+      "critic": {
+        "row_id": "R71",
+        "verdict": "approve",
+        "reasons": [
+          "ultra: Correctly identified no KEV match for Veeam Agent for Microsoft Windows 6.1",
+          "ultra: Product type client correctly matches endpoint backup agent on laptop",
+          "ultra: Lightning and Bolt votes for Veeam Backup & Replication rejected - different product (server vs client agent)",
+          "ultra: Monitor rule with 90-day review appropriate for non-KEV software",
+          "approved: rubric 7/9 after Ultra review (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 2,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "no KEV or EPSS values cited; nothing to re-check"
+      ],
+      "why": "No CISA KEV product matches \"Veeam Agent for Microsoft Windows 6.1\". Review it again by 2027-01-25 (every 90 days under your rules).",
+      "decision": "monitor",
+      "target_date": "2027-01-25",
+      "kev": {
+        "cves": [],
+        "earliest_due": null,
+        "overdue_days": null
+      },
+      "epss": null,
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Veeam Agent for Microsoft Windows 6.1",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_p1e740fl",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_12xso1bv",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_beiykd0l",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "none",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevPairs",
+          "field": "match",
+          "value": "none",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "monitor: nothing above, so review every 90 days",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R71)",
+          "field": "provenance",
+          "value": "4 current fact(s) about this row, its asset and 0 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R71)",
+          "field": "resolves_to <- agent:jury",
+          "value": "no_match by ultra; receipts rcpt_req_12xso1bv, rcpt_req_beiykd0l, rcpt_req_p1e740fl",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        }
+      ]
+    }
+  ],
+  "owner_questions": [
+    {
+      "row_id": "R55",
+      "asset_name": "app-gateway-01",
+      "question": "Which NetScaler ADC and Gateway version runs on app-gateway-01?",
+      "reason": "no version in the row, but the KEV CVEs need a version check (which NetScaler ADC and Gateway version?)"
+    },
+    {
+      "row_id": "R24",
+      "asset_name": "remote-01",
+      "question": "Which Connect Secure version runs on remote-01?",
+      "reason": "no version in the row, but the KEV CVEs need a version check (which Connect Secure version?)"
+    },
+    {
+      "row_id": "R43",
+      "asset_name": "mail-01",
+      "question": "Which Windows Server 2019 build runs on mail-01? KEV lists 239 Windows CVEs; the newest, CVE-2026-96951, was added 2026-10-13 with a US federal due date of 2026-10-16, and NVD lists Windows Server 2019 builds below 10.0.17763.9376 as affected by it. Install the latest cumulative update on any machine below that build, then tell us the build.",
+      "reason": "1 Windows Server 2019 row name the edition but no build number, so the NVD build ranges cannot place it; listed as patch_now (fail-closed) until the build is confirmed.",
+      "row_ids": [
+        "R43"
+      ]
+    },
+    {
+      "row_id": "R40",
+      "asset_name": "mail-filter-01",
+      "question": "Which Secure Email Gateway version runs on mail-filter-01?",
+      "reason": "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)"
+    },
+    {
+      "row_id": "R20",
+      "asset_name": "comms-laptop-01",
+      "question": "\"Microsoft Word Online (browser app)\" on comms-laptop-01 looks like a cloud service, but the KEV listing \"Microsoft / Word\" is an endpoint client. Do you run Microsoft / Word itself on comms-laptop-01?",
+      "reason": "type conflict: cloud service vs on-prem client software (\"Microsoft Word Online (browser app)\" is a cloud service; KEV \"Microsoft / Word\" is an endpoint client); rubric 5/9 (accuracy 2, appropriateness 0, actionability 3); auto needs >= 7; still failing after 2 send-back(s) (max 2): ask the owner (L1)"
+    }
+  ],
+  "receipts": [
+    {
+      "call_id": "ns-7ca975f38b2e",
+      "agent": "jury.bolt",
+      "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "response_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "receipt_id": "rcpt_req_p1e740fl",
+      "latency_ms": 2324,
+      "prompt_tokens": 815,
+      "completion_tokens": 71,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-3af634c67010",
+      "agent": "jury.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_bz1bytzo",
+      "latency_ms": 6115,
+      "prompt_tokens": 2058,
+      "completion_tokens": 573,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-d33cf8cee057",
+      "agent": "jury.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_12xso1bv",
+      "latency_ms": 6521,
+      "prompt_tokens": 840,
+      "completion_tokens": 125,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-f696a027708b",
+      "agent": "jury.bolt",
+      "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "response_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
+      "receipt_id": "rcpt_req_e6w5ajhb",
+      "latency_ms": 7546,
+      "prompt_tokens": 1962,
+      "completion_tokens": 355,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-a6d30585c72e",
+      "agent": "jury.adjudicate",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_beiykd0l",
+      "latency_ms": 9370,
+      "prompt_tokens": 1116,
+      "completion_tokens": 121,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-5fcf37f6492f",
+      "agent": "critic",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_rbkyj4ih",
+      "latency_ms": 1431,
+      "prompt_tokens": 1079,
+      "completion_tokens": 135,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-d64b2f509472",
+      "agent": "resolver.retry.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_sqdphp4c",
+      "latency_ms": 1129,
+      "prompt_tokens": 1287,
+      "completion_tokens": 87,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-c09ed6d0de96",
+      "agent": "resolver.retry.ultra",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_qtk23u67",
+      "latency_ms": 1203,
+      "prompt_tokens": 1285,
+      "completion_tokens": 51,
+      "status": "ok"
+    }
+  ],
+  "trace_file": "logs/trace-example-1.jsonl",
+  "report_file": "output/report-example-1.html",
+  "manifest": {
+    "engine": "world-model",
+    "engine_source": "Meterless/Meterless@1742dec engines/world-model/reference (Apache-2.0, vendored unmodified)",
+    "sources": [
+      {
+        "name": "Inventory (synthetic)",
+        "object": "el.inventory",
+        "live": true,
+        "as_of": "2026-10-27"
+      },
+      {
+        "name": "CISA KEV",
+        "object": "el.kev",
+        "live": true,
+        "as_of": "2026.10.26"
+      },
+      {
+        "name": "FIRST EPSS",
+        "object": "EL_EPSS.el_epss_<batch>",
+        "live": true,
+        "as_of": "2026-10-26"
+      },
+      {
+        "name": "NIST NVD",
+        "object": "EL_NVD.el_nvd_<cve> (31 cached 2026-10-27)",
+        "live": false,
+        "as_of": "2026-10-27"
+      }
+    ],
+    "models": {
+      "bolt": "nvidia/nemotron-3.5-bolt-e4b",
+      "lightning": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "ultra": "nvidia/nemotron-3-ultra-550b-a55b"
+    },
+    "helpers_live": [
+      "normaliser",
+      "resolver_jury",
+      "zetaris.discovery",
+      "critic",
+      "critic.ultra_review",
+      "nvdCves",
+      "zetaris.naive_join",
+      "verifier",
+      "world_model",
+      "world-model.ingestRun",
+      "world-model.explain",
+      "world-model.reviewQueue",
+      "world-model.writeAudit",
+      "world-model.stats",
+      "world-model.persist",
+      "report"
+    ],
+    "helpers_dormant": [
+      "nvdProduct (the this_cycle bucket needs it: empty in this build)",
+      "world-model.evidence",
+      "world-model.factsAsOf",
+      "world-model.autoMerges",
+      "world-model.auditLines",
+      "world-model.engine.ingest (10-step stream pipeline; runs only in verify:engine)",
+      "world-model.engine.approveMerge (operator approval; the review queue is shown, not auto-approved)",
+      "world-model.engine.view(snapshot).entityAt (returns empty attrs; factsAsOf is used instead)"
+    ],
+    "policy": {
+      "epss_this_cycle": 0.1,
+      "epss_this_cycle_internet": 0.05,
+      "sla_days": {
+        "patch_now": 7,
+        "this_cycle": 30,
+        "monitor_review": 90
+      },
+      "rubric_auto_min": 7,
+      "max_critic_rounds": 2
+    }
+  }
+}

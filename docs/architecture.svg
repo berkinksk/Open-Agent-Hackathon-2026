@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">ExposureLedger architecture</title>
+  <desc id="d">Six agents turn a software list into a dated patch list. Zetaris serves the four data sources; Meterless Nightshift carries every model call to three NVIDIA Nemotron models; the Meterless World Model engine stores every fact with its provenance.</desc>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4A5568"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2B6CB0"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C05621"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4D7C0F"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B46C1"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="820" fill="#FFFFFF"/>
+
+  <!-- title and legend -->
+  <text x="40" y="42" font-size="22" font-weight="700" fill="#1A202C">ExposureLedger: one run, from software list to dated patch list</text>
+  <g font-size="12.5" fill="#2D3748">
+    <rect x="890" y="29" width="14" height="14" rx="3" fill="#E8F1FB" stroke="#2B6CB0"/><text x="910" y="41">Zetaris (data)</text>
+    <rect x="1010" y="29" width="14" height="14" rx="3" fill="#F7FAFC" stroke="#4A5568"/><text x="1030" y="41">code</text>
+    <rect x="1080" y="29" width="14" height="14" rx="3" fill="#F1F8E6" stroke="#4D7C0F"/><text x="1100" y="41">uses Nemotron</text>
+    <rect x="1210" y="29" width="14" height="14" rx="3" fill="#F3EEFC" stroke="#6B46C1"/><text x="1230" y="41">World Model</text>
+  </g>
+
+  <!-- Zetaris band -->
+  <rect x="40" y="62" width="1320" height="150" rx="12" fill="#E8F1FB" stroke="#2B6CB0" stroke-width="1.5"/>
+  <text x="60" y="88" font-size="15" fill="#1A365D"><tspan font-weight="700">Zetaris: the data layer</tspan><tspan> (local Docker, REST SQL API) · one query at a time · sources read in place; local copies only as labelled caches and the offline sample snapshot</tspan></text>
+  <g font-size="12.5" fill="#2D3748" text-anchor="middle">
+    <rect x="60" y="102" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#2B6CB0"/>
+    <text x="210" y="126" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#1A365D">el.inventory</text>
+    <text x="210" y="148">the IT admin's software list (synthetic)</text>
+    <text x="210" y="168">our JSON file, read over GitHub raw</text>
+
+    <rect x="385" y="102" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#2B6CB0"/>
+    <text x="535" y="126" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#1A365D">el.kev</text>
+    <text x="535" y="148">CISA Known Exploited Vulnerabilities</text>
+    <text x="535" y="168">full catalogue, cisagov/kev-data JSON</text>
+
+    <rect x="710" y="102" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#2B6CB0"/>
+    <text x="860" y="126" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#1A365D">EL_EPSS.el_epss_&lt;hash&gt;</text>
+    <text x="860" y="148">FIRST EPSS exploit-probability scores</text>
+    <text x="860" y="168">public API, at most 100 CVEs per table</text>
+
+    <rect x="1035" y="102" width="300" height="94" rx="8" fill="#FFFFFF" stroke="#2B6CB0"/>
+    <text x="1185" y="126" font-family="Menlo, Consolas, monospace" font-size="13" font-weight="700" fill="#1A365D">EL_NVD.el_nvd_&lt;cve&gt;</text>
+    <text x="1185" y="148">NIST NVD affected-version ranges</text>
+    <text x="1185" y="168">public API, one table per CVE</text>
+  </g>
+
+  <!-- Zetaris <-> pipeline -->
+  <g stroke="#2B6CB0" stroke-width="2" fill="none">
+    <line x1="124" y1="212" x2="124" y2="288" marker-end="url(#ab)"/>
+    <line x1="700" y1="212" x2="700" y2="288" marker-end="url(#ab)"/>
+    <line x1="892" y1="290" x2="892" y2="214" marker-end="url(#ab)"/>
+  </g>
+  <g font-size="12" fill="#1A365D">
+    <text x="134" y="246">inventory · KEV names</text>
+    <text x="710" y="246">KEV · EPSS · NVD facts</text>
+    <text x="902" y="246">live re-check, cache bypassed</text>
+  </g>
+
+  <!-- critic send-back loop -->
+  <path d="M490,290 L490,262 L334,262 L334,288" fill="none" stroke="#C05621" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ao)"/>
+  <text x="412" y="255" font-size="12" fill="#9C4221" text-anchor="middle">send back + reason (at most 2 rounds)</text>
+
+  <!-- pipeline -->
+  <g font-size="12.5" fill="#2D3748" text-anchor="middle">
+    <rect x="39" y="290" width="170" height="140" rx="10" fill="#F7FAFC" stroke="#4A5568" stroke-width="1.5"/>
+    <text x="124" y="314" font-size="14" font-weight="700" fill="#1A202C">1 · Normaliser</text>
+    <text x="124" y="333" font-size="12" font-style="italic" fill="#718096">deterministic code</text>
+    <text x="124" y="358">parses vendor, version</text>
+    <text x="124" y="376">and product type;</text>
+    <text x="124" y="394">top-12 KEV candidates;</text>
+    <text x="124" y="412">casts a third vote</text>
+
+    <rect x="231" y="290" width="170" height="140" rx="10" fill="#F1F8E6" stroke="#4D7C0F" stroke-width="1.5"/>
+    <text x="316" y="314" font-size="14" font-weight="700" fill="#1A202C">2 · Resolver jury</text>
+    <text x="316" y="333" font-size="12" font-style="italic" fill="#718096">Bolt + Lightning vote</text>
+    <text x="316" y="358">each maps every row to</text>
+    <text x="316" y="376">one KEV product or none;</text>
+    <text x="316" y="394">on a split, Ultra</text>
+    <text x="316" y="412">decides</text>
+
+    <rect x="423" y="290" width="170" height="140" rx="10" fill="#F1F8E6" stroke="#4D7C0F" stroke-width="1.5"/>
+    <text x="508" y="314" font-size="14" font-weight="700" fill="#1A202C">3 · Conflict Critic</text>
+    <text x="508" y="333" font-size="12" font-style="italic" fill="#718096">code rules + Ultra</text>
+    <text x="508" y="358">type, version and</text>
+    <text x="508" y="376">identity checks;</text>
+    <text x="508" y="394">rubric 0–3 × 3;</text>
+    <text x="508" y="412">under 7/9 → ask owner</text>
+
+    <rect x="615" y="290" width="170" height="140" rx="10" fill="#F7FAFC" stroke="#4A5568" stroke-width="1.5"/>
+    <text x="700" y="314" font-size="14" font-weight="700" fill="#1A202C">4 · Exposure Analyst</text>
+    <text x="700" y="333" font-size="12" font-style="italic" fill="#718096">policy as code</text>
+    <text x="700" y="358">KEV-listed → patch_now;</text>
+    <text x="700" y="376">NVD version ranges,</text>
+    <text x="700" y="394">EPSS; target dates</text>
+    <text x="700" y="412">from your rules</text>
+
+    <rect x="807" y="290" width="170" height="140" rx="10" fill="#F7FAFC" stroke="#4A5568" stroke-width="1.5"/>
+    <text x="892" y="314" font-size="14" font-weight="700" fill="#1A202C">5 · Verifier</text>
+    <text x="892" y="333" font-size="12" font-style="italic" fill="#718096">code, live</text>
+    <text x="892" y="358">re-queries every cited</text>
+    <text x="892" y="376">KEV and EPSS value</text>
+    <text x="892" y="394">in Zetaris; a mismatch</text>
+    <text x="892" y="412">blocks the line</text>
+
+    <rect x="999" y="290" width="170" height="140" rx="10" fill="#F7FAFC" stroke="#4A5568" stroke-width="1.5"/>
+    <text x="1084" y="314" font-size="14" font-weight="700" fill="#1A202C">6 · Reporter</text>
+    <text x="1084" y="333" font-size="12" font-style="italic" fill="#718096">template</text>
+    <text x="1084" y="358">a "why" of at most two</text>
+    <text x="1084" y="376">sentences per line,</text>
+    <text x="1084" y="394">from structured facts;</text>
+    <text x="1084" y="412">the HTML report</text>
+
+    <rect x="1191" y="290" width="170" height="140" rx="10" fill="#FFFBEA" stroke="#B7791F" stroke-width="1.5"/>
+    <text x="1276" y="314" font-size="14" font-weight="700" fill="#1A202C">Dated patch list</text>
+    <text x="1276" y="333" font-size="12" font-style="italic" fill="#718096">JSON + HTML report</text>
+    <text x="1276" y="358">patch_now · this_cycle</text>
+    <text x="1276" y="376">monitor · ask_owner</text>
+    <text x="1276" y="394">owner questions,</text>
+    <text x="1276" y="412">receipts, trace</text>
+  </g>
+  <g stroke="#4A5568" stroke-width="2">
+    <line x1="209" y1="360" x2="229" y2="360" marker-end="url(#ah)"/>
+    <line x1="401" y1="360" x2="421" y2="360" marker-end="url(#ah)"/>
+    <line x1="593" y1="360" x2="613" y2="360" marker-end="url(#ah)"/>
+    <line x1="785" y1="360" x2="805" y2="360" marker-end="url(#ah)"/>
+    <line x1="977" y1="360" x2="997" y2="360" marker-end="url(#ah)"/>
+    <line x1="1169" y1="360" x2="1189" y2="360" marker-end="url(#ah)"/>
+  </g>
+
+  <!-- pipeline <-> Nightshift and World Model -->
+  <g stroke-width="2" fill="none">
+    <line x1="316" y1="430" x2="316" y2="498" stroke="#4D7C0F" marker-end="url(#ag)"/>
+    <line x1="508" y1="430" x2="508" y2="498" stroke="#4D7C0F" marker-end="url(#ag)"/>
+    <line x1="892" y1="430" x2="892" y2="498" stroke="#6B46C1" marker-end="url(#ap)"/>
+    <line x1="1084" y1="500" x2="1084" y2="432" stroke="#6B46C1" marker-end="url(#ap)"/>
+  </g>
+  <g font-size="12">
+    <text x="412" y="470" text-anchor="middle" fill="#3F6212">model calls · a receipt each</text>
+    <text x="900" y="470" fill="#553C9A">ingest facts</text>
+    <text x="1092" y="470" fill="#553C9A">provenance per line</text>
+  </g>
+
+  <!-- Nightshift + Nemotron -->
+  <rect x="40" y="500" width="660" height="240" rx="12" fill="#F4F9EC" stroke="#4D7C0F" stroke-width="1.5"/>
+  <text x="60" y="528" font-size="15" font-weight="700" fill="#1A2E05">Meterless Nightshift: the primary AI provider</text>
+  <g font-size="12.5" fill="#2D3748">
+    <text x="60" y="550">local OpenAI-compatible runtime at 127.0.0.1:8088/v1 · pinned model IDs, never meterless/auto</text>
+    <text x="60" y="568">a receipt ID and the routed model logged for every call · at most 4 calls at once</text>
+    <text x="60" y="586">thinking off for Lightning and Ultra · the models run in NVIDIA's cloud, through Nightshift</text>
+  </g>
+  <g font-size="12.5" fill="#2D3748" text-anchor="middle">
+    <rect x="60" y="600" width="200" height="125" rx="8" fill="#FFFFFF" stroke="#4D7C0F"/>
+    <text x="160" y="626" font-size="16" font-weight="700" fill="#1A2E05">Bolt</text>
+    <text x="160" y="646" font-size="12" fill="#4A5568">Nemotron 3.5 · e4b</text>
+    <text x="160" y="670">first juror (fast):</text>
+    <text x="160" y="688">votes on every row</text>
+
+    <rect x="270" y="600" width="200" height="125" rx="8" fill="#FFFFFF" stroke="#4D7C0F"/>
+    <text x="370" y="626" font-size="16" font-weight="700" fill="#1A2E05">Lightning</text>
+    <text x="370" y="646" font-size="12" fill="#4A5568">Nemotron 3.5 · 30B-A3B</text>
+    <text x="370" y="670">second juror;</text>
+    <text x="370" y="688">first re-decide of a row</text>
+    <text x="370" y="706">the critic sends back</text>
+
+    <rect x="480" y="600" width="200" height="125" rx="8" fill="#FFFFFF" stroke="#4D7C0F"/>
+    <text x="580" y="626" font-size="16" font-weight="700" fill="#1A2E05">Ultra</text>
+    <text x="580" y="646" font-size="12" fill="#4A5568">Nemotron 3 · 550B-A55B</text>
+    <text x="580" y="670">decides jury splits;</text>
+    <text x="580" y="688">critiques contested matches;</text>
+    <text x="580" y="706">second re-decide of a row</text>
+  </g>
+
+  <!-- World Model -->
+  <rect x="740" y="500" width="620" height="240" rx="12" fill="#F3EEFC" stroke="#6B46C1" stroke-width="1.5"/>
+  <text x="760" y="528" font-size="15" font-weight="700" fill="#322659">Meterless World Model engine</text>
+  <text x="760" y="548" font-size="12.5" font-style="italic" fill="#553C9A">the reference implementation, vendored unmodified (Apache-2.0)</text>
+  <g font-size="12.5" fill="#2D3748">
+    <text x="760" y="574">• every fact carries provenance: its source and the source's own date</text>
+    <text x="760" y="594">• entities: asset → software row → KEV product family → CVE</text>
+    <text x="760" y="614">• each match fact cites the receipt IDs of the model votes behind it</text>
+    <text x="760" y="634">• near-duplicate KEV spellings go to a merge-review queue</text>
+    <text x="760" y="654">• re-ingesting the same run adds no events (idempotent)</text>
+    <text x="760" y="674">• audit log: logs/audit-&lt;run_id&gt;.jsonl</text>
+    <text x="760" y="694">• memory: the next run recalls this one from its saved world</text>
+    <text x="760" y="714">• official conformance test: npm run verify:engine (8/8)</text>
+  </g>
+
+  <!-- sample mode -->
+  <g font-size="13" fill="#4A5568">
+    <text x="40" y="772"><tspan font-weight="700" fill="#2D3748">Sample mode</tspan> (SAMPLE_MODE=true): the same pipeline runs offline. Zetaris answers come from data/sample/snapshot.json (captured through Zetaris),</text>
+    <text x="40" y="792">the jury is replaced by the normaliser's deterministic vote, no model is called, and a network guard blocks every connection.</text>
+  </g>
+</svg>

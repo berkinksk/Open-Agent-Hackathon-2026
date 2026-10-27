@@ -1,0 +1,11 @@
+{
+  "policy": { "sla_days": { "patch_now": 3 } },
+  "inventory": [
+    { "software": "WordPress 6.4.3 - public charity website", "internet_facing": true },
+    { "software": "Roundcube Webmail 1.6.5", "internet_facing": true },
+    { "software": "MikroTik RouterOS 7.12 (office router)", "internet_facing": true },
+    { "software": "SolarWinds Web Help Desk 12.8.3" },
+    { "software": "SharePoint Online (Microsoft 365 intranet)" },
+    { "software": "Signal Desktop 7.20" }
+  ]
+}
