@@ -23,10 +23,11 @@ import type {
 } from "./contracts.ts";
 import { runJury } from "./agents/jury.ts";
 import type { JuryItem } from "./agents/jury.ts";
-import { whyFor, whyNotAffected, whyVersionUnconfirmed } from "./agents/reporter.ts";
+import { whyConfirmed, whyFor, whyNotAffected, whyVersionUnconfirmed } from "./agents/reporter.ts";
 import type { CriticOutcome, CriticRules } from "./agents/critic.ts";
 import { verifyLive } from "./agents/verifier.ts";
-import { addDays, assessRow, citeKev, mergePolicy, PolicyError, sortLines, summarise } from "./policy/analyst.ts";
+import { addDays, assessRow, citeKev, mergePolicy, PolicyError, scopeKevToVersion, sortLines, summarise } from "./policy/analyst.ts";
+import type { VersionScopeResult } from "./policy/analyst.ts";
 import type { AnalystContext } from "./policy/analyst.ts";
 import { groupWindowsQuestions, rangesForEdition, WINDOWS_FAMILY, windowsEdition } from "./policy/windows.ts";
 import { createLedgerWorld, ENGINE_SOURCE } from "./engine/index.ts";
@@ -35,6 +36,7 @@ import { reportFileName, writeReport } from "./report/index.ts";
 import { FactStore } from "./pipeline/facts.ts";
 import type { QueriesWithNvdStatus } from "./pipeline/facts.ts";
 import { hasBlocker, runCriticLoop, withNormaliserVote } from "./pipeline/critic-loop.ts";
+import { earlierRunsFor, openPreviousWorld, readRunIndex, rowMemoryKey, sinceLastRun, writeRunIndex } from "./pipeline/memory.ts";
 import type { CriticLoopStats } from "./pipeline/critic-loop.ts";
 import {
   familiesOf, familyOf, kevProductType, matchedKevPart, normaliserVote, parseSoftware, topCandidates,
@@ -42,11 +44,19 @@ import {
 import { candidatesV0, deterministicVoteV0, familyKey, familyV0, parseVersionV0 } from "./resolve/candidates.ts";
 import { hasVersion, rangesForProduct } from "./resolve/versions.ts";
 import { withNetworkGuard } from "./sample/guard.ts";
+import type { Discovery, NaiveJoin, NaiveJoinInput } from "./adapters/queries.ts";
 
 export { ENGINE_SOURCE };
 
 /** What the sample store reports about its snapshot (src/sample/queries.ts); absent on the live Queries. */
 interface SnapshotAware { snapshotInfo?: () => { file: string; captured_day: string; inventory_day: string } }
+/** The live Queries' cache-backed reads (src/adapters/queries.ts sourceStatus): served live, or from the saved copy. */
+interface ReadStatusAware { sourceStatus?: () => { query: string; label: string; fromCache: boolean; cachedAt?: string; rows: number }[] }
+/** The live Queries' discovery prelude and naive federated join (src/adapters/queries.ts); absent on the sample store. */
+interface FederationAware {
+  discover?: () => Promise<Discovery>;
+  naiveJoin?: (input: NaiveJoinInput) => Promise<NaiveJoin>;
+}
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_OUTPUT_DIR = join(REPO_ROOT, "output");
@@ -66,6 +76,8 @@ export const MAX_ULTRA_CRITIQUES = 16;
  */
 export const CRITIC_RULES: Partial<CriticRules> = { osVsApplication: true, unsureNormaliserIsNoVote: true };
 export const ULTRA_MATCH_CHECK = true;
+/** Once NVD confirms one KEV CVE of a match, look up the line's other cited CVEs too (within the NVD budget). */
+export const COMPLETE_VERSION_CHECK = true;
 export const MAX_RANGE_EVIDENCE = 4;
 
 /** What the pipeline needs from the normaliser. A1's normaliser is the default; v0 is kept for comparison. */
@@ -121,6 +133,10 @@ export interface RunOptions {
   juryBatchSize?: number;
   criticRules?: Partial<CriticRules>;
   ultraMatchCheck?: boolean;
+  /** Complete the version check of confirmed matches (default COMPLETE_VERSION_CHECK). */
+  completeVersionCheck?: boolean;
+  /** Memory across runs (default: live runs that save their world). False switches it off. */
+  memory?: boolean;
 }
 
 export class RequestError extends Error {
@@ -244,6 +260,8 @@ function isPolicyRule(e: Evidence): boolean {
 
 const byDateDesc = (a: KevEntry, b: KevEntry): number =>
   (b.date_added ?? "").localeCompare(a.date_added ?? "") || b.cve_id.localeCompare(a.cve_id);
+/** Sort key for "earliest due date first" (an entry without a valid due date last). */
+const dueKey = (e: KevEntry): string => (/^\d{4}-\d{2}-\d{2}/.test(e.due_date ?? "") ? e.due_date.slice(0, 10) : "9999-99-99");
 
 function uniqCves(entries: KevEntry[]): string[] {
   return [...new Set([...entries].sort(byDateDesc).map((e) => e.cve_id.trim().toUpperCase()))];
@@ -307,6 +325,52 @@ export function notAffectedBlock(
     return { kind: "uncovered", cves: missing, detail: `the version check did not cover ${missing.length} cited KEV CVE(s): ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ` and ${missing.length - 3} more` : ""}` };
   }
   return null;
+}
+
+/** What the naive join found for one row, next to the agents' answer. */
+export interface NaiveJoinRowCompare {
+  row_id: string;
+  naive: string[];          // "vendor / product" hits of the plain join
+  agents: string | null;    // the agents' KEV product, null = no KEV product or left to the owner
+  outcome: "agree" | "naive_only" | "naive_other" | "agents_only" | "neither" | "owner";
+}
+
+/**
+ * Sets the naive join's hits against the agents' final answers, row by row: agree (a hit names the agents' family),
+ * naive_only (hits, but the agents found no KEV product: look-alikes such as "Word" in "Word Online"), naive_other (hits,
+ * but on other products than the agents' match), agents_only (the agents matched a family the join missed), neither,
+ * owner (the agents left the row to the owner).
+ */
+export function compareNaiveJoin(
+  rows: InventoryRow[], hits: { row_id: string; vendor: string; product: string }[],
+  resOf: (rowId: string) => Resolution | undefined, familiesOf: (p: KevPair) => string[],
+): { rows: NaiveJoinRowCompare[]; counts: Record<NaiveJoinRowCompare["outcome"] | "rows" | "rows_hit", number>; summary: string } {
+  const byRow = new Map<string, { vendor: string; product: string }[]>();
+  for (const h of hits) byRow.set(h.row_id, [...(byRow.get(h.row_id) ?? []), h]);
+  const out: NaiveJoinRowCompare[] = rows.map((r) => {
+    const naive = byRow.get(r.row_id) ?? [];
+    const res = resOf(r.row_id);
+    const label = (p: { vendor: string; product: string }) => `${p.vendor.trim()} / ${p.product.trim()}`;
+    const naiveText = [...new Set(naive.map(label))];
+    if (!res || res.status === "unresolved") return { row_id: r.row_id, naive: naiveText, agents: null, outcome: "owner" };
+    if (res.status !== "matched" || !res.vendor || !res.product) {
+      return { row_id: r.row_id, naive: naiveText, agents: null, outcome: naive.length ? "naive_only" : "neither" };
+    }
+    const fam = res.family ? familyKey(res.family) : null;
+    const famsOfRes = new Set([...(fam ? [fam] : []), ...familiesOf({ vendor: res.vendor, product: res.product }).map(familyKey)]);
+    const agree = naive.some((h) => familiesOf(h).some((f) => famsOfRes.has(familyKey(f))));
+    const agents = label({ vendor: res.vendor, product: res.product });
+    return { row_id: r.row_id, naive: naiveText, agents, outcome: agree ? "agree" : naive.length ? "naive_other" : "agents_only" };
+  });
+  const c = (o: NaiveJoinRowCompare["outcome"]) => out.filter((x) => x.outcome === o).length;
+  const counts = {
+    rows: out.length, rows_hit: out.filter((x) => x.naive.length).length,
+    agree: c("agree"), naive_only: c("naive_only"), naive_other: c("naive_other"), agents_only: c("agents_only"), neither: c("neither"), owner: c("owner"),
+  };
+  const summary = `a plain SQL join of the inventory and KEV inside Zetaris (KEV product name inside the software text) hits ${counts.rows_hit} of ${counts.rows} row(s): `
+    + `${counts.agree} agree with the agents, ${counts.naive_only} are look-alikes the agents found no KEV product for, ${counts.naive_other} name another product than the agents' match; `
+    + `the agents resolve ${counts.agents_only} row(s) the join misses${counts.owner ? `, and leave ${counts.owner} to the owner` : ""}`;
+  return { rows: out, counts, summary };
 }
 
 // ---------------------------------------------------------------- run
@@ -393,9 +457,25 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       details: {
         pipeline: pipeline.name, as_of, models: MODELS,
         critic_rules: { ...CRITIC_RULES, ...(opts.criticRules ?? {}) }, ultra_match_check: opts.ultraMatchCheck ?? ULTRA_MATCH_CHECK,
+        complete_version_check: opts.completeVersionCheck ?? COMPLETE_VERSION_CHECK,
         nvd_budget_ms: opts.nvdBudgetMs ?? NVD_BUDGET_MS, jury_batch: opts.juryBatchSize ?? 10, candidates_k: CANDIDATES_K,
       },
     });
+    // discovery prelude (live): the sources registered in Zetaris, each REST table with its endpoint (display only)
+    const fed = deps.queries as FederationAware;
+    if (live && typeof fed.discover === "function") {
+      try {
+        const d = await timed("discovery", () => (fed.discover as () => Promise<Discovery>)());
+        helpers_live.push("zetaris.discovery");
+        tracer.emit({
+          agent: "zetaris", action: "discovery", target_agent: "normaliser", status: "ok", latency_ms: d.ms,
+          output_summary: `sources discovered: ${d.databases.length} database(s) (${d.databases.join(", ")}); ${d.tables.map((t) => `${t.db}.${t.name} <- ${t.source.replace(/^https?:\/\//, "").slice(0, 90)}`).join("; ")}`,
+          details: { databases: d.databases, tables: d.tables, sql: d.sql, ms: d.ms },
+        });
+      } catch (e) {
+        tracer.emit({ agent: "zetaris", action: "discovery", status: "error", output_summary: `discovery failed (display only; the run goes on): ${msg(e)}` });
+      }
+    }
     try {
       policy = mergePolicy(deps.policy ?? DEFAULT_POLICY, req.policy);
     } catch (e) {
@@ -606,6 +686,18 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
         maxUltraCritiques: opts.maxUltraCritiques ?? MAX_ULTRA_CRITIQUES,
         criticRules: { ...CRITIC_RULES, ...(opts.criticRules ?? {}) },
         ultraMatchCheck: opts.ultraMatchCheck ?? ULTRA_MATCH_CHECK,
+        // once NVD confirms one KEV CVE, the line's other cited CVEs are looked up too (most urgent first: the earliest
+        // due date, then the highest EPSS), so the ones NVD places outside are dropped on evidence
+        ...((opts.completeVersionCheck ?? COMPLETE_VERSION_CHECK) ? {
+          completeVersionCheck: (row: InventoryRow, res: Resolution) => {
+            const fam = rowFamily(row, res);
+            if (!fam) return [];
+            const epssOf = (c: string): number => facts.epssIndex().get(c.trim().toUpperCase())?.epss ?? -1;
+            return citeKev(facts.entries(fam))
+              .sort((a, b) => dueKey(a).localeCompare(dueKey(b)) || epssOf(b.cve_id) - epssOf(a.cve_id) || a.cve_id.localeCompare(b.cve_id))
+              .map((e) => e.cve_id);
+          },
+        } : {}),
       }));
       outcomes = loop.outcomes;
       loopStats = loop.stats;
@@ -625,12 +717,42 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
     if (!kevPairsError) await facts.ensureEpss(matchedFams(finalRes.values()).flatMap(citedOf));
     await prefetchNvd;
     await facts.settle();
+    // Zetaris answered from the client's saved copy (the live read failed): that data is labelled not live, the run is
+    // partial, and no line is relaxed to monitor on it (BUILD_KIT: "the cached snapshot, labelled"; design §5.5)
+    const fallbackReads = live ? ((deps.queries as ReadStatusAware).sourceStatus?.() ?? []).filter((x) => x.fromCache) : [];
+    const staleOf = (qs: string[]): { day: string } | null => {
+      const hit = fallbackReads.filter((x) => qs.includes(x.query));
+      if (!hit.length) return null;
+      const days = hit.map((x) => String(x.cachedAt ?? "").slice(0, 10)).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+      return { day: days[0] ?? "an unknown day" };
+    };
+    const staleInventory = staleOf(["inventory"]);
+    const staleKev = staleOf(["kevPairs", "kevByProducts"]);
+    const staleEpss = staleOf(["epss"]);
+    if (fallbackReads.length) {
+      problems.push("zetaris_fallback");
+      tracer.emit({
+        agent: "pipeline", action: "zetaris_fallback", status: "fallback",
+        output_summary: `${fallbackReads.length} Zetaris read(s) served from the client's cached copy (the live read failed): ${[...new Set(fallbackReads.map((x) => x.query))].join(", ")}; labelled not live, nothing relaxed to monitor on them`,
+        details: { reads: fallbackReads },
+      });
+    }
+    const cachedObject = (o: string, day: string): string => `${o} (cached copy saved ${day}; the live read failed)`;
+    if (staleInventory) {
+      const inv = sources.find((x) => x.name === "Inventory (synthetic)");
+      if (inv) Object.assign(inv, { live: false, as_of: staleInventory.day, object: cachedObject(inv.object, staleInventory.day) });
+    }
     const nvdLooked = [...facts.nvdState.entries()].filter(([c]) => facts.nvdLooked(c)).map(([c]) => c);
     if (facts.nvdDormant) helpers_dormant.push("nvdCves");
     else if (nvdLooked.length) helpers_live.push("nvdCves");
-    sources.push({ name: "CISA KEV", object: live ? "el.kev" : "sample snapshot (el.kev)", live, ...(facts.catalogVersion() ? { as_of: facts.catalogVersion() as string } : {}) });
+    const catalog = facts.catalogVersion();
+    sources.push(staleKev
+      ? { name: "CISA KEV", object: cachedObject(`el.kev${catalog ? `, catalog ${catalog}` : ""}`, staleKev.day), live: false, as_of: staleKev.day }
+      : { name: "CISA KEV", object: live ? "el.kev" : "sample snapshot (el.kev)", live, ...(catalog ? { as_of: catalog } : {}) });
     const epssDate = facts.epssScores().map((s) => s.score_date).filter(Boolean).sort().pop();
-    sources.push({ name: "FIRST EPSS", object: live ? "EL_EPSS.el_epss_<batch>" : "sample snapshot (EPSS)", live, ...(epssDate ? { as_of: epssDate } : {}) });
+    sources.push(staleEpss
+      ? { name: "FIRST EPSS", object: cachedObject(`EL_EPSS.el_epss_<batch>${epssDate ? `, scores of ${epssDate}` : ""}`, staleEpss.day), live: false, as_of: staleEpss.day }
+      : { name: "FIRST EPSS", object: live ? "EL_EPSS.el_epss_<batch>" : "sample snapshot (EPSS)", live, ...(epssDate ? { as_of: epssDate } : {}) });
     // NVD is "live" only when this run read some CVE through Zetaris; today's cache is labelled with its day
     const nvdLiveCves = nvdLooked.filter((c) => facts.nvdLive(c));
     const nvdOld = nvdLooked.filter((c) => !facts.nvdLive(c));
@@ -656,6 +778,7 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
     const unresolvedByCritic: string[] = [];
     const notAffected: string[] = [];
     const notAffectedHeld: string[] = [];
+    const versionScoped: { row_id: string; basis: VersionScopeResult["basis"]; cited: string[]; inside: string[]; outside: string[]; unchecked_cited: string[] }[] = [];
     const lines0: PatchLine[] = await timed("analyst", () => rows.map((row) => {
       let res = finalRes.get(row.row_id);
       const o = outcomes.get(row.row_id);
@@ -666,12 +789,31 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
         unresolvedByCritic.push(row.row_id);
       }
       const a = assessRow(row, res, ctx);
-      const line = a.line;
+      let line = a.line;
       if (!o) {
         if (a.owner) lineOwner.set(row.row_id, a.owner);
         line.why = whyFor(line, a.owner, policy);
         return line;
       }
+      // a line cites the KEV CVEs NVD does not rule out for the installed version: NVD's per-CVE check drops only the
+      // CVEs it places the version outside; the confirmed ones and the ones not version-checked stay cited, and the due
+      // date, overdue days and EPSS come from both (fail-closed)
+      const rowVersion = res?.version ?? parsedBy.get(row.row_id)?.version ?? null;
+      const scope = scopeKevToVersion(line, o.cve_status, { ...ctx, version: hasVersion(rowVersion) ? rowVersion : null }, (cves) => nvdRead(cves));
+      line = scope.line;
+      if (scope.changed) {
+        versionScoped.push({
+          row_id: row.row_id, basis: scope.basis, cited: (line.kev?.cves ?? []).map((e) => e.cve_id),
+          inside: scope.inside.map((e) => e.cve_id), outside: scope.outside.map((e) => e.cve_id),
+          unchecked_cited: scope.unchecked.map((e) => e.cve_id),
+        });
+      }
+      const whyPatch = (owner: OwnerQuestion | null): string =>
+        line.decision === "patch_now" && scope.basis === "inside"
+          ? whyConfirmed(line, policy, {
+            version: hasVersion(rowVersion) ? rowVersion : null, outside: scope.outside.length, inside: scope.inside.map((e) => e.cve_id),
+          })
+          : whyFor(line, owner, policy);
       const verdict = o.verdict.verdict === "send_back" ? { ...o.verdict, verdict: "ask_owner" as const } : o.verdict;
       line.critic = verdict;
       const fam = res ? rowFamily(row, res) : null;
@@ -705,7 +847,7 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
           // the version check did not cover every cited KEV CVE: "not affected" is unproven, so patch_now stays
           notAffectedHeld.push(row.row_id);
           line.evidence.push({ source: "agent", query: "critic", field: "not_affected_unproven", value: `NVD places the version outside the ranges it checked, but ${block.detail}; the line stays patch_now (fail-closed)`, live: false });
-          line.why = whyFor(line, a.owner, policy);
+          line.why = whyPatch(a.owner);
           if (a.owner) lineOwner.set(row.row_id, a.owner);
         } else if (relax) {
           notAffected.push(row.row_id);
@@ -716,7 +858,7 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
           line.evidence.push({ source: "agent", query: "policy", field: "rule", value: `monitor: the installed version is outside every NVD range of the ${o.family_cves.length} KEV CVE(s) of the family; review every ${policy.sla_days.monitor_review} days`, live: false });
           line.why = whyNotAffected(line, policy, { cves: o.family_cves.length, version });
         } else {
-          line.why = whyFor(line, a.owner, policy);
+          line.why = whyPatch(a.owner);
           if (a.owner) lineOwner.set(row.row_id, a.owner);
         }
       } else {
@@ -728,7 +870,10 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
           line.evidence.push({ source: "agent", query: "critic", field: "version_unconfirmed", value: versionCheck?.detail ?? "version not confirmed", live: false });
           line.evidence.push({ source: "agent", query: "policy", field: "rule", value: "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version", live: false });
           if (o.owner_question) lineOwner.set(row.row_id, o.owner_question);
-          line.why = whyVersionUnconfirmed(line, policy, isWindows(fam) ? { group: windowsEdition(row.software)?.label ?? "Windows", action: "install the latest cumulative update" } : {});
+          line.why = whyVersionUnconfirmed(line, policy, {
+            ...(isWindows(fam) ? { group: windowsEdition(row.software)?.label ?? "Windows", action: "install the latest cumulative update" } : {}),
+            outside: scope.outside.length,
+          });
         } else {
           // a match the critic did not approve (rubric, version, Ultra): the owner decides; the KEV listing stays as
           // context while the row is still matched (a rejected match was turned into "unresolved" above)
@@ -744,7 +889,9 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       }
       // NVD ranges behind the line's version check (the claimed product's CPEs only, at most a few), as cited evidence
       if (o.claimed && (line.decision !== "ask_owner" || notAffectedHeld.includes(row.row_id))) {
-        const all = o.family_cves.flatMap((c) => facts.nvdRanges.get(c) ?? []);
+        // the cited CVEs' ranges first (after the version scope, the CVEs NVD places the version inside)
+        const order = [...new Set([...(line.kev?.cves ?? []).map((e) => e.cve_id.trim().toUpperCase()), ...o.family_cves])];
+        const all = order.flatMap((c) => facts.nvdRanges.get(c) ?? []);
         const ed = isWindows(fam) ? windowsEdition(row.software) : null;
         const own = isWindows(fam) ? (ed ? rangesForEdition(ed, all) : []) : rangesForProduct(all, o.claimed.vendor, o.claimed.product);
         const mine = own.filter((r) => r.vulnerable).slice(0, MAX_RANGE_EVIDENCE);
@@ -752,6 +899,54 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       }
       return line;
     }));
+
+    // Cached Zetaris copies: their evidence is not live, and a line resting on a cached KEV or EPSS read is never relaxed
+    // to monitor (a stale KEV name list could hide a newly listed product): such lines go to the owner (fail-closed)
+    const heldStale: string[] = [];
+    if (staleInventory || staleKev || staleEpss) {
+      const staleNote = [
+        staleInventory && `the inventory (cached copy saved ${staleInventory.day})`,
+        staleKev && `CISA KEV (cached copy saved ${staleKev.day})`,
+        staleEpss && `FIRST EPSS (cached copy saved ${staleEpss.day})`,
+      ].filter(Boolean).join(", ");
+      for (const l of lines0) {
+        l.evidence = l.evidence.map((e) => ((staleKev && e.source === "zetaris:kev") || (staleEpss && e.source === "zetaris:epss") || (staleInventory && e.source === "zetaris:inventory")) ? { ...e, live: false } : e);
+        l.evidence.push({ source: "agent", query: "zetaris_fallback", field: "cached_copy", value: `read from the Zetaris client's cached copy because the live read failed: ${staleNote}`, live: false });
+        if (l.decision !== "monitor" || !(staleKev || staleEpss)) continue;
+        heldStale.push(l.row_id);
+        const what = [staleKev && `CISA KEV (served from a cached copy saved ${staleKev.day})`, staleEpss && `FIRST EPSS (served from a cached copy saved ${staleEpss.day})`].filter(Boolean).join(" and ");
+        const owner: OwnerQuestion = {
+          row_id: l.row_id, asset_name: l.asset_name,
+          question: `Please re-run when Zetaris answers live, or confirm that "${l.software}" on ${l.asset_name} is not affected by a current KEV listing.`,
+          reason: `${what} could not be read live, so this row was not relaxed to monitor (fail-closed)`,
+        };
+        l.decision = "ask_owner";
+        l.target_date = null;
+        l.evidence = l.evidence.filter((e) => !isPolicyRule(e));
+        l.evidence.push({ source: "agent", query: "policy", field: "rule", value: `ask_owner: ${owner.reason}`, live: false });
+        lineOwner.set(l.row_id, owner);
+        l.why = whyFor(l, owner, policy);
+      }
+    }
+
+    // The naive federated join inside Zetaris: what a plain SQL join of the inventory and KEV finds, set against the
+    // agents' answers (evidence and display only, never a decision input)
+    if (live && !kevPairsError && typeof fed.naiveJoin === "function") {
+      try {
+        const input: NaiveJoinInput = inventoryFrom === "zetaris" ? { from: "inventory", rowIds: rows.map((r) => r.row_id) } : { from: "values", rows };
+        const j = await timed("federated_join", () => (fed.naiveJoin as (i: NaiveJoinInput) => Promise<NaiveJoin>)(input));
+        const cmp = compareNaiveJoin(rows, j.rows, (id) => lines0.find((l) => l.row_id === id)?.resolution, famsOf);
+        helpers_live.push("zetaris.naive_join");
+        tracer.emit({
+          agent: "zetaris", action: "naive_join", target_agent: "exposure_analyst", status: "ok", latency_ms: j.ms,
+          input_summary: `${rows.length} row(s) x CISA KEV, joined inside Zetaris on "the KEV product name appears in the software text"`,
+          output_summary: cmp.summary,
+          details: { sql: j.sql, ms: j.ms, hits: j.rows.length, ...cmp.counts, rows: cmp.rows },
+        });
+      } catch (e) {
+        tracer.emit({ agent: "zetaris", action: "naive_join", status: "error", output_summary: `the naive join failed (display only; the run goes on): ${msg(e)}` });
+      }
+    }
 
     // Windows: one question per edition for the rows whose build is unconfirmed
     const winMembers = lines0.filter((l) => versionUnconfirmed.has(l.row_id) && isWindows(l.resolution.family))
@@ -781,6 +976,7 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       output_summary: `${summarise(lines).patch_now} patch_now (${versionUnconfirmed.size} version unconfirmed), ${summarise(lines).this_cycle} this_cycle, ${summarise(lines).ask_owner} ask_owner, ${summarise(lines).monitor} monitor (as of ${as_of})`,
       details: {
         version_unconfirmed: [...versionUnconfirmed], not_affected: notAffected, not_affected_held: notAffectedHeld, rejected_by_critic: unresolvedByCritic,
+        version_scoped: versionScoped, held_cached_source: heldStale,
         lines: lines.map((l) => ({ row_id: l.row_id, decision: l.decision, target_date: l.target_date, overdue_days: l.kev?.overdue_days ?? null, epss: l.epss?.max ?? null, critic: l.critic?.verdict ?? null })),
       },
     });
@@ -798,6 +994,32 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
           namespace: worldNamespace(tracer.run_id), ...(outputDir ? { persistDir: join(outputDir, "world") } : {}), tracer,
           resolver: { autoMergeAt: 1.01 }, // controller ruling: KEV spellings are never auto-merged, near-duplicates are queued
         });
+        // memory across runs (live runs that save their world), kept per row: each row's last earlier run, read back from
+        // its saved world through the engine, before this run is ingested; it keeps the patch_now clock (so this run's
+        // world records the kept target) and says what changed since then. A run on another subset of the rows moves only
+        // its own rows' pointers.
+        const memoryOn = live && !!outputDir && opts.memory !== false;
+        const worldDir = outputDir ? join(outputDir, "world") : "";
+        const memoryKeys = rows.map((r) => ({ row_id: r.row_id, key: rowMemoryKey(inventoryFrom, r) }));
+        if (memoryOn) {
+          try {
+            const { runs: earlier, fresh } = earlierRunsFor(readRunIndex(worldDir), memoryKeys, tracer.run_id);
+            const opened = earlier.map((g) => ({ ...g, world: openPreviousWorld(worldDir, g.pointer) }));
+            const diff = opened.some((g) => g.world) ? sinceLastRun(lines, opened, fresh) : null;
+            if (diff && diff.previous.length) {
+              helpers_live.push("world_model.since_last_run");
+              tracer.emit({
+                agent: "world_model", action: "since_last_run", target_agent: "reporter", status: "ok",
+                input_summary: `each row's last earlier run (${diff.previous.length} run(s): ${diff.previous.map((p) => `${p.run_id} x${p.rows.length}`).join(", ")}), reopened read-only from its saved world`,
+                output_summary: diff.summary, details: { ...diff },
+              });
+            } else {
+              tracer.emit({ agent: "world_model", action: "since_last_run", status: "ok", output_summary: `no earlier run on these ${rows.length} row(s): this run's world is their first` });
+            }
+          } catch (e) {
+            tracer.emit({ agent: "world_model", action: "since_last_run", status: "error", output_summary: `the earlier runs could not be read (${msg(e)}); this run is unaffected` });
+          }
+        }
         const fams = matchedFams(finalRes.values());
         const usedKev = [...new Map(fams.flatMap((f) => facts.entries(f)).map((e) => [`${e.cve_id}|${e.vendor}|${e.product}`, e])).values()];
         const spellings = fams.flatMap((f) => facts.pairsFor(f));
@@ -814,6 +1036,10 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
         const review = world.reviewQueue();
         const audit = logsDir ? world.writeAudit(logsDir, tracer.run_id) : null;
         const saved = outputDir ? world.persist() : null;
+        if (memoryOn && saved) {
+          try { writeRunIndex(worldDir, memoryKeys.map((k) => k.key), { run_id: tracer.run_id, namespace: worldNamespace(tracer.run_id), as_of, rows: rows.length }); }
+          catch (e) { tracer.emit({ agent: "world_model", action: "run_index", status: "error", output_summary: `the run index could not be written (${msg(e)})` }); }
+        }
         const stats = world.stats();
         tracer.emit({
           agent: "world_model", action: "explain_audit", status: "ok",
@@ -846,7 +1072,7 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       tracer.emit({
         agent: "pipeline", action: "agents_summary", status: "ok",
         output_summary: `jury ${juryStats ? `${juryStats.agreed} agreed, ${juryStats.splits} split (${juryStats.adjudicated} by Ultra)` : "skipped"}; critic ${loopStats ? `${loopStats.reviews} reviews in ${loopStats.rounds} round(s), ${loopStats.sent_back} send-back(s) (${loopStats.redecided.lightning} to Lightning, ${loopStats.redecided.ultra} to Ultra, ${loopStats.nvd_sendbacks} for NVD ranges), ${loopStats.ultra_critiques} Ultra critique(s)` : "skipped"}; ${owner_questions.length} owner question(s)`,
-        details: { jury: juryStats, critic: loopStats, nvd: { live_calls: facts.nvdCalls, cached: facts.nvdCachedHits, ms: facts.nvdMs, states: Object.fromEntries(facts.nvdState) } },
+        details: { jury: juryStats, critic: loopStats, nvd: { ...facts.nvdCounts(live), ms: facts.nvdMs, states: Object.fromEntries(facts.nvdState) } },
       });
     }
     helpers_live.unshift("normaliser", "resolver_jury");

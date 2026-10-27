@@ -123,11 +123,74 @@ function kevSort(a: KevEntry, b: KevEntry): number {
   return a.vendor.localeCompare(b.vendor) || a.product.localeCompare(b.product) || a.cve_id.localeCompare(b.cve_id);
 }
 
-export function createZetarisQueries(cfg: { client: SqlClient; tracer: Tracer; prefix: string }): Queries {
+/**
+ * One cache-backed read (cache "use") of a named query: whether Zetaris answered live, or the client served its saved
+ * copy because the live read failed (fromCache, with the day it was saved). The pipeline labels such data not live,
+ * marks the run partial and never relaxes a line to monitor on it. The verifier's reads bypass the cache: not listed.
+ */
+export interface ZetarisReadStatus {
+  query: "inventory" | "kevPairs" | "kevByProducts" | "epss";
+  label: string;
+  fromCache: boolean;
+  cachedAt?: string;
+  rows: number;
+}
+
+/** What discovery found: the app's databases among SHOW LIGHTNING DATABASES, and the REST tables of two of them. */
+export interface Discovery {
+  databases: string[];
+  tables: { db: string; name: string; source: string }[];
+  sql: string[];
+  ms: number;
+}
+
+/** One hit of the naive join: a KEV (vendor, product) whose product name appears inside the row's software text. */
+export interface NaiveJoinRow { row_id: string; vendor: string; product: string; kev_cves: number; }
+export interface NaiveJoin { sql: string; rows: NaiveJoinRow[]; ms: number; }
+
+/** The rows a naive join runs over: the registered inventory (by row id) or the request's own rows (inline VALUES). */
+export type NaiveJoinInput = { from: "inventory"; rowIds: string[] } | { from: "values"; rows: { row_id: string; software: string }[] };
+
+export const NAIVE_JOIN_MAX_ROWS = 200;
+
+/**
+ * The naive federated join, inside Zetaris: inventory rows x KEV, matched when a KEV product name appears in the
+ * software text (lower-cased, trimmed). It is display and evidence only (what a plain SQL join finds), never a decision
+ * input: KEV's generic names ("Desktop", "Server", "Word") give look-alikes, and messy names give misses.
+ */
+export function naiveJoinSql(input: NaiveJoinInput, prefix = "EL_"): string {
+  const n = elNames(prefix);
+  const join = `JOIN ${n.kevRef} k ON instr(lower(i.software), lower(trim(k.product))) > 0`;
+  const tail = "GROUP BY i.row_id, k.vendor, k.product ORDER BY i.row_id, k.vendor, k.product";
+  const select = "SELECT i.row_id, k.vendor, k.product, count(DISTINCT k.cve_id) AS kev_cves";
+  if (input.from === "inventory") {
+    const ids = [...new Set(input.rowIds.map((x) => String(x ?? "").trim()).filter(Boolean))].slice(0, NAIVE_JOIN_MAX_ROWS);
+    return `${select} FROM ${n.inventoryRef} i ${join} WHERE i.row_id IN (${ids.map(sqlString).join(", ")}) ${tail}`;
+  }
+  const rows = input.rows.slice(0, NAIVE_JOIN_MAX_ROWS)
+    .map((r) => `(${sqlString(String(r.row_id ?? "").slice(0, 80))}, ${sqlString(String(r.software ?? "").replace(/\s+/g, " ").slice(0, 300))})`);
+  return `${select} FROM (VALUES ${rows.join(", ")}) AS i(row_id, software) ${join} ${tail}`;
+}
+
+/** The live Queries plus the per-read status of the cache-backed reads (like the NVD adapter's nvdStatus()). */
+export type ZetarisQueries = Queries & {
+  sourceStatus(): ZetarisReadStatus[];
+  /** Discovery prelude: SHOW LIGHTNING DATABASES, then SHOW LIGHTNING TABLES of the inventory and KEV databases. */
+  discover(): Promise<Discovery>;
+  /** The naive inventory x KEV join, run inside Zetaris (live, never cached). */
+  naiveJoin(input: NaiveJoinInput): Promise<NaiveJoin>;
+};
+
+export function createZetarisQueries(cfg: { client: SqlClient; tracer: Tracer; prefix: string }): ZetarisQueries {
   const { client, tracer } = cfg;
   const n = elNames(cfg.prefix);
   const cveTable = new Map<string, string>(); // CVE -> EPSS table it was fetched through (this run)
   const registered = new Set<string>();       // EPSS tables created or confirmed by this instance
+  const reads: ZetarisReadStatus[] = [];
+  const noteRead = (query: ZetarisReadStatus["query"], label: string, r: QueryResult): QueryResult => {
+    reads.push({ query, label, fromCache: r.fromCache === true, ...(r.fromCache && r.cachedAt ? { cachedAt: r.cachedAt } : {}), rows: r.rows.length });
+    return r;
+  };
 
   const noteInvalid = (where: string, invalid: string[]) => {
     if (!invalid.length) return;
@@ -153,17 +216,49 @@ export function createZetarisQueries(cfg: { client: SqlClient; tracer: Tracer; p
 
   async function readEpss(table: string, cache: CacheMode, label: string, onlyIds?: string[]): Promise<EpssScore[]> {
     const r = await client.query(epssSelectSql(table, n.prefix, onlyIds), { cache, label, limit: EPSS_BATCH_MAX * 2 });
+    if (cache === "use") noteRead("epss", label, r);
     return r.rows.map(toEpssScore).filter((x): x is EpssScore => x !== null);
   }
 
   return {
+    sourceStatus(): ZetarisReadStatus[] {
+      return reads.map((x) => ({ ...x }));
+    },
+
+    async discover(): Promise<Discovery> {
+      const t0 = performance.now();
+      const sql = ["SHOW LIGHTNING DATABASES"];
+      const dbsRes = await client.query(sql[0], { cache: "bypass", label: "discover_databases", limit: 1000 });
+      const mine = new Set([n.invDb, n.kevDb, n.epssDb, n.nvdDb].map((x) => x.toUpperCase()));
+      const databases = dbsRes.rows.map((r) => String(Object.values(r)[0] ?? "").trim()).filter((d) => mine.has(d.toUpperCase())).sort();
+      const tables: Discovery["tables"] = [];
+      for (const db of [n.invDb, n.kevDb]) {
+        if (!databases.some((d) => d.toUpperCase() === db.toUpperCase())) continue;
+        const q = `SHOW LIGHTNING TABLES ${db}`;
+        sql.push(q);
+        const r = await client.query(q, { cache: "bypass", label: "discover_tables", limit: 1000 });
+        for (const row of r.rows) tables.push({ db, name: String(row.name ?? ""), source: String(row.source_table ?? "") });
+      }
+      return { databases, tables, sql, ms: Math.round(performance.now() - t0) };
+    },
+
+    async naiveJoin(input: NaiveJoinInput): Promise<NaiveJoin> {
+      const sql = naiveJoinSql(input, n.prefix);
+      const r = await client.query(sql, { cache: "bypass", label: "naive_join", limit: 10000 });
+      const rows = r.rows.map((x) => ({
+        row_id: String(x.row_id ?? "").trim(), vendor: String(x.vendor ?? ""), product: String(x.product ?? ""),
+        kev_cves: Number(x.kev_cves) || 0,
+      })).filter((x) => x.row_id && x.product.trim());
+      return { sql, rows, ms: r.ms };
+    },
+
     async inventory(): Promise<InventoryRow[]> {
-      const r = await client.query(`SELECT ${INVENTORY_COLUMNS.join(", ")} FROM ${n.inventoryRef}`, { cache: "use", label: "inventory", limit: 5000 });
+      const r = noteRead("inventory", "inventory", await client.query(`SELECT ${INVENTORY_COLUMNS.join(", ")} FROM ${n.inventoryRef}`, { cache: "use", label: "inventory", limit: 5000 }));
       return r.rows.map(toInventoryRow).filter((x) => x.row_id !== "" || x.software.trim() !== "");
     },
 
     async kevPairs(): Promise<KevPair[]> {
-      const r = await client.query(`SELECT DISTINCT vendor, product FROM ${n.kevRef} ORDER BY vendor, product`, { cache: "use", label: "kevPairs", limit: 10000 });
+      const r = noteRead("kevPairs", "kevPairs", await client.query(`SELECT DISTINCT vendor, product FROM ${n.kevRef} ORDER BY vendor, product`, { cache: "use", label: "kevPairs", limit: 10000 }));
       return r.rows.map((x) => ({ vendor: x.vendor ?? "", product: x.product ?? "" }));
     },
 
@@ -180,7 +275,8 @@ export function createZetarisQueries(cfg: { client: SqlClient; tracer: Tracer; p
       const parts = chunk([...keys.values()], PAIR_CHUNK);
       for (let i = 0; i < parts.length; i++) {
         const where = parts[i].map(({ v, p }) => `(lower(trim(vendor)) = ${sqlString(v)} AND lower(trim(product)) = ${sqlString(p)})`).join(" OR ");
-        const r = await client.query(`${kevSelect(n)} WHERE ${where}`, { cache: "use", label: `kevByProducts(${parts[i].length})`, limit: 10000 });
+        const label = `kevByProducts(${parts[i].length})`;
+        const r = noteRead("kevByProducts", label, await client.query(`${kevSelect(n)} WHERE ${where}`, { cache: "use", label, limit: 10000 }));
         out.push(...r.rows.map(toKevEntry));
       }
       return out.sort(kevSort);

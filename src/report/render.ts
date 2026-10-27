@@ -321,6 +321,8 @@ function header(c: Ctx): string {
 function nav(c: Ctx): string {
   const items: [string, string][] = [["summary", "Summary"]];
   if (c.facts?.pipeline.length) items.push(["pipeline", "How it was made"]);
+  if (naiveJoinEvent(c)) items.push(["federation", "Plain SQL join"]);
+  if (sinceLastRunEvent(c)) items.push(["since-last-run", "Since the last run"]);
   items.push(["patch-list", "Patch list"], ["owner-questions", "Owner questions"], ["sources", "Sources and rules"],
     ["models", "Models at work"], ["critic", "Critic"], ["timing", "Timing"]);
   if (c.trace) items.push(["timeline", "Trace"]);
@@ -367,6 +369,58 @@ function pipelineSection(c: Ctx): string {
   const receipted = c.receipts.filter((r) => r.receipt_id).length;
   return section("pipeline", "How this list was made", `<div class="steps-row">${boxes}</div>`,
     `Each agent's own summary from this run's trace, in pipeline order.${c.receipts.length ? ` ${receipted} of ${plural(c.receipts.length, "model call")} carry a Nightshift receipt (see <a href="#models">Models at work</a>).` : ""}`);
+}
+
+function naiveJoinEvent(c: Ctx): TraceEvent | null {
+  return (c.trace ?? []).find((e) => e.action === "naive_join" && e.status === "ok") ?? null;
+}
+
+const NAIVE_OUTCOME: Record<string, string> = {
+  agree: "agrees", naive_only: "look-alike (agents: no KEV product)", naive_other: "another product than the agents' match",
+  agents_only: "missed by the join", neither: "neither", owner: "left to the owner",
+};
+
+/** The naive federated join (inventory x KEV inside Zetaris) set against the agents, from the run's own trace. */
+function federationSection(c: Ctx): string {
+  const e = naiveJoinEvent(c);
+  if (!e) return "";
+  const d = detailsObj(e);
+  const disc = (c.trace ?? []).find((x) => x.action === "discovery" && x.status === "ok");
+  const rows = objs(d.rows as { row_id: string; naive: string[]; agents: string | null; outcome: string }[] | undefined)
+    .filter((r) => r && (arr(r.naive).length || r.outcome === "agents_only"))
+    .map((r) => `<tr><td class="mono">${lineLink(String(r.row_id), c.lineIds)}</td><td>${arr(r.naive).map((x) => esc(x)).join("<br>") || "–"}</td><td>${txt(r.agents ?? "no KEV product")}</td><td>${txt(NAIVE_OUTCOME[str(r.outcome)] ?? r.outcome)}</td></tr>`);
+  const body = `${disc ? `<p class="sub">${txt(disc.output_summary)}</p>` : ""}<p>${txt(e.output_summary)} (${esc(fmtMs(d.ms ?? e.latency_ms))}).</p>`
+    + `<pre class="mono sql">${txt(d.sql)}</pre>`
+    + (rows.length ? table(["Row", "Plain join hit", "Agents' answer", "Outcome"], rows, "compact") : "");
+  return section("federation", "One SQL across the inventory and KEV, inside Zetaris", body,
+    "What a plain federated join finds (the KEV product name inside the software text), next to what the agents resolved. Display only: it never decides a line.");
+}
+
+function sinceLastRunEvent(c: Ctx): TraceEvent | null {
+  return (c.trace ?? []).find((e) => e.action === "since_last_run" && e.status === "ok" && detailsObj(e).previous) ?? null;
+}
+
+/** What the World Model recalled from each row's last earlier run (its saved world), from this run's trace. */
+function sinceLastRunSection(c: Ctx): string {
+  const e = sinceLastRunEvent(c);
+  if (!e) return "";
+  const d = detailsObj(e);
+  const items: string[] = [];
+  for (const x of objs(d.changed as { row_id: string; from: string; to: string }[] | undefined)) {
+    items.push(`<li>${lineLink(String(x.row_id), c.lineIds)}: decision ${decisionPill(x.from)} → ${decisionPill(x.to)}</li>`);
+  }
+  for (const x of objs(d.newly_cited as { row_id: string; cves: { cve_id: string; date_added: string; added_since_last_run: boolean }[] }[] | undefined)) {
+    items.push(`<li>${lineLink(String(x.row_id), c.lineIds)}: newly cited ${arr(x.cves).map((v) => `<span class="mono">${txt(v.cve_id)}</span>${v.added_since_last_run ? ` (added to KEV ${txt(v.date_added)}, after the last run)` : ""}`).join(", ")}</li>`);
+  }
+  for (const x of objs(d.anchored as { row_id: string; target_date: string; was: string; since: string }[] | undefined)) {
+    items.push(`<li>${lineLink(String(x.row_id), c.lineIds)}: still patch_now; the target stays ${txt(x.target_date)} (not ${txt(x.was)}), the date the earlier run set</li>`);
+  }
+  for (const x of objs(d.still_open as { row_id: string; since: string }[] | undefined)) {
+    items.push(`<li>${lineLink(String(x.row_id), c.lineIds)}: owner question still open since ${txt(x.since)}</li>`);
+  }
+  const body = `<p>${txt(e.output_summary)}.</p>${items.length ? `<ul class="since">${items.join("")}</ul>` : `<p class="empty">Nothing changed for these rows.</p>`}`;
+  return section("since-last-run", "Since the last run", body,
+    "Recalled by the World Model from the saved world of each row's last earlier run (read-only, through the engine; memory is kept per row, so a run on other rows does not reset these). A line that was already patch_now keeps its earlier target date, so re-running never pushes a deadline back.");
 }
 
 function sourcesAndRules(c: Ctx): string {
@@ -901,7 +955,7 @@ h1{margin:0;font-size:30px;letter-spacing:-.01em}h2{margin:0 0 12px;font-size:22
 .nav-run{font-size:13.5px;color:var(--muted);margin:0 8px 0 2px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:0 0 16px}
 .card.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
-.lead{margin:0 0 12px;color:var(--muted)}.empty{color:var(--muted);font-style:italic;margin:6px 0}
+.lead{margin:0 0 12px;color:var(--muted)}pre.sql{white-space:pre-wrap;word-break:break-word;font-size:12px;margin:6px 0 10px}.empty{color:var(--muted);font-style:italic;margin:6px 0}
 .chips{display:flex;flex-wrap:wrap;gap:12px}
 .chip{display:flex;align-items:baseline;gap:10px;padding:10px 18px;border-radius:10px;text-decoration:none;border:1px solid transparent;min-width:170px}
 .chip-n{font-size:34px;font-weight:700;line-height:1}.chip-l{font-size:17px;font-weight:600}.chip.zero{opacity:.55}
@@ -1029,6 +1083,8 @@ ${header(c)}
 ${nav(c)}
 ${summarySection(c)}
 ${pipelineSection(c)}
+${federationSection(c)}
+${sinceLastRunSection(c)}
 ${patchList(c)}
 ${ownerQuestions(c)}
 ${sourcesAndRules(c)}

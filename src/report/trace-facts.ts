@@ -235,8 +235,8 @@ export function indexTrace(trace: TraceEvent[], receipts: Receipt[]): TraceFacts
     };
   });
 
-  // NVD: the run's per-CVE outcomes when present, else the lookup events. The summary's live_calls counter is not
-  // used: it counts every non-cached attempt, failed lookups included (and sample-mode misses).
+  // NVD: the run's per-CVE outcomes when present, else the lookup events. The summary's counters (live_reads, attempts;
+  // live_calls in older traces) are not used: the per-CVE states say the same, and older counters mixed in failures.
   const summary = evs.find((e) => e.action === "agents_summary");
   const nvdD = obj(summary ? obj(details(summary).nvd) : {});
   const nvdEvents = evs.filter((e) => /^nvd$/i.test(str(e.agent)));
@@ -251,7 +251,7 @@ export function indexTrace(trace: TraceEvent[], receipts: Receipt[]): TraceFacts
   const callers = (re: RegExp) => [...new Set(receipts.filter((r) => re.test(str(r.agent))).map((r) => modelShort(r.requested_model)).filter(Boolean))];
   const pipeline: PipelineStep[] = [];
   const push = (agent: string, models: string[], text: string[]) => { if (text.length) pipeline.push({ agent, models, text }); };
-  push("Zetaris", [], [...said(first("inventory_loaded")), ...said(first("kev_pairs"))]);
+  push("Zetaris", [], [...said(first("discovery")), ...said(first("inventory_loaded")), ...said(first("kev_pairs")), ...said(first("naive_join"))]);
   push("Normaliser", [], said(first("candidates_built")));
   const jury = first("jury_summary");
   const adj = first("ultra_adjudication");
