@@ -2,29 +2,29 @@
   "run_id": "example-1",
   "mode": "live",
   "status": "success",
-  "started_at": "2026-10-27T04:15:47.356Z",
-  "finished_at": "2026-10-27T04:16:12.470Z",
+  "started_at": "2026-10-27T15:06:50.989Z",
+  "finished_at": "2026-10-27T15:07:21.331Z",
   "as_of": "2026-10-27",
   "timing_ms": {
-    "discovery": 164,
-    "inventory": 1064,
-    "kev_pairs": 540,
-    "normalise": 58,
-    "facts": 1069,
-    "nvd": 2,
-    "jury": 16926,
-    "critic": 3798,
-    "analyst": 5,
-    "federated_join": 1387,
-    "verifier": 622,
-    "world_model": 67,
-    "total": 25113
+    "discovery": 251,
+    "inventory": 601,
+    "kev_pairs": 611,
+    "normalise": 61,
+    "facts": 2748,
+    "nvd": 1,
+    "jury": 13421,
+    "critic": 11878,
+    "analyst": 4,
+    "federated_join": 922,
+    "verifier": 587,
+    "world_model": 55,
+    "total": 30342
   },
   "summary": {
-    "patch_now": 8,
+    "patch_now": 7,
     "this_cycle": 0,
     "monitor": 3,
-    "ask_owner": 1
+    "ask_owner": 2
   },
   "lines": [
     {
@@ -49,7 +49,7 @@
             "product": "HTTP Server",
             "product_type": "server",
             "confidence": 0.98,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R61",
@@ -58,7 +58,7 @@
             "product": "HTTP Server",
             "product_type": "server",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R61",
@@ -156,14 +156,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
@@ -209,7 +209,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99992",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -286,7 +286,7 @@
           "source": "world_model",
           "query": "explain(R61)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -321,7 +321,7 @@
             "product": "NetScaler ADC and Gateway",
             "product_type": "unknown",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R55",
@@ -330,7 +330,7 @@
             "product": "NetScaler ADC and Gateway",
             "product_type": "unknown",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R55",
@@ -649,14 +649,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
@@ -838,7 +838,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99999",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -874,7 +874,7 @@
           "source": "world_model",
           "query": "explain(R55)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -909,7 +909,7 @@
             "product": "Connect Secure",
             "product_type": "network_appliance",
             "confidence": 0.98,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R24",
@@ -918,7 +918,7 @@
             "product": "Connect Secure",
             "product_type": "network_appliance",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R24",
@@ -1172,14 +1172,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
@@ -1321,7 +1321,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99999",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -1357,7 +1357,7 @@
           "source": "world_model",
           "query": "explain(R24)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1392,7 +1392,7 @@
             "product": "Exchange Server",
             "product_type": "server",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R63",
@@ -1401,7 +1401,7 @@
             "product": "Exchange Server",
             "product_type": "server",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R63",
@@ -1497,7 +1497,7 @@
       "epss": {
         "max": 0.9997,
         "cve_id": "CVE-2022-41082",
-        "percentile": 0.99977
+        "percentile": 0.99978
       },
       "evidence": [
         {
@@ -1512,14 +1512,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
@@ -1580,7 +1580,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.9997",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -1650,7 +1650,7 @@
           "source": "world_model",
           "query": "explain(R63)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1685,7 +1685,7 @@
             "product": "Tomcat",
             "product_type": "server",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_p1e740fl"
+            "receipt_id": "rcpt_req_oj3cxr4j"
           },
           {
             "row_id": "R73",
@@ -1693,8 +1693,8 @@
             "vendor": "Apache",
             "product": "Tomcat",
             "product_type": "server",
-            "confidence": 0.99,
-            "receipt_id": "rcpt_req_12xso1bv"
+            "confidence": 0.5,
+            "receipt_id": "rcpt_req_juzzifxr"
           },
           {
             "row_id": "R73",
@@ -1766,14 +1766,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_p1e740fl",
+          "value": "rcpt_req_oj3cxr4j",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_12xso1bv",
+          "value": "rcpt_req_juzzifxr",
           "live": true
         },
         {
@@ -1810,7 +1810,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99942",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -1880,7 +1880,7 @@
           "source": "world_model",
           "query": "explain(R73)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_12xso1bv, rcpt_req_p1e740fl",
+          "value": "matched by bolt+lightning; receipts rcpt_req_juzzifxr, rcpt_req_oj3cxr4j",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1889,6 +1889,431 @@
           "query": "explain(R73)",
           "field": "kev_family_spellings",
           "value": "apache:tomcat: Apache / Tomcat",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R40",
+      "asset_id": "A06",
+      "asset_name": "mail-filter-01",
+      "internet_facing": true,
+      "software": "Cisco Secure Email GW (ESA) - release not noted",
+      "resolution": {
+        "row_id": "R40",
+        "status": "matched",
+        "vendor": "Cisco",
+        "product": "Secure Email Gateway",
+        "family": "cisco:secure-email-gateway",
+        "version": null,
+        "product_type": "unknown",
+        "votes": [
+          {
+            "row_id": "R40",
+            "juror": "bolt",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "network_appliance",
+            "confidence": 0.97,
+            "receipt_id": "rcpt_req_wxor4tk6"
+          },
+          {
+            "row_id": "R40",
+            "juror": "lightning",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "unknown",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_m0ofmgp1"
+          },
+          {
+            "row_id": "R40",
+            "juror": "normaliser",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "product_type": "server",
+            "confidence": 0.79
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R40",
+        "verdict": "ask_owner",
+        "reasons": [
+          "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 2,
+          "total": 7
+        },
+        "round": 0
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 13 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "Cisco Secure Email Gateway is listed in CISA KEV as exploited in the wild: 2 cited CVEs, most recently CVE-2026-76519 (added 2026-10-14). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2026-09-17) passed 40 days ago): the version is unconfirmed, so it stays patch_now until you answer the owner question.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2026-76519",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "vulnerability_name": "Cisco Secure Email Gateway Relative Path Traversal Vulnerability",
+            "date_added": "2026-10-14",
+            "due_date": "2026-10-17",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Cisco Secure Email Gateway contains a relative path traversal vulnerability that could allow an unauthenticated, remote attacker to write arbitrary files on the underlying operating system.",
+            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-afw-zqYJkjxp ; ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76519",
+            "catalog_version": "2026.10.26"
+          },
+          {
+            "cve_id": "CVE-2026-76461",
+            "vendor": "Cisco",
+            "product": "Secure Email Gateway",
+            "vulnerability_name": "Cisco Secure Email Gateway SQL Injection Vulnerability",
+            "date_added": "2026-09-14",
+            "due_date": "2026-09-17",
+            "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
+            "short_description": "Cisco AsyncOS software for Cisco Secure Email Gateway (SEG) contains a SQL injection vulnerability that could allow an unauthenticated, remote attacker to execute arbitrary commands with root privileges on the underlying operating system.",
+            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-inj-2bLVGmhX ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76461",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2026-09-17",
+        "overdue_days": 40
+      },
+      "epss": {
+        "max": 0.29543,
+        "cve_id": "CVE-2026-76461",
+        "percentile": 0.98178
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "Cisco Secure Email GW (ESA) - release not noted",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wxor4tk6",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_m0ofmgp1",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "Cisco Secure Email Gateway",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "Cisco Secure Email Gateway",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-76519",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2026-76461",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.29543",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "critic",
+          "field": "version_unconfirmed",
+          "value": "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "provenance",
+          "value": "10 current fact(s) about this row, its asset and 2 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R40)",
+          "field": "kev_family_spellings",
+          "value": "cisco:secure-email-gateway: Cisco / Secure Email Gateway",
+          "live": false
+        }
+      ]
+    },
+    {
+      "row_id": "R44",
+      "asset_id": "A10",
+      "asset_name": "print-01",
+      "internet_facing": false,
+      "software": "PaperCut NG v22.0.4 - print management",
+      "resolution": {
+        "row_id": "R44",
+        "status": "matched",
+        "vendor": "PaperCut",
+        "product": "MF/NG",
+        "family": "papercut:mf-ng",
+        "version": "22.0.4",
+        "product_type": "server",
+        "votes": [
+          {
+            "row_id": "R44",
+            "juror": "bolt",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "product_type": "server",
+            "confidence": 0.98,
+            "receipt_id": "rcpt_req_wxor4tk6"
+          },
+          {
+            "row_id": "R44",
+            "juror": "lightning",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_m0ofmgp1"
+          },
+          {
+            "row_id": "R44",
+            "juror": "normaliser",
+            "vendor": null,
+            "product": null,
+            "product_type": "server",
+            "confidence": 0.3
+          }
+        ],
+        "adjudicated_by": null,
+        "confidence": 1
+      },
+      "critic": {
+        "row_id": "R44",
+        "verdict": "approve",
+        "reasons": [
+          "approved: rubric 8/9 (L2, automatic)"
+        ],
+        "rubric": {
+          "accuracy": 3,
+          "appropriateness": 2,
+          "actionability": 3,
+          "total": 8
+        },
+        "round": 1
+      },
+      "verified": true,
+      "verifier_notes": [
+        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
+      ],
+      "why": "NVD places PaperCut MF/NG 22.0.4 inside the affected range of CVE-2023-27350, which CISA KEV lists as exploited in the wild (added 2023-04-21). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2023-05-12) passed 1264 days ago, and EPSS for CVE-2023-27350 is 0.99999.",
+      "decision": "patch_now",
+      "target_date": "2026-11-03",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2023-27350",
+            "vendor": "PaperCut",
+            "product": "MF/NG",
+            "vulnerability_name": "PaperCut MF/NG Improper Access Control Vulnerability",
+            "date_added": "2023-04-21",
+            "due_date": "2023-05-12",
+            "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "PaperCut MF/NG contains an improper access control vulnerability within the SetupCompleted class that allows authentication bypass and code execution in the context of system.",
+            "notes": "https://www.papercut.com/kb/Main/PO-1216-and-PO-1219;  https://nvd.nist.gov/vuln/detail/CVE-2023-27350",
+            "catalog_version": "2026.10.26"
+          }
+        ],
+        "earliest_due": "2023-05-12",
+        "overdue_days": 1264
+      },
+      "epss": {
+        "max": 0.99999,
+        "cve_id": "CVE-2023-27350",
+        "percentile": 0.99994
+      },
+      "evidence": [
+        {
+          "source": "zetaris:inventory",
+          "query": "inventory",
+          "field": "software",
+          "value": "PaperCut NG v22.0.4 - print management",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.bolt",
+          "field": "receipt_id",
+          "value": "rcpt_req_wxor4tk6",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_m0ofmgp1",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "normaliser",
+          "field": "vote",
+          "value": "none",
+          "live": false
+        },
+        {
+          "source": "agent",
+          "query": "resolver_jury",
+          "field": "resolves_to",
+          "value": "PaperCut MF/NG",
+          "live": true
+        },
+        {
+          "source": "zetaris:kev",
+          "query": "kevByProducts",
+          "field": "cve_id",
+          "value": "CVE-2023-27350",
+          "as_of": "2026.10.26",
+          "live": true
+        },
+        {
+          "source": "zetaris:epss",
+          "query": "epss",
+          "field": "epss",
+          "value": "0.99999",
+          "as_of": "2026-10-27",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "policy",
+          "field": "rule",
+          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "live": false
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_check",
+          "value": "version 22.0.4 is inside an NVD affected range",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 21.0.0 < 21.2.11",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 22.0.0 < 22.0.9",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "zetaris:nvd",
+          "query": "nvdCves",
+          "field": "version_range",
+          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_ng:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
+          "live": false,
+          "as_of": "2026-10-27"
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "provenance",
+          "value": "7 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "resolves_to <- agent:jury",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
+          "as_of": "2026-10-27T00:00:00.000Z",
+          "live": false
+        },
+        {
+          "source": "world_model",
+          "query": "explain(R44)",
+          "field": "kev_family_spellings",
+          "value": "papercut:mf-ng: PaperCut / MF/NG",
           "live": false
         }
       ]
@@ -1915,7 +2340,16 @@
             "product": "Windows",
             "product_type": "os",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
+          },
+          {
+            "row_id": "R43",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Exchange Server",
+            "product_type": "server",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R43",
@@ -1924,7 +2358,7 @@
             "product": "Windows",
             "product_type": "os",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_beiykd0l"
+            "receipt_id": "rcpt_req_n06lqy7s"
           },
           {
             "row_id": "R43",
@@ -1936,20 +2370,21 @@
           }
         ],
         "adjudicated_by": "ultra",
-        "confidence": 1
+        "confidence": 0.67
       },
       "critic": {
         "row_id": "R43",
         "verdict": "ask_owner",
         "reasons": [
           "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more)",
+          "rubric 6/9 (accuracy 2, appropriateness 2, actionability 2); auto needs >= 7",
           "name-only match: no version evidence; the owner confirms the version (L1)"
         ],
         "rubric": {
-          "accuracy": 3,
+          "accuracy": 2,
           "appropriateness": 2,
           "actionability": 2,
-          "total": 7
+          "total": 6
         },
         "round": 0
       },
@@ -1957,9 +2392,9 @@
       "verifier_notes": [
         "re-checked 103 cited value(s) against live single-source Zetaris queries: all match"
       ],
-      "why": "Microsoft Windows is listed in CISA KEV as exploited in the wild: 20 cited CVEs, most recently CVE-2026-96951 (added 2026-10-13). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2025-11-14) passed 347 days ago): install the latest cumulative update; the build is unconfirmed, so it stays patch_now and one question covers every Windows Server 2019 machine.",
-      "decision": "patch_now",
-      "target_date": "2026-11-03",
+      "why": "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more); rubric 6/9 (accuracy 2, appropriateness 2, actionability 2); auto needs >= 7; name-only match: no version evidence; the owner confirms the version (L1). Which exact Windows version or build runs on mail-01? \"2019\" is too vague to place in NVD's affected ranges for CVE-2026-96951.",
+      "decision": "ask_owner",
+      "target_date": null,
       "kev": {
         "cves": [
           {
@@ -2244,14 +2679,21 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.adjudicate",
           "field": "receipt_id",
-          "value": "rcpt_req_beiykd0l",
+          "value": "rcpt_req_n06lqy7s",
           "live": true
         },
         {
@@ -2441,37 +2883,15 @@
           "query": "epss",
           "field": "epss",
           "value": "0.9998",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
           "source": "agent",
           "query": "policy",
           "field": "rule",
-          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
+          "value": "ask_owner: name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more); rubric 6/9 (accuracy 2, appropriateness 2, actionability 2); auto needs >= 7; name-only match: no version evidence; the owner confirms the version (L1)",
           "live": false
-        },
-        {
-          "source": "agent",
-          "query": "critic",
-          "field": "version_unconfirmed",
-          "value": "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more)",
-          "live": false
-        },
-        {
-          "source": "agent",
-          "query": "policy",
-          "field": "rule",
-          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
-          "live": false
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_range",
-          "value": "CVE-2026-96951: cpe:2.3:o:microsoft:windows_server_2019:*:*:*:*:*:*:*:* < 10.0.17763.9376",
-          "live": false,
-          "as_of": "2026-10-27"
         },
         {
           "source": "world_model",
@@ -2485,7 +2905,7 @@
           "source": "world_model",
           "query": "explain(R43)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by ultra; receipts rcpt_req_beiykd0l, rcpt_req_e6w5ajhb",
+          "value": "matched by ultra; receipts rcpt_req_m0ofmgp1, rcpt_req_n06lqy7s, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -2494,431 +2914,6 @@
           "query": "explain(R43)",
           "field": "kev_family_spellings",
           "value": "microsoft:windows: Microsoft / ATM Font Driver | Microsoft / Ancillary Function Driver (afd.sys) | Microsoft / Client-Server Run-time Subsystem (CSRSS) | Microsoft / DWM Core Library | Microsoft / DirectX | Microsoft / DirectX Graphics Kernel (DXGKRNL) (+29 more)",
-          "live": false
-        }
-      ]
-    },
-    {
-      "row_id": "R40",
-      "asset_id": "A06",
-      "asset_name": "mail-filter-01",
-      "internet_facing": true,
-      "software": "Cisco Secure Email GW (ESA) - release not noted",
-      "resolution": {
-        "row_id": "R40",
-        "status": "matched",
-        "vendor": "Cisco",
-        "product": "Secure Email Gateway",
-        "family": "cisco:secure-email-gateway",
-        "version": null,
-        "product_type": "unknown",
-        "votes": [
-          {
-            "row_id": "R40",
-            "juror": "bolt",
-            "vendor": "Cisco",
-            "product": "Secure Email Gateway",
-            "product_type": "network_appliance",
-            "confidence": 0.97,
-            "receipt_id": "rcpt_req_e6w5ajhb"
-          },
-          {
-            "row_id": "R40",
-            "juror": "lightning",
-            "vendor": "Cisco",
-            "product": "Secure Email Gateway",
-            "product_type": "unknown",
-            "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
-          },
-          {
-            "row_id": "R40",
-            "juror": "normaliser",
-            "vendor": "Cisco",
-            "product": "Secure Email Gateway",
-            "product_type": "server",
-            "confidence": 0.79
-          }
-        ],
-        "adjudicated_by": null,
-        "confidence": 1
-      },
-      "critic": {
-        "row_id": "R40",
-        "verdict": "ask_owner",
-        "reasons": [
-          "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)"
-        ],
-        "rubric": {
-          "accuracy": 3,
-          "appropriateness": 2,
-          "actionability": 2,
-          "total": 7
-        },
-        "round": 0
-      },
-      "verified": true,
-      "verifier_notes": [
-        "re-checked 13 cited value(s) against live single-source Zetaris queries: all match"
-      ],
-      "why": "Cisco Secure Email Gateway is listed in CISA KEV as exploited in the wild: 2 cited CVEs, most recently CVE-2026-76519 (added 2026-10-14). Patch by 2026-11-03 under your 7-day rule (the US federal due date (2026-09-17) passed 40 days ago): the version is unconfirmed, so it stays patch_now until you answer the owner question.",
-      "decision": "patch_now",
-      "target_date": "2026-11-03",
-      "kev": {
-        "cves": [
-          {
-            "cve_id": "CVE-2026-76519",
-            "vendor": "Cisco",
-            "product": "Secure Email Gateway",
-            "vulnerability_name": "Cisco Secure Email Gateway Relative Path Traversal Vulnerability",
-            "date_added": "2026-10-14",
-            "due_date": "2026-10-17",
-            "ransomware_use": "Unknown",
-            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
-            "short_description": "Cisco Secure Email Gateway contains a relative path traversal vulnerability that could allow an unauthenticated, remote attacker to write arbitrary files on the underlying operating system.",
-            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-afw-zqYJkjxp ; ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76519",
-            "catalog_version": "2026.10.26"
-          },
-          {
-            "cve_id": "CVE-2026-76461",
-            "vendor": "Cisco",
-            "product": "Secure Email Gateway",
-            "vulnerability_name": "Cisco Secure Email Gateway SQL Injection Vulnerability",
-            "date_added": "2026-09-14",
-            "due_date": "2026-09-17",
-            "ransomware_use": "Unknown",
-            "required_action": "Apply mitigations in accordance with vendor instructions, ensuring compliance with CISA’s BOD 26-04 Prioritizing Security Updates Based on Risk (see URL in Notes) guidance and CISA’s “Forensics Triage Requirements” (see URL in Notes). Follow applicable BOD 26-04 guidance for cloud services or discontinue use of the product if mitigations are unavailable. Stakeholders are responsible for evaluating each asset's internet exposure and ensuring adherence to BOD 26-04 patching guidelines.",
-            "short_description": "Cisco AsyncOS software for Cisco Secure Email Gateway (SEG) contains a SQL injection vulnerability that could allow an unauthenticated, remote attacker to execute arbitrary commands with root privileges on the underlying operating system.",
-            "notes": "https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-esa-inj-2bLVGmhX ; BOD 26-04: https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk ; Forensics Triage Requirements: https://www.cisa.gov/news-events/directives/bod-26-04-implementation-guidance-prioritizing-security-updates-based-risk ; https://nvd.nist.gov/vuln/detail/CVE-2026-76461",
-            "catalog_version": "2026.10.26"
-          }
-        ],
-        "earliest_due": "2026-09-17",
-        "overdue_days": 40
-      },
-      "epss": {
-        "max": 0.29543,
-        "cve_id": "CVE-2026-76461",
-        "percentile": 0.98175
-      },
-      "evidence": [
-        {
-          "source": "zetaris:inventory",
-          "query": "inventory",
-          "field": "software",
-          "value": "Cisco Secure Email GW (ESA) - release not noted",
-          "as_of": "2026-10-27",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "jury.bolt",
-          "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "jury.lightning",
-          "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "normaliser",
-          "field": "vote",
-          "value": "Cisco Secure Email Gateway",
-          "live": false
-        },
-        {
-          "source": "agent",
-          "query": "resolver_jury",
-          "field": "resolves_to",
-          "value": "Cisco Secure Email Gateway",
-          "live": true
-        },
-        {
-          "source": "zetaris:kev",
-          "query": "kevByProducts",
-          "field": "cve_id",
-          "value": "CVE-2026-76519",
-          "as_of": "2026.10.26",
-          "live": true
-        },
-        {
-          "source": "zetaris:kev",
-          "query": "kevByProducts",
-          "field": "cve_id",
-          "value": "CVE-2026-76461",
-          "as_of": "2026.10.26",
-          "live": true
-        },
-        {
-          "source": "zetaris:epss",
-          "query": "epss",
-          "field": "epss",
-          "value": "0.29543",
-          "as_of": "2026-10-26",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "policy",
-          "field": "rule",
-          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
-          "live": false
-        },
-        {
-          "source": "agent",
-          "query": "critic",
-          "field": "version_unconfirmed",
-          "value": "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)",
-          "live": false
-        },
-        {
-          "source": "agent",
-          "query": "policy",
-          "field": "rule",
-          "value": "patch_now (fail-closed): KEV-listed, version unconfirmed; the owner confirms the version",
-          "live": false
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R40)",
-          "field": "provenance",
-          "value": "10 current fact(s) about this row, its asset and 2 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
-          "as_of": "2026-10-27T00:00:00.000Z",
-          "live": false
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R40)",
-          "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
-          "as_of": "2026-10-27T00:00:00.000Z",
-          "live": false
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R40)",
-          "field": "kev_family_spellings",
-          "value": "cisco:secure-email-gateway: Cisco / Secure Email Gateway",
-          "live": false
-        }
-      ]
-    },
-    {
-      "row_id": "R44",
-      "asset_id": "A10",
-      "asset_name": "print-01",
-      "internet_facing": false,
-      "software": "PaperCut NG v22.0.4 - print management",
-      "resolution": {
-        "row_id": "R44",
-        "status": "matched",
-        "vendor": "PaperCut",
-        "product": "MF/NG",
-        "family": "papercut:mf-ng",
-        "version": "22.0.4",
-        "product_type": "server",
-        "votes": [
-          {
-            "row_id": "R44",
-            "juror": "bolt",
-            "vendor": "PaperCut",
-            "product": "MF/NG",
-            "product_type": "server",
-            "confidence": 0.98,
-            "receipt_id": "rcpt_req_e6w5ajhb"
-          },
-          {
-            "row_id": "R44",
-            "juror": "lightning",
-            "vendor": "PaperCut",
-            "product": "MF/NG",
-            "product_type": "server",
-            "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
-          },
-          {
-            "row_id": "R44",
-            "juror": "normaliser",
-            "vendor": null,
-            "product": null,
-            "product_type": "server",
-            "confidence": 0.3
-          }
-        ],
-        "adjudicated_by": null,
-        "confidence": 1
-      },
-      "critic": {
-        "row_id": "R44",
-        "verdict": "approve",
-        "reasons": [
-          "approved: rubric 8/9 (L2, automatic)"
-        ],
-        "rubric": {
-          "accuracy": 3,
-          "appropriateness": 2,
-          "actionability": 3,
-          "total": 8
-        },
-        "round": 1
-      },
-      "verified": true,
-      "verifier_notes": [
-        "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
-      ],
-      "why": "NVD places PaperCut MF/NG 22.0.4 inside the affected range of CVE-2023-27350, which CISA KEV lists as exploited in the wild (added 2023-04-21). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2023-05-12) passed 1264 days ago, and EPSS for CVE-2023-27350 is 0.99999.",
-      "decision": "patch_now",
-      "target_date": "2026-11-03",
-      "kev": {
-        "cves": [
-          {
-            "cve_id": "CVE-2023-27350",
-            "vendor": "PaperCut",
-            "product": "MF/NG",
-            "vulnerability_name": "PaperCut MF/NG Improper Access Control Vulnerability",
-            "date_added": "2023-04-21",
-            "due_date": "2023-05-12",
-            "ransomware_use": "Known",
-            "required_action": "Apply updates per vendor instructions.",
-            "short_description": "PaperCut MF/NG contains an improper access control vulnerability within the SetupCompleted class that allows authentication bypass and code execution in the context of system.",
-            "notes": "https://www.papercut.com/kb/Main/PO-1216-and-PO-1219;  https://nvd.nist.gov/vuln/detail/CVE-2023-27350",
-            "catalog_version": "2026.10.26"
-          }
-        ],
-        "earliest_due": "2023-05-12",
-        "overdue_days": 1264
-      },
-      "epss": {
-        "max": 0.99999,
-        "cve_id": "CVE-2023-27350",
-        "percentile": 0.99995
-      },
-      "evidence": [
-        {
-          "source": "zetaris:inventory",
-          "query": "inventory",
-          "field": "software",
-          "value": "PaperCut NG v22.0.4 - print management",
-          "as_of": "2026-10-27",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "jury.bolt",
-          "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "jury.lightning",
-          "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "normaliser",
-          "field": "vote",
-          "value": "none",
-          "live": false
-        },
-        {
-          "source": "agent",
-          "query": "resolver_jury",
-          "field": "resolves_to",
-          "value": "PaperCut MF/NG",
-          "live": true
-        },
-        {
-          "source": "zetaris:kev",
-          "query": "kevByProducts",
-          "field": "cve_id",
-          "value": "CVE-2023-27350",
-          "as_of": "2026.10.26",
-          "live": true
-        },
-        {
-          "source": "zetaris:epss",
-          "query": "epss",
-          "field": "epss",
-          "value": "0.99999",
-          "as_of": "2026-10-26",
-          "live": true
-        },
-        {
-          "source": "agent",
-          "query": "policy",
-          "field": "rule",
-          "value": "patch_now: listed in KEV, so patch within 7 days whatever the EPSS",
-          "live": false
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_check",
-          "value": "version 22.0.4 is inside an NVD affected range",
-          "live": false,
-          "as_of": "2026-10-27"
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_range",
-          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
-          "live": false,
-          "as_of": "2026-10-27"
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_range",
-          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 21.0.0 < 21.2.11",
-          "live": false,
-          "as_of": "2026-10-27"
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_range",
-          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_mf:*:*:*:*:*:*:*:* >= 22.0.0 < 22.0.9",
-          "live": false,
-          "as_of": "2026-10-27"
-        },
-        {
-          "source": "zetaris:nvd",
-          "query": "nvdCves",
-          "field": "version_range",
-          "value": "CVE-2023-27350: cpe:2.3:a:papercut:papercut_ng:*:*:*:*:*:*:*:* >= 8.0 < 20.1.7",
-          "live": false,
-          "as_of": "2026-10-27"
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R44)",
-          "field": "provenance",
-          "value": "7 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, zetaris:el.inventory, zetaris:el.kev, zetaris:epss",
-          "as_of": "2026-10-27T00:00:00.000Z",
-          "live": false
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R44)",
-          "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
-          "as_of": "2026-10-27T00:00:00.000Z",
-          "live": false
-        },
-        {
-          "source": "world_model",
-          "query": "explain(R44)",
-          "field": "kev_family_spellings",
-          "value": "papercut:mf-ng: PaperCut / MF/NG",
           "live": false
         }
       ]
@@ -2945,7 +2940,7 @@
             "product": "Word",
             "product_type": "cloud_service",
             "confidence": 0.95,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R20",
@@ -2954,7 +2949,7 @@
             "product": "Word",
             "product_type": "client",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R20",
@@ -2966,12 +2961,21 @@
           },
           {
             "row_id": "R20",
+            "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Word",
+            "product_type": "cloud_service",
+            "confidence": 0.95,
+            "receipt_id": "rcpt_req_zw1k6iqd"
+          },
+          {
+            "row_id": "R20",
             "juror": "ultra",
             "vendor": "Microsoft",
             "product": "Word",
             "product_type": "cloud_service",
             "confidence": 0.95,
-            "receipt_id": "rcpt_req_qtk23u67"
+            "receipt_id": "rcpt_req_xf1qqdk8"
           }
         ],
         "adjudicated_by": "critic",
@@ -3015,14 +3019,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
@@ -3034,9 +3038,16 @@
         },
         {
           "source": "agent",
+          "query": "jury.lightning",
+          "field": "receipt_id",
+          "value": "rcpt_req_zw1k6iqd",
+          "live": true
+        },
+        {
+          "source": "agent",
           "query": "jury.adjudicate",
           "field": "receipt_id",
-          "value": "rcpt_req_qtk23u67",
+          "value": "rcpt_req_xf1qqdk8",
           "live": true
         },
         {
@@ -3058,7 +3069,7 @@
           "source": "world_model",
           "query": "explain(R20)",
           "field": "resolves_to <- agent:critic",
-          "value": "unresolved by critic; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb, rcpt_req_qtk23u67",
+          "value": "unresolved by critic; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6, rcpt_req_xf1qqdk8, rcpt_req_zw1k6iqd",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         }
@@ -3086,7 +3097,7 @@
             "product": "7-Zip",
             "product_type": "client",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R05",
@@ -3095,7 +3106,7 @@
             "product": "7-Zip",
             "product_type": "client",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "receipt_id": "rcpt_req_m0ofmgp1"
           },
           {
             "row_id": "R05",
@@ -3127,7 +3138,7 @@
       "verifier_notes": [
         "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
       ],
-      "why": "KEV lists 1 exploited CVE for 7-Zip 7-Zip, but NVD's version ranges place version 24.09 outside all of them. Review it again by 2027-01-25 (every 90 days under your rules).",
+      "why": "KEV lists 1 exploited CVE for 7-Zip, but NVD's version ranges place version 24.09 outside all of them. Review it again by 2027-01-25 (every 90 days under your rules).",
       "decision": "monitor",
       "target_date": "2027-01-25",
       "kev": {
@@ -3152,7 +3163,7 @@
       "epss": {
         "max": 0.67071,
         "cve_id": "CVE-2025-0411",
-        "percentile": 0.99294
+        "percentile": 0.99295
       },
       "evidence": [
         {
@@ -3167,28 +3178,28 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
           "live": true
         },
         {
           "source": "agent",
           "query": "normaliser",
           "field": "vote",
-          "value": "7-Zip 7-Zip",
+          "value": "7-Zip",
           "live": false
         },
         {
           "source": "agent",
           "query": "resolver_jury",
           "field": "resolves_to",
-          "value": "7-Zip 7-Zip",
+          "value": "7-Zip",
           "live": true
         },
         {
@@ -3204,7 +3215,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.67071",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -3242,7 +3253,7 @@
           "source": "world_model",
           "query": "explain(R05)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "matched by bolt+lightning; receipts rcpt_req_m0ofmgp1, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -3277,16 +3288,25 @@
             "product": null,
             "product_type": "client",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_e6w5ajhb"
+            "receipt_id": "rcpt_req_wxor4tk6"
           },
           {
             "row_id": "R12",
             "juror": "lightning",
+            "vendor": "Microsoft",
+            "product": "Remote Desktop Services",
+            "product_type": "client",
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_m0ofmgp1"
+          },
+          {
+            "row_id": "R12",
+            "juror": "ultra",
             "vendor": null,
             "product": null,
             "product_type": "client",
-            "confidence": 0,
-            "receipt_id": "rcpt_req_bz1bytzo"
+            "confidence": 0.99,
+            "receipt_id": "rcpt_req_n06lqy7s"
           },
           {
             "row_id": "R12",
@@ -3297,20 +3317,24 @@
             "confidence": 0.8
           }
         ],
-        "adjudicated_by": null,
-        "confidence": 1
+        "adjudicated_by": "ultra",
+        "confidence": 0.67
       },
       "critic": {
         "row_id": "R12",
         "verdict": "approve",
         "reasons": [
-          "approved: rubric 9/9 (L2, automatic)"
+          "ultra: Correctly identified no KEV match for Microsoft PowerToys v0.84 desktop utilities",
+          "ultra: Product type client correctly matches endpoint utility suite on desktop",
+          "ultra: Bolt and Lightning incorrectly matched Docker Desktop - different vendor/product entirely",
+          "ultra: Monitor rule with 90-day review appropriate for non-KEV software",
+          "approved: rubric 7/9 after Ultra review (L2, automatic)"
         ],
         "rubric": {
-          "accuracy": 3,
-          "appropriateness": 3,
+          "accuracy": 2,
+          "appropriateness": 2,
           "actionability": 3,
-          "total": 9
+          "total": 7
         },
         "round": 0
       },
@@ -3340,14 +3364,21 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_e6w5ajhb",
+          "value": "rcpt_req_wxor4tk6",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_bz1bytzo",
+          "value": "rcpt_req_m0ofmgp1",
+          "live": true
+        },
+        {
+          "source": "agent",
+          "query": "jury.adjudicate",
+          "field": "receipt_id",
+          "value": "rcpt_req_n06lqy7s",
           "live": true
         },
         {
@@ -3391,7 +3422,7 @@
           "source": "world_model",
           "query": "explain(R12)",
           "field": "resolves_to <- agent:jury",
-          "value": "no_match by bolt+lightning; receipts rcpt_req_bz1bytzo, rcpt_req_e6w5ajhb",
+          "value": "no_match by ultra; receipts rcpt_req_m0ofmgp1, rcpt_req_n06lqy7s, rcpt_req_wxor4tk6",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         }
@@ -3419,7 +3450,7 @@
             "product": null,
             "product_type": "client",
             "confidence": 0,
-            "receipt_id": "rcpt_req_p1e740fl"
+            "receipt_id": "rcpt_req_oj3cxr4j"
           },
           {
             "row_id": "R71",
@@ -3427,8 +3458,8 @@
             "vendor": "Veeam",
             "product": "Backup & Replication",
             "product_type": "server",
-            "confidence": 0.99,
-            "receipt_id": "rcpt_req_12xso1bv"
+            "confidence": 0.5,
+            "receipt_id": "rcpt_req_juzzifxr"
           },
           {
             "row_id": "R71",
@@ -3437,7 +3468,7 @@
             "product": null,
             "product_type": "client",
             "confidence": 0.99,
-            "receipt_id": "rcpt_req_beiykd0l"
+            "receipt_id": "rcpt_req_n06lqy7s"
           },
           {
             "row_id": "R71",
@@ -3495,21 +3526,21 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_p1e740fl",
+          "value": "rcpt_req_oj3cxr4j",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_12xso1bv",
+          "value": "rcpt_req_juzzifxr",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.adjudicate",
           "field": "receipt_id",
-          "value": "rcpt_req_beiykd0l",
+          "value": "rcpt_req_n06lqy7s",
           "live": true
         },
         {
@@ -3553,7 +3584,7 @@
           "source": "world_model",
           "query": "explain(R71)",
           "field": "resolves_to <- agent:jury",
-          "value": "no_match by ultra; receipts rcpt_req_12xso1bv, rcpt_req_beiykd0l, rcpt_req_p1e740fl",
+          "value": "no_match by ultra; receipts rcpt_req_juzzifxr, rcpt_req_n06lqy7s, rcpt_req_oj3cxr4j",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         }
@@ -3574,19 +3605,16 @@
       "reason": "no version in the row, but the KEV CVEs need a version check (which Connect Secure version?)"
     },
     {
-      "row_id": "R43",
-      "asset_name": "mail-01",
-      "question": "Which Windows Server 2019 build runs on mail-01? KEV lists 239 Windows CVEs; the newest, CVE-2026-96951, was added 2026-10-13 with a US federal due date of 2026-10-16, and NVD lists Windows Server 2019 builds below 10.0.17763.9376 as affected by it. Install the latest cumulative update on any machine below that build, then tell us the build.",
-      "reason": "1 Windows Server 2019 row name the edition but no build number, so the NVD build ranges cannot place it; listed as patch_now (fail-closed) until the build is confirmed.",
-      "row_ids": [
-        "R43"
-      ]
-    },
-    {
       "row_id": "R40",
       "asset_name": "mail-filter-01",
       "question": "Which Secure Email Gateway version runs on mail-filter-01?",
       "reason": "no version in the row, but the KEV CVEs need a version check (which Secure Email Gateway version?)"
+    },
+    {
+      "row_id": "R43",
+      "asset_name": "mail-01",
+      "question": "Which exact Windows version or build runs on mail-01? \"2019\" is too vague to place in NVD's affected ranges for CVE-2026-96951.",
+      "reason": "name-only match, no version evidence: no NVD range settles version 2019 (too vague for the ranges of CVE-2026-96951; not looked up in NVD in this run: CVE-2011-2005, CVE-2015-2387, CVE-2016-0151 and 235 more); rubric 6/9 (accuracy 2, appropriateness 2, actionability 2); auto needs >= 7; name-only match: no version evidence; the owner confirms the version (L1)"
     },
     {
       "row_id": "R20",
@@ -3597,98 +3625,110 @@
   ],
   "receipts": [
     {
-      "call_id": "ns-7ca975f38b2e",
+      "call_id": "ns-f5a755990ee9",
+      "agent": "jury.lightning",
+      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "receipt_id": "rcpt_req_juzzifxr",
+      "latency_ms": 1496,
+      "prompt_tokens": 841,
+      "completion_tokens": 103,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-1822cf12860c",
       "agent": "jury.bolt",
       "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
       "response_model": "nvidia/nemotron-3.5-bolt-e4b",
       "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
-      "receipt_id": "rcpt_req_p1e740fl",
-      "latency_ms": 2324,
-      "prompt_tokens": 815,
+      "receipt_id": "rcpt_req_oj3cxr4j",
+      "latency_ms": 1541,
+      "prompt_tokens": 813,
       "completion_tokens": 71,
       "status": "ok"
     },
     {
-      "call_id": "ns-3af634c67010",
+      "call_id": "ns-83e3a2352f3f",
       "agent": "jury.lightning",
       "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "receipt_id": "rcpt_req_bz1bytzo",
-      "latency_ms": 6115,
-      "prompt_tokens": 2058,
-      "completion_tokens": 573,
+      "receipt_id": "rcpt_req_m0ofmgp1",
+      "latency_ms": 5614,
+      "prompt_tokens": 2059,
+      "completion_tokens": 364,
       "status": "ok"
     },
     {
-      "call_id": "ns-d33cf8cee057",
-      "agent": "jury.lightning",
-      "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "receipt_id": "rcpt_req_12xso1bv",
-      "latency_ms": 6521,
-      "prompt_tokens": 840,
-      "completion_tokens": 125,
-      "status": "ok"
-    },
-    {
-      "call_id": "ns-f696a027708b",
+      "call_id": "ns-adf9c448d8bd",
       "agent": "jury.bolt",
       "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
       "response_model": "nvidia/nemotron-3.5-bolt-e4b",
       "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
-      "receipt_id": "rcpt_req_e6w5ajhb",
-      "latency_ms": 7546,
-      "prompt_tokens": 1962,
+      "receipt_id": "rcpt_req_wxor4tk6",
+      "latency_ms": 9790,
+      "prompt_tokens": 1961,
       "completion_tokens": 355,
       "status": "ok"
     },
     {
-      "call_id": "ns-a6d30585c72e",
+      "call_id": "ns-0e82cab5f1c0",
       "agent": "jury.adjudicate",
       "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "receipt_id": "rcpt_req_beiykd0l",
-      "latency_ms": 9370,
-      "prompt_tokens": 1116,
-      "completion_tokens": 121,
+      "receipt_id": "rcpt_req_n06lqy7s",
+      "latency_ms": 3624,
+      "prompt_tokens": 1126,
+      "completion_tokens": 174,
       "status": "ok"
     },
     {
-      "call_id": "ns-5fcf37f6492f",
+      "call_id": "ns-7710d06bd0e7",
       "agent": "critic",
       "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "receipt_id": "rcpt_req_rbkyj4ih",
-      "latency_ms": 1431,
-      "prompt_tokens": 1079,
+      "receipt_id": "rcpt_req_xih128zv",
+      "latency_ms": 3133,
+      "prompt_tokens": 1048,
+      "completion_tokens": 125,
+      "status": "ok"
+    },
+    {
+      "call_id": "ns-3c61108e8a6a",
+      "agent": "critic",
+      "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "receipt_id": "rcpt_req_0sosksov",
+      "latency_ms": 9078,
+      "prompt_tokens": 1080,
       "completion_tokens": 135,
       "status": "ok"
     },
     {
-      "call_id": "ns-d64b2f509472",
+      "call_id": "ns-53f930cd5196",
       "agent": "resolver.retry.lightning",
       "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "receipt_id": "rcpt_req_sqdphp4c",
-      "latency_ms": 1129,
-      "prompt_tokens": 1287,
-      "completion_tokens": 87,
+      "receipt_id": "rcpt_req_zw1k6iqd",
+      "latency_ms": 1386,
+      "prompt_tokens": 1276,
+      "completion_tokens": 79,
       "status": "ok"
     },
     {
-      "call_id": "ns-c09ed6d0de96",
+      "call_id": "ns-fc255cd6dc4a",
       "agent": "resolver.retry.ultra",
       "requested_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "response_model": "nvidia/nemotron-3-ultra-550b-a55b",
       "routed_model": "nvidia/nemotron-3-ultra-550b-a55b",
-      "receipt_id": "rcpt_req_qtk23u67",
-      "latency_ms": 1203,
-      "prompt_tokens": 1285,
+      "receipt_id": "rcpt_req_xf1qqdk8",
+      "latency_ms": 1365,
+      "prompt_tokens": 1273,
       "completion_tokens": 51,
       "status": "ok"
     }
@@ -3715,7 +3755,7 @@
         "name": "FIRST EPSS",
         "object": "EL_EPSS.el_epss_<batch>",
         "live": true,
-        "as_of": "2026-10-26"
+        "as_of": "2026-10-27"
       },
       {
         "name": "NIST NVD",

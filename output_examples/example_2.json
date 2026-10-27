@@ -2,22 +2,22 @@
   "run_id": "example-2",
   "mode": "live",
   "status": "success",
-  "started_at": "2026-10-27T04:16:12.791Z",
-  "finished_at": "2026-10-27T04:16:21.251Z",
+  "started_at": "2026-10-27T15:07:38.621Z",
+  "finished_at": "2026-10-27T15:08:02.664Z",
   "as_of": "2026-10-27",
   "timing_ms": {
-    "discovery": 120,
-    "kev_pairs": 311,
-    "normalise": 52,
-    "facts": 1845,
-    "nvd": 1,
-    "jury": 5582,
-    "critic": 17,
-    "analyst": 2,
-    "federated_join": 481,
-    "verifier": 446,
-    "world_model": 23,
-    "total": 8460
+    "discovery": 159,
+    "kev_pairs": 877,
+    "normalise": 50,
+    "facts": 1915,
+    "nvd": 0,
+    "jury": 20322,
+    "critic": 27,
+    "analyst": 3,
+    "federated_join": 434,
+    "verifier": 1367,
+    "world_model": 25,
+    "total": 24044
   },
   "summary": {
     "patch_now": 5,
@@ -48,7 +48,7 @@
             "product": "Zimbra Collaboration Suite",
             "product_type": "server",
             "confidence": 1,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J01",
@@ -56,8 +56,8 @@
             "vendor": "Synacor",
             "product": "Zimbra Collaboration Suite",
             "product_type": "server",
-            "confidence": 0.95,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "confidence": 1,
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J01",
@@ -259,14 +259,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
@@ -383,7 +383,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99907",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -461,7 +461,7 @@
           "source": "world_model",
           "query": "explain(J01)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "matched by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -496,7 +496,7 @@
             "product": "FortiOS",
             "product_type": "network_appliance",
             "confidence": 1,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J02",
@@ -504,8 +504,8 @@
             "vendor": "Fortinet",
             "product": "FortiOS",
             "product_type": "network_appliance",
-            "confidence": 0.95,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "confidence": 1,
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J02",
@@ -588,7 +588,7 @@
       "epss": {
         "max": 0.85689,
         "cve_id": "CVE-2023-27997",
-        "percentile": 0.99723
+        "percentile": 0.99724
       },
       "evidence": [
         {
@@ -603,14 +603,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
@@ -663,7 +663,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.85689",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -733,7 +733,7 @@
           "source": "world_model",
           "query": "explain(J02)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "matched by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -768,7 +768,7 @@
             "product": "Confluence Data Center and Server",
             "product_type": "server",
             "confidence": 1,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J03",
@@ -776,8 +776,8 @@
             "vendor": "Atlassian",
             "product": "Confluence Data Center and Server",
             "product_type": "server",
-            "confidence": 0.95,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "confidence": 1,
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J03",
@@ -875,14 +875,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
@@ -928,7 +928,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99999",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -990,7 +990,7 @@
           "source": "world_model",
           "query": "explain(J03)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "matched by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1025,7 +1025,7 @@
             "product": "Jenkins",
             "product_type": "server",
             "confidence": 1,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J04",
@@ -1033,8 +1033,8 @@
             "vendor": "Jenkins",
             "product": "Jenkins",
             "product_type": "server",
-            "confidence": 0.95,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "confidence": 1,
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J04",
@@ -1066,7 +1066,7 @@
       "verifier_notes": [
         "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
       ],
-      "why": "NVD places Jenkins Jenkins 2.440 inside the affected range of CVE-2024-23897, which CISA KEV lists as exploited in the wild (added 2024-08-19); it is outside the ranges of 3 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2024-09-09) passed 778 days ago, and EPSS for CVE-2024-23897 is 0.99999.",
+      "why": "NVD places Jenkins 2.440 inside the affected range of CVE-2024-23897, which CISA KEV lists as exploited in the wild (added 2024-08-19); it is outside the ranges of 3 other KEV CVEs. Patch by 2026-11-03 under your 7-day rule; the US federal due date (2024-09-09) passed 778 days ago, and EPSS for CVE-2024-23897 is 0.99999.",
       "decision": "patch_now",
       "target_date": "2026-11-03",
       "kev": {
@@ -1106,28 +1106,28 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
           "source": "agent",
           "query": "normaliser",
           "field": "vote",
-          "value": "Jenkins Jenkins",
+          "value": "Jenkins",
           "live": false
         },
         {
           "source": "agent",
           "query": "resolver_jury",
           "field": "resolves_to",
-          "value": "Jenkins Jenkins",
+          "value": "Jenkins",
           "live": true
         },
         {
@@ -1143,7 +1143,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.99999",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -1220,7 +1220,7 @@
           "source": "world_model",
           "query": "explain(J04)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "matched by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1255,7 +1255,7 @@
             "product": "Notepad++",
             "product_type": "client",
             "confidence": 1,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J06",
@@ -1263,8 +1263,8 @@
             "vendor": "Notepad++",
             "product": "Notepad++",
             "product_type": "client",
-            "confidence": 0.95,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "confidence": 1,
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J06",
@@ -1296,7 +1296,7 @@
       "verifier_notes": [
         "re-checked 8 cited value(s) against live single-source Zetaris queries: all match"
       ],
-      "why": "NVD places Notepad++ Notepad++ 8.6.2 inside the affected range of CVE-2025-15556, which CISA KEV lists as exploited in the wild (added 2026-02-12). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2026-03-05) passed 236 days ago, and EPSS for CVE-2025-15556 is 0.01772, low, but the KEV listing decides under your rules.",
+      "why": "NVD places Notepad++ 8.6.2 inside the affected range of CVE-2025-15556, which CISA KEV lists as exploited in the wild (added 2026-02-12). Patch by 2026-11-03 under your 7-day rule; the US federal due date (2026-03-05) passed 236 days ago, and EPSS for CVE-2025-15556 is 0.01772, low, but the KEV listing decides under your rules.",
       "decision": "patch_now",
       "target_date": "2026-11-03",
       "kev": {
@@ -1321,7 +1321,7 @@
       "epss": {
         "max": 0.01772,
         "cve_id": "CVE-2025-15556",
-        "percentile": 0.78008
+        "percentile": 0.78044
       },
       "evidence": [
         {
@@ -1336,28 +1336,28 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
           "source": "agent",
           "query": "normaliser",
           "field": "vote",
-          "value": "Notepad++ Notepad++",
+          "value": "Notepad++",
           "live": false
         },
         {
           "source": "agent",
           "query": "resolver_jury",
           "field": "resolves_to",
-          "value": "Notepad++ Notepad++",
+          "value": "Notepad++",
           "live": true
         },
         {
@@ -1373,7 +1373,7 @@
           "query": "epss",
           "field": "epss",
           "value": "0.01772",
-          "as_of": "2026-10-26",
+          "as_of": "2026-10-27",
           "live": true
         },
         {
@@ -1418,7 +1418,7 @@
           "source": "world_model",
           "query": "explain(J06)",
           "field": "resolves_to <- agent:jury",
-          "value": "matched by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "matched by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         },
@@ -1453,7 +1453,7 @@
             "product": null,
             "product_type": "client",
             "confidence": 0,
-            "receipt_id": "rcpt_req_wgdf1rso"
+            "receipt_id": "rcpt_req_en13xwob"
           },
           {
             "row_id": "J05",
@@ -1462,7 +1462,7 @@
             "product": null,
             "product_type": "client",
             "confidence": 0,
-            "receipt_id": "rcpt_req_6451x5o4"
+            "receipt_id": "rcpt_req_k0o33avh"
           },
           {
             "row_id": "J05",
@@ -1516,14 +1516,14 @@
           "source": "agent",
           "query": "jury.bolt",
           "field": "receipt_id",
-          "value": "rcpt_req_wgdf1rso",
+          "value": "rcpt_req_en13xwob",
           "live": true
         },
         {
           "source": "agent",
           "query": "jury.lightning",
           "field": "receipt_id",
-          "value": "rcpt_req_6451x5o4",
+          "value": "rcpt_req_k0o33avh",
           "live": true
         },
         {
@@ -1567,7 +1567,7 @@
           "source": "world_model",
           "query": "explain(J05)",
           "field": "resolves_to <- agent:jury",
-          "value": "no_match by bolt+lightning; receipts rcpt_req_6451x5o4, rcpt_req_wgdf1rso",
+          "value": "no_match by bolt+lightning; receipts rcpt_req_en13xwob, rcpt_req_k0o33avh",
           "as_of": "2026-10-27T00:00:00.000Z",
           "live": false
         }
@@ -1577,27 +1577,27 @@
   "owner_questions": [],
   "receipts": [
     {
-      "call_id": "ns-97edd9e08047",
+      "call_id": "ns-c3b9c3b7da8d",
       "agent": "jury.bolt",
       "requested_model": "nvidia/nemotron-3.5-bolt-e4b",
       "response_model": "nvidia/nemotron-3.5-bolt-e4b",
       "routed_model": "nvidia/nemotron-3.5-bolt-e4b",
-      "receipt_id": "rcpt_req_wgdf1rso",
-      "latency_ms": 4735,
-      "prompt_tokens": 863,
+      "receipt_id": "rcpt_req_en13xwob",
+      "latency_ms": 5017,
+      "prompt_tokens": 864,
       "completion_tokens": 223,
       "status": "ok"
     },
     {
-      "call_id": "ns-8136b4fe052b",
+      "call_id": "ns-1bc5a830ce21",
       "agent": "jury.lightning",
       "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
       "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "receipt_id": "rcpt_req_6451x5o4",
-      "latency_ms": 5576,
-      "prompt_tokens": 903,
-      "completion_tokens": 365,
+      "receipt_id": "rcpt_req_k0o33avh",
+      "latency_ms": 20316,
+      "prompt_tokens": 902,
+      "completion_tokens": 360,
       "status": "ok"
     }
   ],
@@ -1623,7 +1623,7 @@
         "name": "FIRST EPSS",
         "object": "EL_EPSS.el_epss_<batch>",
         "live": true,
-        "as_of": "2026-10-26"
+        "as_of": "2026-10-27"
       },
       {
         "name": "NIST NVD",

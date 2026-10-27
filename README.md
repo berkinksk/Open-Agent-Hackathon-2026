@@ -71,7 +71,7 @@ R73  patch_now  target 2026-11-03  erp-portal-01 (internet-facing)  "Apache Tomc
 why: NVD places Apache Tomcat 9.0.54 inside the affected range of CVE-2025-24813, which CISA KEV lists as exploited
      in the wild (added 2025-04-01); it is outside the ranges of 5 other KEV CVEs. Patch by 2026-11-03 under your
      7-day rule; the US federal due date (2025-04-22) passed 553 days ago, and EPSS for CVE-2025-24813 is 0.99942.
-votes: Bolt, Lightning and the normaliser agree (receipts rcpt_req_p1e740fl, rcpt_req_12xso1bv) · critic 9/9 · re-checked live
+votes: Bolt, Lightning and the normaliser agree (receipts rcpt_req_oj3cxr4j, rcpt_req_juzzifxr) · critic 9/9 · re-checked live
 ```
 (KEV lists 6 Tomcat CVEs. NVD places 9.0.54 outside the ranges of the other 5, the newer CVE-2026-34486 and four older ones such as Ghostcat, CVE-2020-1938, so they are not cited: they are listed in the line's evidence as "version not affected". A CVE NVD cannot check stays cited and counts toward the date, labelled "not version-checked, counted fail-closed". In the same run, "Apache HTTPD 2.4.49" cites three CVEs NVD confirms, including CVE-2021-41773, so its US federal due date is 2021-11-17, 1,805 days ago.)
 
@@ -108,8 +108,8 @@ One run, step by step (`src/run.ts`):
 
 ```text
 zetaris          discovery          sources discovered: 4 database(s) (EL_EPSS, EL_INVENTORY, EL_KEV, EL_NVD); ...
-resolver_jury    split_detected     batch 1: 1 split row(s) sent to Ultra · batch 2: 1 split row(s) sent to Ultra
-jury.adjudicate  ultra_adjudication 2 of 2 decided    model=nvidia/nemotron-3-ultra-550b-a55b receipt=rcpt_req_beiykd0l
+resolver_jury    split_detected     batch 1: 2 split row(s) sent to Ultra · batch 2: 1 split row(s) sent to Ultra
+jury.adjudicate  ultra_adjudication 3 of 3 decided    model=nvidia/nemotron-3-ultra-550b-a55b receipt=rcpt_req_n06lqy7s
                    R71 "Veeam Agent for Microsoft Windows 6.1": Ultra sided with Bolt -> none ("a distinct endpoint
                    backup agent; Veeam Backup & Replication is the management server product")
 critic           send_back          R20 "Microsoft Word Online (browser app)" -> Microsoft / Word: type conflict:
@@ -207,7 +207,7 @@ Every model call goes through Nightshift's local OpenAI-compatible endpoint (`PO
 | **Lightning** `nvidia/nemotron-3.5-lightning-30b-a3b` | second juror; makes the first re-decide of a row the critic sends back |
 | **Ultra** `nvidia/nemotron-3-ultra-550b-a55b` | decides jury splits; critiques contested matches; a "same product?" check before an unconfirmed `patch_now` that the normaliser does not back; the second re-decide of a row |
 
-The models run in NVIDIA's cloud, reached through Nightshift. The receipts show which model answered each call. In the three examples, all 17 calls (8 + 2 + 7) were answered by the pinned model that was asked for.
+The models run in NVIDIA's cloud, reached through Nightshift. The receipts show which model answered each call. In the three examples, all 15 calls (9 + 2 + 4) were answered by the pinned model that was asked for.
 
 ## 6. Setup
 
@@ -250,19 +250,19 @@ npm run cli -- --help
 ```
 The CLI prints the trace, then the decision counts and the output paths:
 ```text
-run example-1  mode=live  status=success  as_of=2026-10-27  25.1 s
-  patch_now   8
+run example-1  mode=live  status=success  as_of=2026-10-27  30.3 s
+  patch_now   7
   this_cycle  0
   monitor     3
-  ask_owner   1
-  owner questions: 5   model calls: 8   lines: 12
+  ask_owner   2
+  owner questions: 5   model calls: 9   lines: 12
 outputs:
   run     output/run-example-1.json
   report  output/report-example-1.html
   trace   logs/trace-example-1.jsonl
 ```
 
-**Timing:** the first live run of the day (or the first on a fresh clone) takes about 1–1.5 minutes (65–87 s measured), because cold NVD lookups are slow and a run may spend up to its 60 s NVD budget (`EL_NVD_BUDGET_S`). NVD records are cached per CVE for the day: a run whose CVEs are already cached takes about 8.5–31 s (the runs in §10), while a run on rows with new CVEs is slow again.
+**Timing:** the first live run of the day (or the first on a fresh clone) takes about 1–1.5 minutes (65–87 s measured), because cold NVD lookups are slow and a run may spend up to its 60 s NVD budget (`EL_NVD_BUDGET_S`). NVD records are cached per CVE for the day: a run whose CVEs are already cached takes about 20–30 s (the runs in §10), while a run on rows with new CVEs is slow again.
 
 **HTTP API** (`npm start`, on `0.0.0.0:8000`; set `PORT` to change it)
 ```bash
@@ -344,15 +344,15 @@ SAMPLE_MODE=true npm start
 
 ## 10. Input and output examples
 
-The three outputs are **real runs**, made live (Zetaris + Nightshift) with `npm run cli -- --input input_examples/example_N.json --run-id example-N` on 27 Oct 2026, 04:15–04:16 UK, with today's NVD records already in the per-day cache (an earlier run that morning had read them; the manifest labels them cached, not live). They are never read by the app. The only change after the run: local absolute file paths were shortened to repo-relative ones (details in [`output_examples/README.md`](output_examples/README.md)).
+The three outputs are **real runs**, made live (Zetaris + Nightshift) with `npm run cli -- --input input_examples/example_N.json --run-id example-N` on 27 Oct 2026, 15:06–15:08 UK, with that day's NVD records already in the per-day cache (earlier runs that morning had read them; the manifests label them cached, not live). They are never read by the app. The only change after the run: local absolute file paths were shortened to repo-relative ones (details in [`output_examples/README.md`](output_examples/README.md)).
 
 "Re-checked" counts the lines whose cited KEV and EPSS values the verifier compared with fresh Zetaris reads. A line that cites none (a "no KEV product" line) has nothing to re-check and is counted apart.
 
 | Input | What it shows | Result (live) |
 |---|---|---|
-| [`example_1.json`](input_examples/example_1.json): 12 rows of the registered inventory, by `row_ids` | the inventory read through Zetaris; discovery and the plain SQL join (9 of 12 hit, 3 of them look-alikes); jury splits decided by Ultra (Veeam Agent is not Veeam Backup & Replication); the critic catching a cloud look-alike (Word Online, sent to the owner after two re-decides); lines whose cited KEV CVEs follow NVD's per-CVE check (Tomcat and Exchange drop the CVEs NVD rules out; HTTP Server 2.4.49 keeps CVE-2021-41773, due 2021-11-17); fail-closed `patch_now` with version questions | 25.1 s · 8 patch_now / 0 this_cycle / 3 monitor / 1 ask_owner · 8 model calls (Bolt 2, Lightning 3, Ultra 3) · 9 re-checked + 3 with nothing to re-check |
-| [`example_2.json`](input_examples/example_2.json): 6 rows of your own, with all fields | rows that are not in the bundled inventory, joined in Zetaris as an inline `VALUES` table; a one-letter look-alike (OpenSSH, not OpenSSL) → no KEV product; KEV and EPSS disagreeing (Notepad++: KEV-listed, EPSS 0.018) | 8.5 s · 5 / 0 / 1 / 0 · 2 model calls · 5 re-checked + 1 with nothing to re-check |
-| [`example_3.json`](input_examples/example_3.json): 6 rows with only `software`, plus a policy override (`patch_now` within 3 days) | the minimal input; 2026 KEV entries (WordPress, Roundcube, MikroTik RouterOS, SolarWinds Web Help Desk); a cloud look-alike (SharePoint Online) sent back and corrected | 31.1 s · 4 / 0 / 2 / 0 · 7 model calls (Ultra 4) · 4 re-checked + 2 with nothing to re-check |
+| [`example_1.json`](input_examples/example_1.json): 12 rows of the registered inventory, by `row_ids` | the inventory read through Zetaris; discovery and the plain SQL join (9 of 12 hit, 3 of them look-alikes); jury splits decided by Ultra (Veeam Agent is not Veeam Backup & Replication; a Windows Server "mail host" is Windows, not Exchange Server; after the split and with no build number it scores 6/9 and goes to the owner); the critic catching a cloud look-alike (Word Online, sent to the owner after two re-decides); lines whose cited KEV CVEs follow NVD's per-CVE check (Tomcat and Exchange drop the CVEs NVD rules out; HTTP Server 2.4.49 keeps CVE-2021-41773, due 2021-11-17); fail-closed `patch_now` with version questions | 30.3 s · 7 patch_now / 0 this_cycle / 3 monitor / 2 ask_owner · 9 model calls (Bolt 2, Lightning 3, Ultra 4) · 9 re-checked + 3 with nothing to re-check |
+| [`example_2.json`](input_examples/example_2.json): 6 rows of your own, with all fields | rows that are not in the bundled inventory, joined in Zetaris as an inline `VALUES` table; a one-letter look-alike (OpenSSH, not OpenSSL) → no KEV product; KEV and EPSS disagreeing (Notepad++: KEV-listed, EPSS 0.018) | 24.0 s · 5 / 0 / 1 / 0 · 2 model calls · 5 re-checked + 1 with nothing to re-check |
+| [`example_3.json`](input_examples/example_3.json): 6 rows with only `software`, plus a policy override (`patch_now` within 3 days) | the minimal input; 2026 KEV entries (WordPress, Roundcube, MikroTik RouterOS, SolarWinds Web Help Desk); a cloud look-alike (SharePoint Online) sent back and corrected | 19.6 s · 4 / 0 / 2 / 0 · 4 model calls (Ultra 1) · 4 re-checked + 2 with nothing to re-check |
 
 Each output has three files: `example_N.json` (the `RunResponse`), `example_N.trace.jsonl` (the trace) and `example_N.report.html` (the report). Inside `example_N.json`, the `trace_file` and `report_file` fields keep the paths the run wrote (`logs/trace-example-N.jsonl`, `output/report-example-N.html`); the committed copies of those two files are `output_examples/example_N.trace.jsonl` and `output_examples/example_N.report.html`.
 
@@ -411,7 +411,7 @@ The npm scripts load `.env` automatically (`node --env-file-if-exists=.env`). Fo
 |---|---|---|---|
 | **Software inventory** (80 rows, 30 assets) | Zetaris REST table over `data/inventory.json` in the public data repo `berkinksk/exposureledger` (GitHub raw); a CSV copy is `data/software_list.csv` | **synthetic**: made up by the team for this project; no real organisation, people or addresses | our own data |
 | **CISA KEV** | Zetaris REST table over `cisagov/kev-data` on GitHub (CISA's own published JSON), re-fetched on every query | **live** (the examples cite catalogue version 2026.10.26) | CC0 1.0 (as stated in the `cisagov/kev-data` repository) |
-| **FIRST EPSS** | Zetaris REST tables over `api.first.org/data/v1/epss`, created per run | **live** (the examples cite scores of 2026-10-26) | free to use; FIRST requests attribution: EPSS scores are by FIRST (first.org/epss) |
+| **FIRST EPSS** | Zetaris REST tables over `api.first.org/data/v1/epss`, created per run | **live** (the examples cite scores of 2026-10-27) | free to use; FIRST requests attribution: EPSS scores are by FIRST (first.org/epss) |
 | **NIST NVD** | Zetaris REST tables over the NVD CVE API 2.0, one per CVE | **live**, plus a local cache per day (labelled "cached" with its date, never "live") | US government data. *This product uses the NVD API but is not endorsed or certified by the NVD.* |
 | **Sample snapshot** (`data/sample/snapshot.json`) | file, sample mode only | **captured copy** of the four sources above, dated (27 Oct 2026; KEV 2026.10.23) | as the sources above |
 
@@ -454,7 +454,7 @@ The app has no database of its own: the live sources are read through Zetaris wh
 - **No accuracy numbers yet.** The development table measures agreement, not accuracy; the final test waits for the agreed human answers (§11). Three of the 30 test rows are variants of examples the rules were built on (§11).
 - **Model answers vary** between identical runs at temperature 0 (single models changed 2–6 of 50 rows between two runs; the full system 0 of 50 in that test). Saved examples are one real run each.
 - **Ultra can be too strict.** It sometimes disputes a plausible match (e.g. an OpenSSL library on a mail server). Such rows go to the owner: safe, but more questions.
-- **NVD is slow when cold.** NVD's keyless rate limit makes a first lookup take ~10 s through Zetaris. Each run has a 60 s NVD budget (`EL_NVD_BUDGET_S`); CVEs left over are named "not looked up in this run" and their rows stay at the fail-closed outcome with a question. Lookups are cached for the day, so a later run the same day reads them free (the examples' NVD records came from that day's cache, or were read live within the budget).
+- **NVD is slow when cold.** NVD's keyless rate limit makes a first lookup take ~10 s through Zetaris. Each run has a 60 s NVD budget (`EL_NVD_BUDGET_S`); CVEs left over are named "not looked up in this run" and their rows stay at the fail-closed outcome with a question. Lookups are cached for the day, so a later run the same day reads them free (the examples' NVD records all came from that day's cache).
 - **Rows without a version** cannot be placed in NVD's ranges. A strong match to a KEV-listed product stays `patch_now` with a version question; a weaker one goes to the owner. Windows rows without a build share one question per edition.
 - **Sample mode is weaker than live mode** (§8): more owner questions, because the normaliser alone is unsure where the jury would decide.
 - **Memory needs a saved world.** "Since the last run" and the kept `patch_now` target apply to live runs that save their outputs (the CLI and the server do); a run on the same day changes no target date. Memory is per row: the registered inventory and request rows never share it, and a row whose software text changes counts as new.
