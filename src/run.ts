@@ -41,8 +41,12 @@ import {
 } from "./resolve/normalise.ts";
 import { candidatesV0, deterministicVoteV0, familyKey, familyV0, parseVersionV0 } from "./resolve/candidates.ts";
 import { hasVersion, rangesForProduct } from "./resolve/versions.ts";
+import { withNetworkGuard } from "./sample/guard.ts";
 
 export { ENGINE_SOURCE };
+
+/** What the sample store reports about its snapshot (src/sample/queries.ts); absent on the live Queries. */
+interface SnapshotAware { snapshotInfo?: () => { file: string; captured_day: string; inventory_day: string } }
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_OUTPUT_DIR = join(REPO_ROOT, "output");
@@ -308,7 +312,10 @@ export function notAffectedBlock(
 // ---------------------------------------------------------------- run
 
 export async function run(req: RunRequest, deps: Deps): Promise<RunResponse> {
-  return runWith(req, deps, runOptionsFromEnv(process.env));
+  const opts = runOptionsFromEnv(process.env);
+  // sample mode (design §10): no network at all; fetch and net.Socket.connect throw for the whole run
+  if (deps.mode === "sample") return withNetworkGuard(() => runWith(req, deps, opts), { tracer: deps.tracer });
+  return runWith(req, deps, opts);
 }
 
 /** Operator knobs read by run(): EL_NVD_BUDGET_S (seconds of NVD lookups per run; default 60). */
@@ -416,10 +423,14 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
       if (e instanceof RequestError) return respond("error", [], [], { type: "invalid_request", message: e.message, recoverable: true });
       return respond("error", [], [], { type: "inventory_unavailable", message: msg(e), recoverable: true });
     }
+    // sample mode: the snapshot the facts come from, with its capture date (design §10 "stamped with the snapshot date")
+    const snapshot = !live ? (deps.queries as SnapshotAware).snapshotInfo?.() ?? null : null;
+    if (snapshot) sources.push({ name: "Sample snapshot", object: `${snapshot.file} (captured through Zetaris)`, live: false, as_of: snapshot.captured_day });
     sources.push({
       name: inventoryFrom === "request" ? "Inventory (request rows)" : "Inventory (synthetic)",
       object: inventoryFrom === "request" ? "run request" : live ? "el.inventory" : "sample snapshot (el.inventory)",
-      live: inventoryFrom === "zetaris" && live, as_of,
+      live: inventoryFrom === "zetaris" && live,
+      as_of: snapshot && inventoryFrom === "zetaris" ? snapshot.inventory_day : as_of,
     });
     tracer.emit({
       agent: "pipeline", action: "inventory_loaded", target_agent: "normaliser", status: "ok",
