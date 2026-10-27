@@ -1,0 +1,927 @@
+{
+ "status": 200,
+ "seconds": 1.8,
+ "headers": [
+  "vendor",
+  "product"
+ ],
+ "rows": [
+  [
+   "Adobe",
+   "Acrobat"
+  ],
+  [
+   "Adobe",
+   "Acrobat and Reader"
+  ],
+  [
+   "Adobe",
+   "Acrobat and Reader, Flash Player"
+  ],
+  [
+   "Adobe",
+   "BlazeDS"
+  ],
+  [
+   "Adobe",
+   "ColdFusion"
+  ],
+  [
+   "Adobe",
+   "Commerce and Magento"
+  ],
+  [
+   "Adobe",
+   "Commerce and Magento "
+  ],
+  [
+   "Adobe",
+   "Commerce and Magento Open Source"
+  ],
+  [
+   "Adobe",
+   "Commerce and Magento"
+  ],
+  [
+   "Adobe",
+   "Experience Manager (AEM) Forms"
+  ],
+  [
+   "Adobe",
+   "Flash Player"
+  ],
+  [
+   "Adobe",
+   "Flash Player and AIR"
+  ],
+  [
+   "Adobe",
+   "Reader"
+  ],
+  [
+   "Adobe",
+   "Reader and Acrobat"
+  ],
+  [
+   "Apache",
+   "APISIX"
+  ],
+  [
+   "Apache",
+   "ActiveMQ"
+  ],
+  [
+   "Apache",
+   "Airflow"
+  ],
+  [
+   "Apache",
+   "Airflow's Experimental API"
+  ],
+  [
+   "Apache",
+   "Apache"
+  ],
+  [
+   "Apache",
+   "CouchDB"
+  ],
+  [
+   "Apache",
+   "Flink"
+  ],
+  [
+   "Apache",
+   "HTTP Server"
+  ],
+  [
+   "Apache",
+   "HugeGraph-Server"
+  ],
+  [
+   "Apache",
+   "Kylin"
+  ],
+  [
+   "Apache",
+   "Log4j2"
+  ],
+  [
+   "Apache",
+   "OFBiz"
+  ],
+  [
+   "Apache",
+   "RocketMQ"
+  ],
+  [
+   "Apache",
+   "Shiro"
+  ],
+  [
+   "Apache",
+   "Solr"
+  ],
+  [
+   "Apache",
+   "Spark"
+  ],
+  [
+   "Apache",
+   "Struts"
+  ],
+  [
+   "Apache",
+   "Struts 1"
+  ],
+  [
+   "Apache",
+   "Struts 2"
+  ],
+  [
+   "Apache",
+   "Superset"
+  ],
+  [
+   "Apache",
+   "Tomcat"
+  ],
+  [
+   "Cisco",
+   "Adaptive Security Appliance (ASA)"
+  ],
+  [
+   "Cisco",
+   "Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD)"
+  ],
+  [
+   "Cisco",
+   "Adaptive Security Appliance and Firepower Threat Defense"
+  ],
+  [
+   "Cisco",
+   "AnyConnect Secure"
+  ],
+  [
+   "Cisco",
+   "Catalyst 4500 Series Switches and Cisco Catalyst 4500-X Series Switches"
+  ],
+  [
+   "Cisco",
+   "Catalyst 6800 Series Switches"
+  ],
+  [
+   "Cisco",
+   "Catalyst SD-WAN"
+  ],
+  [
+   "Cisco",
+   "Catalyst SD-WAN Controller and Manager"
+  ],
+  [
+   "Cisco",
+   "Catalyst SD-WAN Manager"
+  ],
+  [
+   "Cisco",
+   "Catalyst SD-WAN Manger"
+  ],
+  [
+   "Cisco",
+   "Cisco IOS XE Web UI"
+  ],
+  [
+   "Cisco",
+   "Cisco IP Phones"
+  ],
+  [
+   "Cisco",
+   "HyperFlex HX"
+  ],
+  [
+   "Cisco",
+   "IOS"
+  ],
+  [
+   "Cisco",
+   "IOS Software"
+  ],
+  [
+   "Cisco",
+   "IOS Software and Cisco IOS XE Software"
+  ],
+  [
+   "Cisco",
+   "IOS XE Software"
+  ],
+  [
+   "Cisco",
+   "IOS XE Web UI"
+  ],
+  [
+   "Cisco",
+   "IOS XR"
+  ],
+  [
+   "Cisco",
+   "IOS and IOS XE"
+  ],
+  [
+   "Cisco",
+   "IOS and IOS XE Software"
+  ],
+  [
+   "Cisco",
+   "IOS software"
+  ],
+  [
+   "Cisco",
+   "IOS, IOS XR, and IOS XE"
+  ],
+  [
+   "Cisco",
+   "IOS, XR, and XE Software"
+  ],
+  [
+   "Cisco",
+   "Identity Services Engine"
+  ],
+  [
+   "Cisco",
+   "Multiple Products"
+  ],
+  [
+   "Cisco",
+   "NX-OS"
+  ],
+  [
+   "Cisco",
+   "Prime Data Center Network Manager (DCNM)"
+  ],
+  [
+   "Cisco",
+   "RV Series Routers"
+  ],
+  [
+   "Cisco",
+   "SD-WAN"
+  ],
+  [
+   "Cisco",
+   "Secure Access Control System (ACS)"
+  ],
+  [
+   "Cisco",
+   "Secure Email Gateway"
+  ],
+  [
+   "Cisco",
+   "Secure Firewall Adaptive Security Appliance (ASA) and Secure Firewall Threat Defense (FTD) "
+  ],
+  [
+   "Cisco",
+   "Secure Firewall Adaptive Security Appliance and Secure Firewall Threat Defense"
+  ],
+  [
+   "Cisco",
+   "Secure Firewall Management Center (FMC)"
+  ],
+  [
+   "Cisco",
+   "Secure Firewall Management Center (FMC) and Security Cloud Control (SCC) Firewall Management"
+  ],
+  [
+   "Cisco",
+   "Small Business RV Series Routers"
+  ],
+  [
+   "Cisco",
+   "Small Business RV160, RV260, RV340, and RV345 Series Routers"
+  ],
+  [
+   "Cisco",
+   "Small Business RV320 and RV325 Dual Gigabit WAN VPN Routers"
+  ],
+  [
+   "Cisco",
+   "Small Business RV320 and RV325 Routers"
+  ],
+  [
+   "Cisco",
+   "Smart Licensing Utility"
+  ],
+  [
+   "Cisco",
+   "Unified Communications Manager"
+  ],
+  [
+   "Cisco",
+   "VPN Routers"
+  ],
+  [
+   "Citrix",
+   "Application Delivery Controller (ADC) and Gateway"
+  ],
+  [
+   "Citrix",
+   "Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance"
+  ],
+  [
+   "Citrix",
+   "Content Collaboration"
+  ],
+  [
+   "Citrix",
+   "NetScaler"
+  ],
+  [
+   "Citrix",
+   "NetScaler ADC and Gateway"
+  ],
+  [
+   "Citrix",
+   "NetScaler ADC and NetScaler Gateway"
+  ],
+  [
+   "Citrix",
+   "NetScaler SD-WAN Enterprise, CloudBridge Virtual WAN, and XenMobile Server"
+  ],
+  [
+   "Citrix",
+   "SD-WAN and NetScaler"
+  ],
+  [
+   "Citrix",
+   "Session Recording"
+  ],
+  [
+   "Citrix",
+   "ShareFile"
+  ],
+  [
+   "Citrix",
+   "StoreFront Server"
+  ],
+  [
+   "Citrix",
+   "Workspace Application and Receiver for Windows"
+  ],
+  [
+   "Fortinet",
+   "FortiClient EMS"
+  ],
+  [
+   "Fortinet",
+   "FortiMail"
+  ],
+  [
+   "Fortinet",
+   "FortiManager"
+  ],
+  [
+   "Fortinet",
+   "FortiOS"
+  ],
+  [
+   "Fortinet",
+   "FortiOS and FortiADC"
+  ],
+  [
+   "Fortinet",
+   "FortiOS and FortiProxy"
+  ],
+  [
+   "Fortinet",
+   "FortiOS and FortiProxy SSL-VPN"
+  ],
+  [
+   "Fortinet",
+   "FortiSandbox"
+  ],
+  [
+   "Fortinet",
+   "FortiWeb"
+  ],
+  [
+   "Fortinet",
+   "Multiple Products"
+  ],
+  [
+   "Google",
+   "Chrome"
+  ],
+  [
+   "Google",
+   "Chrome Blink"
+  ],
+  [
+   "Google",
+   "Chrome FreeType"
+  ],
+  [
+   "Google",
+   "Chrome Media"
+  ],
+  [
+   "Google",
+   "Chrome WebAudio"
+  ],
+  [
+   "Google",
+   "Chrome for Android UI"
+  ],
+  [
+   "Google",
+   "Chromium"
+  ],
+  [
+   "Google",
+   "Chromium Animation"
+  ],
+  [
+   "Google",
+   "Chromium Blink"
+  ],
+  [
+   "Google",
+   "Chromium GPU"
+  ],
+  [
+   "Google",
+   "Chromium Indexed DB API"
+  ],
+  [
+   "Google",
+   "Chromium Intents"
+  ],
+  [
+   "Google",
+   "Chromium Mojo"
+  ],
+  [
+   "Google",
+   "Chromium Network Service"
+  ],
+  [
+   "Google",
+   "Chromium PopupBlocker"
+  ],
+  [
+   "Google",
+   "Chromium Portals"
+  ],
+  [
+   "Google",
+   "Chromium Skia"
+  ],
+  [
+   "Google",
+   "Chromium V8"
+  ],
+  [
+   "Google",
+   "Chromium WebGL"
+  ],
+  [
+   "Google",
+   "Chromium WebP"
+  ],
+  [
+   "Google",
+   "Chromium WebRTC"
+  ],
+  [
+   "Google",
+   "Chromium libvpx"
+  ],
+  [
+   "Google",
+   "Dawn"
+  ],
+  [
+   "Google",
+   "Pixel"
+  ],
+  [
+   "Google",
+   "Skia"
+  ],
+  [
+   "Ivanti",
+   " Endpoint Manager (EPM)"
+  ],
+  [
+   "Ivanti",
+   "Cloud Services Appliance"
+  ],
+  [
+   "Ivanti",
+   "Cloud Services Appliance (CSA)"
+  ],
+  [
+   "Ivanti",
+   "Connect Secure"
+  ],
+  [
+   "Ivanti",
+   "Connect Secure and Policy Secure"
+  ],
+  [
+   "Ivanti",
+   "Connect Secure, Policy Secure, and Neurons"
+  ],
+  [
+   "Ivanti",
+   "Connect Secure, Policy Secure, and ZTA Gateways"
+  ],
+  [
+   "Ivanti",
+   "Endpoint Manager (EPM)"
+  ],
+  [
+   "Ivanti",
+   "Endpoint Manager Cloud Service Appliance (EPM CSA)"
+  ],
+  [
+   "Ivanti",
+   "Endpoint Manager Mobile (EPMM)"
+  ],
+  [
+   "Ivanti",
+   "Endpoint Manager Mobile (EPMM) and MobileIron Core"
+  ],
+  [
+   "Ivanti",
+   "MobileIron Multiple Products"
+  ],
+  [
+   "Ivanti",
+   "Pulse Connect Secure"
+  ],
+  [
+   "Ivanti",
+   "Pulse Connect Secure and Pulse Policy Secure"
+  ],
+  [
+   "Ivanti",
+   "Sentry"
+  ],
+  [
+   "Ivanti",
+   "Virtual Traffic Manager"
+  ],
+  [
+   "Microsoft",
+   ".NET Core and Visual Studio"
+  ],
+  [
+   "Microsoft",
+   ".NET Framework"
+  ],
+  [
+   "Microsoft",
+   ".NET Framework, SharePoint, Visual Studio"
+  ],
+  [
+   "Microsoft",
+   "ATM Font Driver"
+  ],
+  [
+   "Microsoft",
+   "Active Directory"
+  ],
+  [
+   "Microsoft",
+   "Active Directory Federation Services"
+  ],
+  [
+   "Microsoft",
+   "Ancillary Function Driver (afd.sys)"
+  ],
+  [
+   "Microsoft",
+   "Client-Server Run-time Subsystem (CSRSS)"
+  ],
+  [
+   "Microsoft",
+   "Configuration Manager"
+  ],
+  [
+   "Microsoft",
+   "DWM Core Library"
+  ],
+  [
+   "Microsoft",
+   "Defender"
+  ],
+  [
+   "Microsoft",
+   "DirectX"
+  ],
+  [
+   "Microsoft",
+   "DirectX Graphics Kernel (DXGKRNL)"
+  ],
+  [
+   "Microsoft",
+   "Edge"
+  ],
+  [
+   "Microsoft",
+   "Edge and Internet Explorer"
+  ],
+  [
+   "Microsoft",
+   "Enhanced Cryptographic Provider"
+  ],
+  [
+   "Microsoft",
+   "Excel"
+  ],
+  [
+   "Microsoft",
+   "Exchange"
+  ],
+  [
+   "Microsoft",
+   "Exchange Server"
+  ],
+  [
+   "Microsoft",
+   "Forefront Threat Management Gateway (TMG)"
+  ],
+  [
+   "Microsoft",
+   "Graphics Component"
+  ],
+  [
+   "Microsoft",
+   "Graphics Device Interface (GDI)"
+  ],
+  [
+   "Microsoft",
+   "HTTP Protocol Stack"
+  ],
+  [
+   "Microsoft",
+   "HTTP.sys"
+  ],
+  [
+   "Microsoft",
+   "Hyper-V RemoteFX"
+  ],
+  [
+   "Microsoft",
+   "Input Method Editor (IME) Japanese"
+  ],
+  [
+   "Microsoft",
+   "Internet Explorer"
+  ],
+  [
+   "Microsoft",
+   "Internet Explorer Scripting Engine"
+  ],
+  [
+   "Microsoft",
+   "Internet Explorer and Edge"
+  ],
+  [
+   "Microsoft",
+   "Internet Information Services (IIS)"
+  ],
+  [
+   "Microsoft",
+   "Internet Key Exchange (IKE) Service Extensions"
+  ],
+  [
+   "Microsoft",
+   "Kerberos Key Distribution Center (KDC)"
+  ],
+  [
+   "Microsoft",
+   "MSCOMCTL.OCX"
+  ],
+  [
+   "Microsoft",
+   "MSHTML"
+  ],
+  [
+   "Microsoft",
+   "Malware Protection Engine"
+  ],
+  [
+   "Microsoft",
+   "Microsoft"
+  ],
+  [
+   "Microsoft",
+   "Netlogon"
+  ],
+  [
+   "Microsoft",
+   "Office"
+  ],
+  [
+   "Microsoft",
+   "Office Outlook"
+  ],
+  [
+   "Microsoft",
+   "Office and WordPad"
+  ],
+  [
+   "Microsoft",
+   "Open Management Infrastructure (OMI)"
+  ],
+  [
+   "Microsoft",
+   "Outlook"
+  ],
+  [
+   "Microsoft",
+   "Partner Center"
+  ],
+  [
+   "Microsoft",
+   "Power Pages"
+  ],
+  [
+   "Microsoft",
+   "PowerPoint"
+  ],
+  [
+   "Microsoft",
+   "Project"
+  ],
+  [
+   "Microsoft",
+   "Publisher"
+  ],
+  [
+   "Microsoft",
+   "Remote Desktop Services"
+  ],
+  [
+   "Microsoft",
+   "SMBv1"
+  ],
+  [
+   "Microsoft",
+   "SMBv1 server"
+  ],
+  [
+   "Microsoft",
+   "SMBv3"
+  ],
+  [
+   "Microsoft",
+   "SQL Server"
+  ],
+  [
+   "Microsoft",
+   "SharePoint"
+  ],
+  [
+   "Microsoft",
+   "SharePoint Server"
+  ],
+  [
+   "Microsoft",
+   "Silverlight"
+  ],
+  [
+   "Microsoft",
+   "Skype for Business"
+  ],
+  [
+   "Microsoft",
+   "SmartScreen Prompt"
+  ],
+  [
+   "Microsoft",
+   "Streaming Service"
+  ],
+  [
+   "Microsoft",
+   "Streaming Service Proxy"
+  ],
+  [
+   "Microsoft",
+   "Task Scheduler"
+  ],
+  [
+   "Microsoft",
+   "Update Notification Manager"
+  ],
+  [
+   "Microsoft",
+   "Visual Basic for Applications (VBA)"
+  ],
+  [
+   "Microsoft",
+   "Win32k"
+  ],
+  [
+   "Microsoft",
+   "WinVerifyTrust function"
+  ],
+  [
+   "Microsoft",
+   "Windows"
+  ],
+  [
+   "Microsoft",
+   "Windows "
+  ],
+  [
+   "Microsoft",
+   "Windows Ancillary Function Driver for WinSock "
+  ],
+  [
+   "Microsoft",
+   "Windows CNG Key Isolation Service"
+  ],
+  [
+   "Microsoft",
+   "Windows COM+ Event System Service"
+  ],
+  [
+   "Microsoft",
+   "Word"
+  ],
+  [
+   "Microsoft",
+   "WordPad"
+  ],
+  [
+   "Microsoft",
+   "XML Core Services"
+  ],
+  [
+   "Palo Alto Networks",
+   "Expedition"
+  ],
+  [
+   "Palo Alto Networks",
+   "PAN-OS"
+  ],
+  [
+   "VMware",
+   "Aria Operations for Networks"
+  ],
+  [
+   "VMware",
+   "ESXi"
+  ],
+  [
+   "VMware",
+   "ESXi and Workstation"
+  ],
+  [
+   "VMware",
+   "ESXi, Workstation, and Fusion"
+  ],
+  [
+   "VMware",
+   "Multiple Products"
+  ],
+  [
+   "VMware",
+   "SD-WAN Edge"
+  ],
+  [
+   "VMware",
+   "Spring Cloud Gateway"
+  ],
+  [
+   "VMware",
+   "Spring Framework"
+  ],
+  [
+   "VMware",
+   "Tools"
+  ],
+  [
+   "VMware",
+   "VMware ESXi and Horizon DaaS"
+  ],
+  [
+   "VMware",
+   "Workspace ONE Access and Identity Manager"
+  ],
+  [
+   "VMware",
+   "vCenter Server"
+  ],
+  [
+   "VMware",
+   "vCenter Server and Cloud Foundation"
+  ],
+  [
+   "VMware",
+   "vRealize Operations Manager API"
+  ]
+ ],
+ "total": 229
+}

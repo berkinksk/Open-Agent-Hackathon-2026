@@ -204,6 +204,20 @@ test("GET /report/:id serves output/report-<id>.html, 404 when absent, 400 for u
   } finally { await s.close(); }
 });
 
+test("GET /report/:id renders from output/run-<id>.json when no HTML was saved; the page carries a CSP header", async () => {
+  const dir = tmp();
+  const logs = tmp();
+  const resp = fakeResponse({}, { tracer: memoryTracer("r7") } as unknown as Deps);
+  writeFileSync(join(dir, "run-r7.json"), JSON.stringify({ ...resp, run_id: "r7" }));
+  const s = await start({ outputDir: dir, logsDir: logs, run: async (req, deps) => fakeResponse(req, deps) });
+  try {
+    const r = await fetch(`${s.base}/report/r7`);
+    assert.equal(r.status, 200);
+    assert.match(r.headers.get("content-security-policy") ?? "", /default-src 'none'/);
+    assert.match(await r.text(), /<!doctype html>/i);
+  } finally { await s.close(); }
+});
+
 test("normaliseRunRequest: a bare array is the inventory; types are checked", () => {
   assert.equal(normaliseRunRequest([{ software: "x" }]).inventory!.length, 1);
   assert.deepEqual(normaliseRunRequest({ row_ids: [" R1 ", "R2"] }).row_ids, ["R1", "R2"]);

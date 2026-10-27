@@ -1,0 +1,281 @@
+{
+  "_note": "Hand-written test fixture for test/report.test.ts. It is not output from a run: asset names, receipt IDs, timings and the CVE-2099-* entries are illustrative. Never read at runtime.",
+  "run_id": "fixture-run-001",
+  "mode": "live",
+  "status": "success",
+  "started_at": "2026-10-26T20:00:00.000Z",
+  "finished_at": "2026-10-26T20:01:12.400Z",
+  "as_of": "2026-10-26",
+  "timing_ms": {
+    "inventory": 640,
+    "kev_pairs": 2310,
+    "normalise": 35,
+    "jury": 41200,
+    "critic": 12800,
+    "facts": 9100,
+    "verifier": 3900,
+    "world_model": 210
+  },
+  "summary": { "patch_now": 2, "this_cycle": 1, "monitor": 1, "ask_owner": 2 },
+  "lines": [
+    {
+      "row_id": "r-001",
+      "asset_id": "a-erp-01",
+      "asset_name": "ERP Portal",
+      "internet_facing": true,
+      "software": "log4j-core 2.14.1 (bundled in ERP-Portal WAR)",
+      "resolution": {
+        "row_id": "r-001", "status": "matched", "vendor": "Apache", "product": "Log4j2", "family": "Apache Log4j",
+        "version": "2.14.1", "product_type": "library",
+        "votes": [
+          { "row_id": "r-001", "juror": "bolt", "vendor": "Apache", "product": "Log4j2", "product_type": "library", "confidence": 0.95, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-001", "juror": "lightning", "vendor": "Apache", "product": "Log4j2", "product_type": "library", "confidence": 0.97, "receipt_id": "rcpt-fx-lightning-1" },
+          { "row_id": "r-001", "juror": "normaliser", "vendor": "Apache", "product": "Log4j2", "product_type": "library", "confidence": 0.9 }
+        ],
+        "adjudicated_by": null, "confidence": 0.96
+      },
+      "decision": "patch_now",
+      "target_date": "2026-11-02",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2021-44228", "vendor": "Apache", "product": "Log4j2",
+            "vulnerability_name": "Apache Log4j2 Remote Code Execution Vulnerability",
+            "date_added": "2021-12-10", "due_date": "2021-12-24", "ransomware_use": "Known",
+            "required_action": "Apply updates per vendor instructions.",
+            "short_description": "Apache Log4j2 contains a vulnerability where JNDI features do not protect against attacker-controlled JNDI-related endpoints.",
+            "notes": "", "catalog_version": "2026.10.23"
+          }
+        ],
+        "earliest_due": "2021-12-24",
+        "overdue_days": 1767
+      },
+      "epss": { "max": 0.944, "cve_id": "CVE-2021-44228", "percentile": 0.99987 },
+      "evidence": [
+        { "source": "zetaris:inventory", "query": "inventory", "sql_hash": "sha-inv-01", "field": "software", "value": "log4j-core 2.14.1 (bundled in ERP-Portal WAR)", "as_of": "2026-10-26", "live": true },
+        { "source": "zetaris:kev", "query": "kevByProducts", "sql_hash": "sha-kev-02", "field": "cve_id", "value": "CVE-2021-44228", "as_of": "2026-10-23", "live": true },
+        { "source": "zetaris:epss", "query": "epssVerify", "sql_hash": "sha-epss-03", "field": "epss", "value": "0.944", "as_of": "2026-10-25", "live": true },
+        { "source": "zetaris:nvd", "query": "nvdCves", "field": "version_end_excluding", "value": "2.15.0", "as_of": "2026-10-26", "live": true },
+        { "source": "world_model", "query": "facts.about", "field": "resolves_to", "value": "Apache Log4j", "as_of": "2026-10-26", "live": false }
+      ],
+      "critic": {
+        "row_id": "r-001", "verdict": "approve", "round": 1,
+        "reasons": ["Version 2.14.1 is inside the NVD range; product type matches (library)."],
+        "rubric": { "accuracy": 3, "appropriateness": 3, "actionability": 3, "total": 9 }
+      },
+      "verified": true,
+      "verifier_notes": [],
+      "why": "Listed in CISA KEV (CVE-2021-44228) and version 2.14.1 is in the affected range. Internet-facing, so it leads the list."
+    },
+    {
+      "row_id": "r-002",
+      "asset_id": "a-files-01",
+      "asset_name": "File Transfer Server",
+      "internet_facing": false,
+      "software": "ExampleSoft EFT v7.4",
+      "resolution": {
+        "row_id": "r-002", "status": "matched", "vendor": "Examplesoft", "product": "Example File Transfer", "family": "Examplesoft File Transfer",
+        "version": "7.4", "product_type": "server",
+        "votes": [
+          { "row_id": "r-002", "juror": "bolt", "vendor": "Examplesoft", "product": "Example File Transfer", "product_type": "server", "confidence": 0.82, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-002", "juror": "lightning", "vendor": null, "product": null, "confidence": 0.7, "receipt_id": "rcpt-fx-lightning-1" },
+          { "row_id": "r-002", "juror": "ultra", "vendor": "Examplesoft", "product": "Example File Transfer", "product_type": "server", "confidence": 0.9, "receipt_id": "rcpt-fx-ultra-1" }
+        ],
+        "adjudicated_by": "ultra", "confidence": 0.9
+      },
+      "decision": "patch_now",
+      "target_date": "2026-11-02",
+      "kev": {
+        "cves": [
+          {
+            "cve_id": "CVE-2099-0101", "vendor": "Examplesoft", "product": "Example File Transfer",
+            "vulnerability_name": "Example File Transfer Path Traversal Vulnerability",
+            "date_added": "2026-10-25", "due_date": "2026-10-28", "ransomware_use": "Unknown",
+            "required_action": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+            "short_description": "Illustrative entry for the report test.", "notes": "", "catalog_version": "2026.10.23"
+          }
+        ],
+        "earliest_due": "2026-10-28",
+        "overdue_days": -2
+      },
+      "epss": { "max": 0.013, "cve_id": "CVE-2099-0101", "percentile": 0.62 },
+      "evidence": [
+        { "source": "zetaris:kev", "query": "kevVerify", "sql_hash": "sha-kev-04", "field": "due_date", "value": "2026-10-28", "as_of": "2026-10-23", "live": true },
+        { "source": "zetaris:epss", "query": "epssVerify", "sql_hash": "sha-epss-05", "field": "epss", "value": "0.013", "as_of": "2026-10-25", "live": true },
+        { "source": "agent", "query": "jury.adjudicate", "field": "receipt_id", "value": "rcpt-fx-ultra-1", "live": true }
+      ],
+      "critic": {
+        "row_id": "r-002", "verdict": "approve", "round": 1,
+        "reasons": ["Jury split resolved by Ultra; the version string matches the KEV product."],
+        "rubric": { "accuracy": 3, "appropriateness": 2, "actionability": 3, "total": 8 }
+      },
+      "verified": true,
+      "verifier_notes": [],
+      "why": "Listed in CISA KEV (CVE-2099-0101); KEV wins over the low EPSS score under your rules."
+    },
+    {
+      "row_id": "r-003",
+      "asset_id": "a-web-01",
+      "asset_name": "Public website",
+      "internet_facing": true,
+      "software": "Example CMS 5.2",
+      "resolution": {
+        "row_id": "r-003", "status": "matched", "vendor": "Examplesoft", "product": "Example CMS", "family": "Examplesoft CMS",
+        "version": "5.2", "product_type": "server",
+        "votes": [
+          { "row_id": "r-003", "juror": "bolt", "vendor": "Examplesoft", "product": "Example CMS", "product_type": "server", "confidence": 0.9, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-003", "juror": "lightning", "vendor": "Examplesoft", "product": "Example CMS", "product_type": "server", "confidence": 0.93, "receipt_id": "rcpt-fx-lightning-1" }
+        ],
+        "adjudicated_by": null, "confidence": 0.91
+      },
+      "decision": "this_cycle",
+      "target_date": "2026-11-25",
+      "kev": null,
+      "epss": { "max": 0.12, "cve_id": "CVE-2099-0202", "percentile": 0.95 },
+      "evidence": [
+        { "source": "zetaris:epss", "query": "epssVerify", "sql_hash": "sha-epss-05", "field": "epss", "value": "0.12", "as_of": "2026-10-25", "live": true },
+        { "source": "zetaris:nvd", "query": "nvdProduct", "field": "version_end_excluding", "value": "5.3", "as_of": "2026-10-26", "live": true }
+      ],
+      "critic": {
+        "row_id": "r-003", "verdict": "approve", "round": 1, "reasons": [],
+        "rubric": { "accuracy": 3, "appropriateness": 3, "actionability": 2, "total": 8 }
+      },
+      "verified": true,
+      "verifier_notes": [],
+      "why": "Not in KEV, but EPSS 0.12 is above your 0.05 internet-facing threshold."
+    },
+    {
+      "row_id": "r-004",
+      "asset_id": "a-lap-17",
+      "asset_name": "Finance laptop 17",
+      "internet_facing": false,
+      "software": "Notepad++ 8.6",
+      "resolution": {
+        "row_id": "r-004", "status": "no_match", "vendor": null, "product": null, "family": null,
+        "version": "8.6", "product_type": "client",
+        "votes": [
+          { "row_id": "r-004", "juror": "bolt", "vendor": null, "product": null, "confidence": 0.88, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-004", "juror": "lightning", "vendor": null, "product": null, "confidence": 0.9, "receipt_id": "rcpt-fx-lightning-1" }
+        ],
+        "adjudicated_by": null, "confidence": 0.89
+      },
+      "decision": "monitor",
+      "target_date": "2027-01-24",
+      "kev": { "cves": [], "earliest_due": null, "overdue_days": null },
+      "epss": null,
+      "evidence": [
+        { "source": "zetaris:kev", "query": "kevPairs", "sql_hash": "sha-kev-01", "field": "match", "value": "none", "as_of": "2026-10-23", "live": true }
+      ],
+      "critic": {
+        "row_id": "r-004", "verdict": "approve", "round": 1, "reasons": [],
+        "rubric": { "accuracy": 3, "appropriateness": 3, "actionability": 2, "total": 8 }
+      },
+      "verified": true,
+      "verifier_notes": [],
+      "why": "No KEV product matches this software. Review again in 90 days."
+    },
+    {
+      "row_id": "r-005",
+      "asset_id": "a-m365",
+      "asset_name": "Mail tenant",
+      "internet_facing": true,
+      "software": "Exchange Online (M365 tenant)",
+      "resolution": {
+        "row_id": "r-005", "status": "unresolved", "vendor": "Microsoft", "product": "Exchange Server", "family": "Microsoft Exchange Server",
+        "version": null, "product_type": "cloud_service",
+        "votes": [
+          { "row_id": "r-005", "juror": "bolt", "vendor": "Microsoft", "product": "Exchange Server", "product_type": "server", "confidence": 0.93, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-005", "juror": "lightning", "vendor": "Microsoft", "product": "Exchange Server", "product_type": "server", "confidence": 0.95, "receipt_id": "rcpt-fx-lightning-2" }
+        ],
+        "adjudicated_by": "critic", "confidence": 0.4
+      },
+      "decision": "ask_owner",
+      "target_date": null,
+      "kev": null,
+      "epss": null,
+      "evidence": [
+        { "source": "agent", "query": "critic.rules", "field": "product_type", "value": "cloud_service vs server", "live": true }
+      ],
+      "critic": {
+        "row_id": "r-005", "verdict": "ask_owner", "round": 2,
+        "reasons": [
+          "Product-type conflict: the inventory row is a cloud service; the KEV product is an on-prem server.",
+          "Sent back twice; the resolver kept the same match."
+        ],
+        "rubric": { "accuracy": 1, "appropriateness": 2, "actionability": 1, "total": 4 }
+      },
+      "verified": false,
+      "verifier_notes": ["No cited KEV or EPSS value to re-check: the line was not resolved."],
+      "why": "The critic blocked a look-alike match (cloud service vs on-prem server). Needs your answer."
+    },
+    {
+      "row_id": "r-006",
+      "asset_id": "a-fw-02",
+      "asset_name": "branch-fw-01",
+      "internet_facing": true,
+      "software": "FortiOS (branch firewall)",
+      "resolution": {
+        "row_id": "r-006", "status": "matched", "vendor": "Fortinet", "product": "FortiOS", "family": "Fortinet FortiOS",
+        "version": null, "product_type": "network_appliance",
+        "votes": [
+          { "row_id": "r-006", "juror": "bolt", "vendor": "Fortinet", "product": "FortiOS", "product_type": "network_appliance", "confidence": 0.97, "receipt_id": "rcpt-fx-bolt-1" },
+          { "row_id": "r-006", "juror": "lightning", "vendor": "Fortinet", "product": "FortiOS", "product_type": "network_appliance", "confidence": 0.98, "receipt_id": "rcpt-fx-lightning-1" }
+        ],
+        "adjudicated_by": null, "confidence": 0.97
+      },
+      "decision": "ask_owner",
+      "target_date": null,
+      "kev": null,
+      "epss": null,
+      "evidence": [
+        { "source": "zetaris:inventory", "query": "inventory", "sql_hash": "sha-inv-01", "field": "software", "value": "FortiOS (branch firewall)", "as_of": "2026-10-26", "live": true }
+      ],
+      "critic": {
+        "row_id": "r-006", "verdict": "ask_owner", "round": 1,
+        "reasons": ["The version needed to decide is missing."],
+        "rubric": { "accuracy": 3, "appropriateness": 2, "actionability": 1, "total": 6 }
+      },
+      "verified": false,
+      "verifier_notes": ["Nothing to verify until the version is known."],
+      "why": "FortiOS has KEV entries, but without a version we cannot tell whether this firewall is affected."
+    }
+  ],
+  "owner_questions": [
+    { "row_id": "r-005", "asset_name": "Mail tenant", "question": "Is \"Exchange Online (M365 tenant)\" the Microsoft cloud service, or do you also run an on-prem Exchange Server?", "reason": "Product-type conflict that survived two send-backs." },
+    { "row_id": "r-006", "asset_name": "branch-fw-01", "question": "Which FortiOS version runs on branch-fw-01?", "reason": "The version needed to decide is missing." }
+  ],
+  "receipts": [
+    { "call_id": "c-01", "agent": "jury.bolt", "requested_model": "nvidia/nemotron-3.5-bolt-e4b", "response_model": "nvidia/nemotron-3.5-bolt-e4b", "routed_model": "nvidia/nemotron-3.5-bolt-e4b", "receipt_id": "rcpt-fx-bolt-1", "latency_ms": 6400, "prompt_tokens": 1210, "completion_tokens": 340, "status": "ok" },
+    { "call_id": "c-02", "agent": "jury.lightning", "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "receipt_id": "rcpt-fx-lightning-1", "latency_ms": 11500, "prompt_tokens": 1210, "completion_tokens": 410, "status": "ok" },
+    { "call_id": "c-03", "agent": "jury.adjudicate", "requested_model": "nvidia/nemotron-3-ultra-550b-a55b", "response_model": "nvidia/nemotron-3-ultra-550b-a55b", "routed_model": "nvidia/nemotron-3-ultra-550b-a55b", "receipt_id": "rcpt-fx-ultra-1", "latency_ms": 10700, "prompt_tokens": 980, "completion_tokens": 120, "status": "ok" },
+    { "call_id": "c-04", "agent": "resolver.retry", "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "response_model": null, "routed_model": null, "receipt_id": null, "latency_ms": 60100, "status": "error", "error": "502 empty_response (retried)" },
+    { "call_id": "c-05", "agent": "resolver.retry", "requested_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "response_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b", "receipt_id": "rcpt-fx-lightning-2", "latency_ms": 5200, "prompt_tokens": 640, "completion_tokens": 95, "status": "ok" },
+    { "call_id": "c-06", "agent": "critic.contested", "requested_model": "nvidia/nemotron-3-ultra-550b-a55b", "response_model": "nvidia/nemotron-3-ultra-550b-a55b", "routed_model": "nvidia/nemotron-3-ultra-550b-a55b", "receipt_id": "rcpt-fx-ultra-2", "latency_ms": 9800, "prompt_tokens": 720, "completion_tokens": 88, "status": "ok" }
+  ],
+  "trace_file": "logs/trace-fixture-run-001.jsonl",
+  "report_file": "output/report-fixture-run-001.html",
+  "manifest": {
+    "engine": "world-model",
+    "engine_source": "Meterless/Meterless@1742dec engines/world-model (Apache-2.0)",
+    "sources": [
+      { "name": "Inventory (synthetic)", "object": "el.inventory", "live": true, "as_of": "2026-10-26" },
+      { "name": "CISA KEV", "object": "el.kev", "live": true, "as_of": "2026-10-23" },
+      { "name": "FIRST EPSS", "object": "EL_EPSS.el_epss_<batch>", "live": true, "as_of": "2026-10-25" },
+      { "name": "NIST NVD", "object": "EL_NVD.el_nvd_<cve>", "live": true, "as_of": "2026-10-26" }
+    ],
+    "models": {
+      "bolt": "nvidia/nemotron-3.5-bolt-e4b",
+      "lightning": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "ultra": "nvidia/nemotron-3-ultra-550b-a55b"
+    },
+    "helpers_live": ["nvdCves", "epssVerify", "kevVerify"],
+    "helpers_dormant": ["nvdProduct"],
+    "policy": {
+      "epss_this_cycle": 0.1,
+      "epss_this_cycle_internet": 0.05,
+      "sla_days": { "patch_now": 7, "this_cycle": 30, "monitor_review": 90 },
+      "rubric_auto_min": 7,
+      "max_critic_rounds": 2
+    }
+  }
+}

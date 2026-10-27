@@ -3,7 +3,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { MODELS } from "../src/contracts.ts";
 import type { Candidate, ChatRequest, ChatResult, InventoryRow, JurorVote, Llm, ModelKey, TraceEvent, Tracer } from "../src/contracts.ts";
-import { buildAdjudicatorPrompt, buildJurorPrompt, parseVotes, runJury, runSingleJuror } from "../src/agents/jury.ts";
+import { buildAdjudicatorPrompt, buildJurorPrompt, buildRetryPrompt, parseVotes, redecide, runJury, runSingleJuror, voteWithModel } from "../src/agents/jury.ts";
 import type { JuryItem } from "../src/agents/jury.ts";
 import { deterministicVoteV0, familyV0 } from "../src/resolve/candidates.ts";
 
@@ -332,4 +332,80 @@ test("runSingleJuror: one model, same prompt, no Ultra; a missing vote is unreso
   assert.equal(rs[1].status, "unresolved");
   assert.equal(llm.calls.length, 1);
   assert.equal(llm.calls[0].agent, "single.lightning");
+});
+
+describe("critic send-back: redecide", () => {
+  test("one batched call per model; the critic's reason and the rejected answer are in the prompt; votes accumulate", async () => {
+    const llm = mockLlm({ lightning: { "Exchange Online (M365 tenant)": A(null, null, { product_type: "cloud_service", reason: "a cloud service" }), "log4j-core 2.14.1": "omit" } });
+    const tracer = memTracer();
+    const prevVotes: JurorVote[] = [{ row_id: "r1", juror: "bolt", vendor: "Microsoft", product: "Exchange Server", confidence: 0.9, receipt_id: "rcpt_b" }];
+    const previous = (row_id: string, vendor: string, product: string, family: string) => ({
+      row_id, status: "matched" as const, vendor, product, family, version: null, product_type: "unknown" as const, votes: row_id === "r1" ? prevVotes : [], adjudicated_by: null, confidence: 1,
+    });
+    const outs = await redecide([
+      { item: item("r1", "Exchange Online (M365 tenant)", C.exch), previous: previous("r1", "Microsoft", "Exchange Server", "microsoft exchange server"), note: "type conflict: cloud service vs on-prem server" },
+      { item: item("r2", "log4j-core 2.14.1", C.log4j), previous: previous("r2", "Apache", "Log4j2", "apache log4j2"), note: "no KEV listing cited" },
+    ], "lightning", { llm, tracer, round: 1 });
+    assert.equal(llm.calls.length, 1);
+    assert.equal(llm.calls[0].model, "lightning");
+    assert.equal(llm.calls[0].agent, "resolver.retry.lightning");
+    assert.match(llm.calls[0].user, /rejected answer: \(Microsoft, Exchange Server\)/);
+    assert.match(llm.calls[0].user, /critic: type conflict: cloud service vs on-prem server/);
+    const [r1, r2] = outs;
+    assert.equal(r1.resolution.status, "no_match");
+    assert.equal(r1.resolution.adjudicated_by, "lightning");
+    assert.equal(r1.changed, true);
+    assert.deepEqual(r1.resolution.votes.map((v) => v.juror), ["bolt", "lightning"]);
+    assert.equal(r1.resolution.confidence, 0.5); // half the model votes name the final answer
+    // no valid answer: the previous resolution stands, so the critic reviews it again
+    assert.equal(r2.vote, null);
+    assert.equal(r2.changed, false);
+    assert.equal(r2.resolution.product, "Log4j2");
+    const ev = tracer.events.find((e) => e.action === "redecide");
+    assert.equal(ev?.retry_count, 1);
+    assert.equal(ev?.target_agent, "critic");
+    assert.equal(ev?.receipt_id, "rcpt_lightning_1");
+  });
+
+  test("with the row-aware family, a repeated combo answer is not 'changed' and keeps the row's family", async () => {
+    const sw = "VMware Workstation Pro 17.5.1";
+    const vm = [cand("VMware", "ESXi and Workstation", "vmware:esxi"), cand("VMware", "ESXi", "vmware:esxi")];
+    const llm = mockLlm({ lightning: { [sw]: A("VMware", "ESXi and Workstation", { product_type: "client" }) } });
+    const previous = {
+      row_id: "v1", status: "matched" as const, vendor: "VMware", product: "ESXi and Workstation", family: "vmware:workstation",
+      version: "17.5.1", product_type: "client" as const, votes: [], adjudicated_by: null, confidence: 1,
+    };
+    // the pipeline's row family: the product of the combo the row matched (Workstation), not the combo's first (ESXi)
+    const rowFamily = (_row: InventoryRow, r: { status: string; product: string | null }) =>
+      r.status === "matched" && r.product === "ESXi and Workstation" ? "vmware:workstation" : null;
+    const input = [{ item: item("v1", sw, vm, "17.5.1"), previous, note: "identity: Ultra judged it a different product" }];
+    const tracer = memTracer();
+    const [rowAware] = await redecide(input, "lightning", { llm, tracer, round: 1, rowFamily });
+    assert.equal(rowAware.changed, false);
+    assert.equal(rowAware.resolution.family, "vmware:workstation");
+    assert.match(tracer.events.find((e) => e.action === "redecide")?.output_summary ?? "", /^0 of 1 changed/);
+    // without it, the candidate's first family differs from the row's and the repeat reads as a change
+    const [firstFamily] = await redecide(input, "lightning", { llm, tracer: memTracer(), round: 1 });
+    assert.equal(firstFamily.changed, true);
+  });
+
+  test("buildRetryPrompt keeps the juror rules and asks for a reason", () => {
+    const p = buildRetryPrompt([{ localId: "I1", item: item("r1", "FortiClient VPN 7.2", C.forti), rejected: "(Fortinet, FortiClient EMS)", note: "endpoint client vs server or console" }]);
+    assert.match(p.system, /re-deciding items that a critic rejected/);
+    assert.match(p.system, /Copy vendor and product EXACTLY/);
+    assert.match(p.user, /candidates: \(Fortinet, FortiClient EMS\) \| \(Fortinet, FortiOS\)/);
+  });
+});
+
+describe("single-model arms: voteWithModel", () => {
+  test("the jury prompt and batching for one model; rows without candidates get a rule vote; invalid rows are left out", async () => {
+    const llm = mockLlm({ bolt: { "log4j-core 2.14.1": A("Apache", "Log4j2"), "MS Exchange Svr 2019": "omit" } });
+    const items = [item("r1", "log4j-core 2.14.1", C.log4j), item("r2", "MS Exchange Svr 2019", C.exch), item("r3", "Notepad++ v8.6", [])];
+    const out = await voteWithModel("bolt", items, { llm, tracer: memTracer() });
+    assert.equal(llm.calls.length, 1);
+    assert.equal(llm.calls[0].agent, "single.bolt");
+    assert.equal(out.receipts.length, 1);
+    assert.deepEqual(out.votes.map((v) => [v.row_id, v.juror, v.product]), [["r1", "bolt", "Log4j2"], ["r3", "normaliser", null]]);
+    await assert.rejects(voteWithModel("bolt", items, { llm: null, tracer: memTracer() }), /needs a model client/);
+  });
 });
