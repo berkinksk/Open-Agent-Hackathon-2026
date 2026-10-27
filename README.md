@@ -207,7 +207,7 @@ Every model call goes through Nightshift's local OpenAI-compatible endpoint (`PO
 | **Lightning** `nvidia/nemotron-3.5-lightning-30b-a3b` | second juror; makes the first re-decide of a row the critic sends back |
 | **Ultra** `nvidia/nemotron-3-ultra-550b-a55b` | decides jury splits; critiques contested matches; a "same product?" check before an unconfirmed `patch_now` that the normaliser does not back; the second re-decide of a row |
 
-The models run in NVIDIA's cloud, reached through Nightshift. The receipts show which model answered each call. In the three examples, all 15 calls were answered by the pinned model that was asked for.
+The models run in NVIDIA's cloud, reached through Nightshift. The receipts show which model answered each call. In the three examples, all 17 calls (8 + 2 + 7) were answered by the pinned model that was asked for.
 
 ## 6. Setup
 
@@ -239,6 +239,8 @@ npm run verify -- --skip tests      # the live checks only
 
 ## 7. Usage: CLI, HTTP API, report
 
+There is no `run.py` (this is a Node.js app): the entry points are `npm start` (the HTTP API, `POST /run`) and `npm run cli` (one run from the command line).
+
 **Command line**
 ```bash
 npm run cli -- --input input_examples/example_1.json            # one live run
@@ -259,6 +261,8 @@ outputs:
   report  output/report-example-1.html
   trace   logs/trace-example-1.jsonl
 ```
+
+**Timing:** the first live run of the day (or the first on a fresh clone) takes about 1–1.5 minutes (65–87 s measured), because cold NVD lookups are slow and a run may spend up to its 60 s NVD budget (`EL_NVD_BUDGET_S`). NVD records are cached per CVE for the day: a run whose CVEs are already cached takes about 8.5–31 s (the runs in §10), while a run on rows with new CVEs is slow again.
 
 **HTTP API** (`npm start`, on `0.0.0.0:8000`; set `PORT` to change it)
 ```bash
@@ -291,7 +295,7 @@ or chosen rows of the inventory registered in Zetaris: `{"row_ids": ["R05", "R12
 - Without `inventory`, the run reads `el.inventory` through Zetaris. `row_ids` picks rows from whichever inventory is used.
 - At most 200 rows per run. Through the HTTP API, a run that takes more than 10 minutes returns HTTP 504.
 
-**`RunResponse`:** `run_id`, `mode` (`live` or `sample`), `status` (`success`, `partial` or `error`), `as_of`, `timing_ms`, `summary` (count per decision), `lines` (the patch list), `owner_questions`, `receipts`, `trace_file`, `report_file`, and `manifest` (the engine, every source with its `live` flag and date, the pinned models, the helpers that ran and the ones that are dormant, the policy).
+**`RunResponse`:** `run_id`, `mode` (`live` or `sample`), `status` (`success`, `partial` or `error`), `as_of`, `timing_ms`, `summary` (count per decision), `lines` (the patch list), `owner_questions`, `receipts`, `trace_file`, `report_file`, and `manifest` (the engine; every source with its date and its `live` flag, which is true only when this run read that source live through Zetaris; the pinned models; the helpers that ran and the ones that are dormant; the policy).
 
 **Errors** are structured: `{"status": "error", "error": {"type", "message", "recoverable"}}` with HTTP 400 (bad request), 413 (body over 2 MB), 503 (settings missing) or 504 (run timeout).
 
@@ -305,6 +309,7 @@ docker run --rm --env-file .env.docker exposureledger npm run setup   # once, on
 mkdir -p logs output
 docker run --rm -p 8000:8000 --env-file .env.docker -v "$PWD/logs:/app/logs" -v "$PWD/output:/app/output" exposureledger
 ```
+- **Inside Docker, use the `host.docker.internal` URLs from `.env.docker.example`, not `localhost` or `127.0.0.1`:** inside a container, both point to the container itself, so Zetaris and Nightshift cannot be reached. If you copied `.env.example` instead, set `ZETARIS_REST_URL=http://host.docker.internal:8888/api/v1.0` and `METERLESS_BASE_URL=http://host.docker.internal:8088/v1` in it.
 - `npm run setup` is idempotent and never drops anything. Without it, a Zetaris that has never seen this app has no `el.inventory` or `el.kev`: a `row_ids` request returns `inventory_unavailable`, and rows of your own fail closed to `ask_owner`.
 - Offline: `docker run --rm -p 8000:8000 -e SAMPLE_MODE=true exposureledger`.
 - The `-v` mounts keep the traces and reports on the host after `--rm`. Without them, the full trace is still on the container's stdout: `docker logs <container>` (run without `--rm`, or with `-d`, to read it afterwards). (Tested on macOS Docker Desktop. On Linux, the container's `node` user, uid 1000, must be able to write to the two folders.)
@@ -349,7 +354,7 @@ The three outputs are **real runs**, made live (Zetaris + Nightshift) with `npm 
 | [`example_2.json`](input_examples/example_2.json): 6 rows of your own, with all fields | rows that are not in the bundled inventory, joined in Zetaris as an inline `VALUES` table; a one-letter look-alike (OpenSSH, not OpenSSL) → no KEV product; KEV and EPSS disagreeing (Notepad++: KEV-listed, EPSS 0.018) | 8.5 s · 5 / 0 / 1 / 0 · 2 model calls · 5 re-checked + 1 with nothing to re-check |
 | [`example_3.json`](input_examples/example_3.json): 6 rows with only `software`, plus a policy override (`patch_now` within 3 days) | the minimal input; 2026 KEV entries (WordPress, Roundcube, MikroTik RouterOS, SolarWinds Web Help Desk); a cloud look-alike (SharePoint Online) sent back and corrected | 31.1 s · 4 / 0 / 2 / 0 · 7 model calls (Ultra 4) · 4 re-checked + 2 with nothing to re-check |
 
-Each output has three files: `example_N.json` (the `RunResponse`), `example_N.trace.jsonl` (the trace) and `example_N.report.html` (the report).
+Each output has three files: `example_N.json` (the `RunResponse`), `example_N.trace.jsonl` (the trace) and `example_N.report.html` (the report). Inside `example_N.json`, the `trace_file` and `report_file` fields keep the paths the run wrote (`logs/trace-example-N.jsonl`, `output/report-example-N.html`); the committed copies of those two files are `output_examples/example_N.trace.jsonl` and `output_examples/example_N.report.html`.
 
 Model answers can differ slightly between identical runs (see §11), so a new run of the same input may not match these files line for line.
 
