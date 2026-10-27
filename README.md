@@ -8,6 +8,8 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 
 > **Decision support only.** The patch policy is the user's own and is configurable. ExposureLedger makes no claim that a flaw is exploitable on your systems. The inventory in this repository is synthetic. KEV due dates are US federal deadlines, shown as a benchmark.
 
+**At a glance:** 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision. The rows come from the synthetic inventory and the answers from two teammates. In the same test, a single Ultra call, given all 30 rows and the union of our normaliser's candidate shortlists, named the right KEV product (or none) for all 30. Details: [§11](#11-evaluation) and [`docs/evaluation.md`](docs/evaluation.md).
+
 ---
 
 ## Contents
@@ -49,7 +51,7 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 | FIRST EPSS | the probability that a flaw is exploited in the next 30 days | CVE ID only |
 | NIST NVD | which product versions a flaw affects | CVE ID + CPE version ranges |
 
-Look-alikes make it worse. In our tests, each model on its own made name-only matches: a cloud mail service to the on-premises mail server, a VPN client to the vendor's management server, "Word Online" to the desktop Word product, a backup *agent* to the vendor's backup *server*.
+Look-alikes make it worse. In our first probe (26 Oct, 10 strings), all three Nemotron models, Ultra included, matched "Exchange Online" to the on-premises Exchange Server and "FortiClient VPN" to the FortiClient EMS management server. In the final test (§11), Bolt alone and Lightning alone named a KEV product for 4 and 6 of the 12 rows that have none (both matched "Exchange Online" to the on-premises Exchange); the full system answered none of the 12 with a KEV product.
 
 ## 2. What it does
 
@@ -360,21 +362,29 @@ Model answers can differ slightly between identical runs (see §11), so a new ru
 
 ## 11. Evaluation
 
-**Development set, not the final test.** Measured live on the 50 development rows of the synthetic inventory with `npm run eval -- --set dev --labels none --arms full,bolt,lightning,baseline,normaliser` (run 3, the final code), after two earlier identical runs without the baseline arm that measured stability. The 30 test rows are sealed and never reached any arm. **The human answers were not ready, so this table has no accuracy: agreement is not accuracy.** Details, and both earlier runs: [`docs/evaluation.md`](docs/evaluation.md).
+**Final test: 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision.** The full write-up, with every owner row explained, is in [`docs/evaluation.md`](docs/evaluation.md); the run's files are in [`docs/eval/final-test/`](docs/eval/final-test/).
 
-| Arm (run 3) | Named a KEV product | No KEV product | Left to the owner | Agrees with the full system | Model calls (Ultra) | Answers changed between runs 1 and 2 |
-|---|---|---|---|---|---|---|
-| Full system (jury + Ultra + critic) | 28 | 17 | 5 | – | 23 (11) | 0 of 50 |
-| Bolt alone | 35 | 15 | 0 | 42/45 | 5 (0) | 2 of 50 |
-| Lightning alone | 37 | 12 | 0 (+1 without a valid vote) | 40/45 | 5 (0) | 6 of 50 |
-| One-call baseline (one Ultra call given every row and every candidate) | 32 | 18 | 0 | 42/45 | 1 (1) | – |
-| Normaliser alone (no model) | 27 | 23 | 0 | 40/45 | 0 | 0 of 50 |
+- **Rows:** 30 rows picked at random from the 80-row synthetic inventory (the seed is the list's SHA-256; [`data/eval/test_rows.json`](data/eval/test_rows.json)) and sealed during development.
+- **Answers:** written by two teammates; where their sheets differed, one of their two answers was chosen per row, following the labelling rules ([`data/test_answers.csv`](data/test_answers.csv)).
+- **Scoring:** by KEV product family. *Strict* counts every row left to the owner as not answered.
+- **One run,** live, on 27 Oct 2026 at 15:26 UK, on commit `e1edc33`, with the arms below run one after another. With the same answer file, on commit `e1edc33`, the command is `npm run eval -- --set test --final --labels data/test_answers.csv` (model answers vary between runs; on later commits these 30 rows are no longer held out).
 
-- Where a single model or the one-call baseline differs from the full system, it named a KEV product that the full system rejected: an online word processor matched to the desktop product, a file-sharing client to the vendor's server, a backup agent to the vendor's backup server.
-- **The plain SQL join** inside Zetaris (§5) hits 35 of these 50 rows: 16 agree with the agents, 14 are look-alikes the agents rejected, 5 name another product, and it misses 8 rows the agents resolve.
-- **Verifier:** no line was blocked; 29 lines were re-checked live and matched, and 21 "no KEV product" lines cited nothing to re-check.
-- **The final accuracy test** (30 sealed rows, answers agreed by two people) runs once, with `npm run eval -- --set test --final --labels data/test_answers.csv --arms full,bolt,lightning,baseline,normaliser`, scored by KEV family, with accuracy and strict accuracy side by side. Its table goes into `docs/evaluation.md`.
-- **Not every test row is unseen.** R13, R46 and R68 are variants of the design's worked example (`log4j-core 2.14.1` in a web archive) and of the look-alikes the critic's product-type rule was built on (Exchange Online, FortiClient VPN). The final table will give accuracy on all 30 rows and on the other 27.
+| Arm | Correct (strict) | Wrong | Left to the owner | Model calls | Time |
+|---|---|---|---|---|---|
+| **Full system** (jury + Ultra + critic) | 25/30 (strict 23/30) | **0** | 7 | 20 (Bolt 3, Lightning 5, Ultra 12) | 188.5 s (the whole pipeline) |
+| Bolt alone | 26/30 (strict 26/30) | 4 | 0 | 3 | 7.6 s |
+| Lightning alone | 23/30 (strict 23/30) | 6, and 1 row with no valid answer | 0 | 3 | 8.7 s |
+| **One Ultra call**, given all 30 rows plus the union of our normaliser's candidate shortlists | **30/30** (strict 30/30) | 0 | 0 | 1 | 10.9 s |
+| Normaliser alone (no model) | 25/30 (strict 25/30) | 5 | 0 | 0 | 1.1 s |
+
+- **Safety, in this test:** of the 18 rows whose answer is a KEV product, the full system matched 13 and sent 5 to the owner; none of the 18 got "no KEV product" as its answer (one of the 5, R78, went to the owner with a question that leans that way). Of the 12 rows with no KEV product, none got a KEV product as its answer: it rejected 10 and sent 2 to the owner. Alone, Bolt matched 4 of those 12 to a KEV product and Lightning 6.
+- **The 7 owner questions:** 4 named the right product and asked only for the version or build (Veeam B&R "12.0" and three Windows rows). 3 did not: a Windows Server row's question asked the owner to confirm that no KEV product matches it, and two rows with no KEV product got questions about the look-alike both small models had matched (Apache Struts for an IDE, PaperCut NG/MF for a print client).
+- **Changed after the test:** in this run, 4 of the 7 owner questions came from how the normaliser read Windows rows: it did not read "Windows11"/"Windows10" written as one word as Windows, and it read "Win Server 2022" as an application server. After the test, the normaliser was changed to read these spellings ("Windows11", "Windows10Enterprise", "Win Server") as the Windows operating system. The test was not re-run: every final-test number above is for the tested code (`e1edc33`), and on later commits these 30 rows are no longer held out.
+- **The other 27 rows** (all but R13, R46 and R68, which are variants of the design's examples; this figure was announced before the test): full system 22/27 (strict 20/27), 0 wrong; Bolt 25/27; Lightning 22/27; one Ultra call 27/27; normaliser 22/27.
+- **Windows rows** (12 of the 30, by chance): full system 8/12, 0 wrong, 4 to the owner; Bolt, Lightning and the one Ultra call 12/12; normaliser 9/12. **The other 18 rows:** full system 17/18 (strict 15/18), 0 wrong; Bolt 14/18; Lightning 11/18; one Ultra call 18/18; normaliser 16/18.
+- **What we learned:** in this test, Ultra was the strongest matcher, and it is already the pipeline's arbiter (in this run it decided all 7 jury splits and made 12 of the 20 calls). No single model is trusted alone: in our first probe, all three models, Ultra included, matched two look-alikes (§1). The next step is Ultra-first matching, with the small models as cross-checks.
+
+**Before the test: the development set.** Three live runs on the 50 development rows (`npm run eval -- --set dev --labels none`) measured what each arm named and how stable it is, with no answers yet, so no accuracy. Between two identical runs, the full system changed 0 of 50 answers, Bolt alone 2 and Lightning alone 6. Tables: [`docs/evaluation.md`](docs/evaluation.md).
 
 ## 12. Tests and checks
 
@@ -451,7 +461,10 @@ The app has no database of its own: the live sources are read through Zetaris wh
 ## 17. Limitations
 
 - **The `this_cycle` bucket is empty.** Decisions come from KEV-listed CVEs and NVD version ranges. Non-KEV CVEs with a high EPSS need the NVD product lookup, which is built but switched off (dormant in every manifest).
-- **No accuracy numbers yet.** The development table measures agreement, not accuracy; the final test waits for the agreed human answers (§11). Three of the 30 test rows are variants of examples the rules were built on (§11).
+- **Measured once, on 30 synthetic rows.** In the final test (§11), the full system gave no wrong answer but left 7 of the 30 rows to the owner, and a single Ultra call named the right KEV product (or none) for all 30. One run on 30 rows of one synthetic inventory is a small sample, and three of the rows are variants of examples the rules were built on (§11).
+- **An owner question can start from a wrong guess.** In the final test, 3 of the 7 owner questions did not name the right product: two asked about the look-alike the small models had matched ("Which Struts version runs on comms-laptop-02?" for an IDE), and one asked the owner to confirm that a Windows Server row has no KEV product. An owner who knows the machine can correct them, but the wording can mislead.
+- **Some spellings are still not read.** A few rarer glued forms ("WinSvr 2019", "WinServer2019", "Windows10LTSC2019") are not recognised as Windows: live, the normaliser's confident "no KEV product" vote counts as dissent, so even a unanimous jury match can go to the owner (as three Windows rows did in the test); offline, such a row can come out as "no KEV product".
+- **Ultra's critique text is free text.** It can describe the jurors' votes inaccurately; the structured votes and the receipts in the run JSON are the record.
 - **Model answers vary** between identical runs at temperature 0 (single models changed 2–6 of 50 rows between two runs; the full system 0 of 50 in that test). Saved examples are one real run each.
 - **Ultra can be too strict.** It sometimes disputes a plausible match (e.g. an OpenSSL library on a mail server). Such rows go to the owner: safe, but more questions.
 - **NVD is slow when cold.** NVD's keyless rate limit makes a first lookup take ~10 s through Zetaris. Each run has a 60 s NVD budget (`EL_NVD_BUDGET_S`); CVEs left over are named "not looked up in this run" and their rows stay at the fail-closed outcome with a question. Lookups are cached for the day, so a later run the same day reads them free (the examples' NVD records all came from that day's cache).
