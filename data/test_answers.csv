@@ -1,0 +1,31 @@
+row_id,software,kev_vendor,kev_products,notes
+R02,Inkscape 1.3.2 - vector tool,-,none,
+R03,Veeam B&R 12.0 - backup console,Veeam,Backup & Replication,
+R04,Windows11 Pro 23H2,Microsoft,Windows,
+R09,Zoom Workplace 6.2 (desktop),Zoom,none,no data in the list
+R11,Palo Alto GlobalProtect app v6.2 - VPN client,-,none,"VPN client application, distinct from PAN-OS firewall software."
+R13,log4j-core 2.14.1 (bundled in ERP portal WAR),Apache,Log4j2,Java logging library bundled with the ERP application.
+R15,Collabora CODE server - built in to Nextcloud; ver unknown,Collabora,Collabora Online – Built-in CODE Server,
+R17,KeePass 2.57.1 - local password manager,-,none,no record
+R25,Mozilla Firefox ESR 128.3 - x64,Mozilla,Firefox,internet browser
+R26,"Microsoft Teams (new desktop app), 24257",Microsoft,none,no record for Microsoft Teams
+R28,Win 11 Pro 23H2,Microsoft,Windows,
+R29,MS Windows 10 Professional 22H2,Microsoft,Windows,
+R32,php 8.1.2 (docs container runtime),PHP,PHP,
+R34,WinSCP v6.3.5 - SFTP desktop app,Microsoft,none,no record for WinSCP
+R37,Win11 Professional 23H2 x64,Microsoft,Windows,
+R38,"MS Windows11 Pro, 23H2",Microsoft,Windows,
+R39,paint.net v5.1,-,none,no record for paint
+R45,Win 11 Pro 23H2 x64,Microsoft,Windows,
+R46,Exchange Online (Microsoft 365 mail in browser),Microsoft,none,
+R50,Windows Svr 2019 x64 (print services),Microsoft,Windows,Server edition
+R51,MS Win11 Pro 23H2,Microsoft,Windows,
+R52,"Windows10 Pro 22H2, build not written",Microsoft,Windows,
+R53,Python 3.12.6 (64-bit),-,none,no record for Python
+R64,Windows 11 Pro; 23H2,Microsoft,Windows,
+R68,FortiClient VPN 7.2.4; endpoint client,-,none,VPN client
+R70,PaperCut Mobility Print client v1.0,-,none,Print management software
+R76,Apache NetBeans IDE 22 - desktop editor,Apache,none,no record for NetBeans
+R78,MS Win Server 2022 Standard (backup host),Microsoft,Windows,Server edition
+R79,Win11 pro / 23H2,Microsoft,Windows,
+R80,"openssl v1.1.1k, bundled with web stack",OpenSSL,OpenSSL,
