@@ -1,14 +1,38 @@
 # ExposureLedger
 
-**Agents that turn a small organisation's messy software list into a dated, evidence-backed patch list.**
+**Turn a messy software list into a patch plan with dates, evidence and clear questions for the owner.**
 
-ExposureLedger reads the software list of a small organisation and answers one question: *"What do I patch first, and by when?"* It matches each line of the list to the public records of exploited security flaws, decides what to do, and shows the evidence and the model receipt behind every line.
+Small IT teams need a practical answer to one question:
 
-It is built for the **Solving Fragmented Intelligence** challenge: the facts it needs live in four sources that name the same software in different ways. **Zetaris** is the data layer for all four. A jury of three **NVIDIA Nemotron** models, called through **Meterless Nightshift**, does the matching. The **Meterless World Model** engine records every fact with its source.
+**What do I patch first, and by when?**
 
-> **Decision support only.** The patch policy is the user's own and is configurable. ExposureLedger makes no claim that a flaw is exploitable on your systems. The inventory in this repository is synthetic. KEV due dates are US federal deadlines, shown as a benchmark.
+Their software list and public security records use different names and identifiers. ExposureLedger connects them and produces one report:
 
-**At a glance:** 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision. The rows come from the synthetic inventory and the answers from two teammates. In the same test, a single Ultra call, given all 30 rows and the union of our normaliser's candidate shortlists, named the right KEV product (or none) for all 30. Details: [§11](#11-evaluation) and [`docs/evaluation.md`](docs/evaluation.md).
+- **Prioritised actions:** patch recommendations and target dates from your organisation's rules, with affected-version evidence where available.
+- **Reviewable evidence:** vulnerability records with source dates, live checks of cited values, model-call receipts where applicable and saved decision history.
+- **Human review:** model answers must pass checks before automatic recommendations. Unresolved matches and product conflicts become owner questions. Missing versions remain visible even on patch recommendations.
+
+For **Solving Fragmented Intelligence**, **Zetaris** queries the inventory and vulnerability sources. **NVIDIA Nemotron** models through **Meterless Nightshift** help identify products. Code checks evidence and applies policy. The **Meterless World Model** stores selected facts and decisions with provenance.
+
+**An example of why the extra checks matter.** In one recorded run, a single Ultra model confused **Word Online, which runs in a browser, with Word installed on a computer**. Trusting that answer could send an administrator looking for a desktop update that does not apply to the browser service. ExposureLedger caught the difference and asked whether desktop Word was actually installed. **It stopped the wrong answer from becoming a recommendation to update the wrong software.** [See the recorded example](output_examples/example_1.trace.jsonl#L67).
+
+**What happened in our test.** We tested **30 made-up software entries**. For each one, the task was to find the matching product in the public list of exploited security flaws, or say there is none:
+
+- **23 entries:** ExposureLedger answered on its own, and **all 23 answers were right**.
+- **7 entries:** it did not guess. It **asked a person to check them**, because they had not passed its checks.
+- **0 wrong answers.** So "23 of 30" does not mean 7 mistakes. It means 23 right answers and 7 questions for a person.
+
+**Why this is better than one Ultra call, even though that call matched all 30 on this test:**
+
+- **Naming the product is only the first step.** One Ultra call gives a product name and stops. It does not check which versions are affected, re-check the evidence, set a date or ask a question. ExposureLedger does all of these, so the administrator gets a plan to act on, not a list of names.
+- **One call has no safety net.** If a single model is wrong, nothing catches it, and even Ultra is sometimes wrong. In the recorded run above, Ultra kept the wrong Word answer. In our first probe, Ultra and both smaller models matched "Exchange Online" and "FortiClient VPN" to the wrong products. ExposureLedger checks every answer, so a doubtful one becomes a question instead of a wrong patch recommendation.
+- **When it is unsure, it asks.** In a security tool, a question takes the administrator a moment to answer. A confident wrong answer can mean patching the wrong software, or missing a real risk.
+
+[See the full results and comparison](#11-evaluation).
+
+> **Decision support only.** The administrator applies the patches. This prototype uses a synthetic inventory and does not prove exploitability. KEV's US federal due dates are benchmarks alongside the user's own configurable targets.
+
+**Explore:** [example inputs and real outputs](#10-input-and-output-examples) · [run offline](#8-sample-mode-offline) · [full evaluation](docs/evaluation.md).
 
 ## Team
 
@@ -25,44 +49,55 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 ---
 
 ## Contents
-1. [The problem and the user](#1-the-problem-and-the-user)
-2. [What it does](#2-what-it-does)
-3. [Architecture](#3-architecture)
-4. [The agents and how they work together](#4-the-agents-and-how-they-work-together)
-5. [Sponsor technology: Zetaris, Meterless and NVIDIA](#5-sponsor-technology-zetaris-meterless-and-nvidia)
-6. [Setup](#6-setup)
-7. [Usage: CLI, HTTP API, report](#7-usage-cli-http-api-report)
-8. [Sample mode (offline)](#8-sample-mode-offline)
-9. [Logs and evidence](#9-logs-and-evidence)
-10. [Input and output examples](#10-input-and-output-examples)
-11. [Evaluation](#11-evaluation)
-12. [Tests and checks](#12-tests-and-checks)
-13. [Configuration](#13-configuration)
-14. [Data sources](#14-data-sources)
-15. [AI and Model Usage](#15-ai-and-model-usage)
-16. [Third-Party Code and Licences](#16-third-party-code-and-licences)
-17. [Limitations](#17-limitations)
-18. [Security caveats](#18-security-caveats)
-19. [Future work](#19-future-work)
+- [ExposureLedger](#exposureledger)
+  - [Team](#team)
+  - [Contents](#contents)
+  - [1. The problem and the user](#1-the-problem-and-the-user)
+  - [2. What it does](#2-what-it-does)
+  - [3. Architecture](#3-architecture)
+  - [4. The agents and how they work together](#4-the-agents-and-how-they-work-together)
+  - [5. Sponsor technology: Zetaris, Meterless and NVIDIA](#5-sponsor-technology-zetaris-meterless-and-nvidia)
+    - [Zetaris: the data layer](#zetaris-the-data-layer)
+    - [Meterless World Model engine](#meterless-world-model-engine)
+    - [Meterless Nightshift: the primary AI provider](#meterless-nightshift-the-primary-ai-provider)
+    - [NVIDIA Nemotron: three model sizes, three roles](#nvidia-nemotron-three-model-sizes-three-roles)
+  - [6. Setup](#6-setup)
+  - [7. Usage: CLI, HTTP API, report](#7-usage-cli-http-api-report)
+  - [8. Sample mode (offline)](#8-sample-mode-offline)
+  - [9. Logs and evidence](#9-logs-and-evidence)
+  - [10. Input and output examples](#10-input-and-output-examples)
+  - [11. Evaluation](#11-evaluation)
+  - [12. Tests and checks](#12-tests-and-checks)
+  - [13. Configuration](#13-configuration)
+  - [14. Data sources](#14-data-sources)
+  - [15. AI and Model Usage](#15-ai-and-model-usage)
+  - [16. Third-Party Code and Licences](#16-third-party-code-and-licences)
+  - [17. Limitations](#17-limitations)
+  - [18. Security caveats](#18-security-caveats)
+  - [19. Future work](#19-future-work)
 
 ---
 
 ## 1. The problem and the user
 
-**The user** is the only IT administrator at a charity of about 200 people. Every week, new flaws are added to the list of those already exploited by attackers, and there is no security team to triage them.
+**The intended user** is an IT administrator with limited time and no dedicated security team. Our illustrative scenario is a charity of about 200 people. The demonstration inventory is synthetic; testing with a real organisation remains future validation.
 
 **The question:** *"Of everything we run, what do I patch first, and by when?"*
 
-**Why this is hard.** The answer is spread across four sources, and each one names software differently:
+**Why the problem matters.** Patching includes deciding which updates matter and when to apply them. [NIST's patch-management guidance](https://csrc.nist.gov/pubs/sp/800/40/r4/final) treats this as necessary maintenance to reduce compromises and operational disruption. ExposureLedger focuses on the repeated lookup and triage work between an existing software list and an actionable patch plan.
+
+**Why this is hard.** The answer is spread across four sources with different identifiers and levels of detail:
 
 | Source | What it says | How it names software |
 |---|---|---|
 | The organisation's software list | what runs where | free text: `MS Exchange Svr 2019 CU12`, `Citrix netscaler ADC / Gateway; firmware tbc` |
-| CISA KEV (Known Exploited Vulnerabilities) | flaws exploited in the wild, with a due date | vendor + product, e.g. `Microsoft / Exchange Server`; KEV alone spells Citrix's gateway 7 ways |
-| FIRST EPSS | the probability that a flaw is exploited in the next 30 days | CVE ID only |
-| NIST NVD | which product versions a flaw affects | CVE ID + CPE version ranges |
+| CISA KEV (Known Exploited Vulnerabilities) | flaws exploited in the wild, with a US federal due date | vendor + product, e.g. `Microsoft / Exchange Server`; KEV alone spells Citrix's gateway 7 ways |
+| FIRST EPSS (Exploit Prediction Scoring System) | the estimated probability that a flaw will be exploited in the next 30 days | CVE ID only |
+| NIST NVD (National Vulnerability Database) | affected-product and version information | CVE ID + CPE product identifiers and version ranges |
 
-Look-alikes make it worse. In our first probe (26 Oct, 10 strings), all three Nemotron models, Ultra included, matched "Exchange Online" to the on-premises Exchange Server and "FortiClient VPN" to the FortiClient EMS management server. In the final test (§11), Bolt alone and Lightning alone named a KEV product for 4 and 6 of the 12 rows that have none (both matched "Exchange Online" to the on-premises Exchange); the full system answered none of the 12 with a KEV product.
+Look-alikes make it worse. "Exchange Online" and the installed Exchange Server share a name, but they are different products. The wrong match can send an administrator to the wrong patch or create false reassurance about the product they actually run.
+
+In our first probe (26 Oct, 10 strings), all three Nemotron models, Ultra included, matched "Exchange Online" to the on-premises Exchange Server and "FortiClient VPN" to the FortiClient EMS management server. The later [30-row test](#11-evaluation) compares automatic answers and referrals with single-model baselines, including Ultra.
 
 ## 2. What it does
 
@@ -70,9 +105,9 @@ Look-alikes make it worse. In our first probe (26 Oct, 10 strings), all three Ne
 - **Output:** a **dated patch list**. Each line has:
   - a **decision**: `patch_now`, `this_cycle`, `monitor` or `ask_owner`;
   - a **target date** from your rules (7 days for `patch_now` by default), plus the KEV federal due date as a benchmark ("passed N days ago");
-  - the **evidence**: the KEV entries, EPSS scores and NVD version ranges it used, each with its source, query and date. A KEV CVE whose NVD ranges place the installed version outside is not cited (it is listed apart as "version not affected"). The CVEs NVD places the version inside lead the line, and the ones NVD could not check stay cited, labelled "not version-checked, counted fail-closed": the due date, the "overdue" days and the EPSS come from both, so more evidence never makes a line less urgent;
+  - the **evidence**: the KEV entries, EPSS scores and NVD version ranges it used, each with its source, query and date. The analyst starts with up to the **20 most recently added KEV CVEs per product family**. Within that set, a CVE whose NVD ranges place the installed version outside is not cited (it is listed apart as "version not affected"). Confirmed CVEs lead the line; unchecked ones stay cited, labelled "not version-checked, counted fail-closed". Due-date, "overdue" and EPSS summaries use that retained subset;
   - the **critic's verdict** and rubric score, and whether the **verifier** re-checked the line live;
-  - the **receipts** of every model call behind the match;
+  - the **receipts** of successful model responses behind the match (failed attempts are logged separately);
   - a short **"why"**, written from those facts only;
   - for `ask_owner` lines, and for lines whose version could not be confirmed, a concrete **question for the owner** ("Which Connect Secure version runs on remote-01?").
 - Every run also writes an **HTML report** and a **trace** of every agent step.
@@ -113,7 +148,7 @@ One run, step by step (`src/run.ts`):
 | 1 | **Normaliser** (`src/resolve/normalise.ts`) | deterministic code | Parses vendor, version and product type (server, network appliance, client, cloud service, library, OS). Builds the top-12 KEV candidates per row. Casts the "third vote". | Resolver jury |
 | 2 | **Resolver jury** (`src/agents/jury.ts`) | Nemotron Bolt + Lightning, Ultra on splits | Each juror maps every row to one KEV product or "none". If they agree, the answer stands. If they split, Ultra adjudicates and gives its reason. A row the critic sends back is re-decided: first by Lightning, then by Ultra. | Critic |
 | 3 | **Conflict Critic** (`src/agents/critic.ts`, `src/pipeline/critic-loop.ts`) | code rules + Ultra | Blocks product-type conflicts (cloud vs on-premises, client vs server, OS vs application), name-only matches without version evidence, and matches without provenance. Scores a **0–3 rubric on accuracy, appropriateness and actionability**. **Below 7/9, the line goes to the owner (autonomy level L1); otherwise it is automatic (L2).** Ultra critiques contested matches; its objections block the match until the answer changes. Sends work back with the reason, **at most 2 rounds**. | Resolver (send back) or Analyst |
-| 4 | **Exposure Analyst** (`src/policy/analyst.ts`) | policy as code | KEV-listed and affecting the installed version → `patch_now`, citing every KEV CVE that NVD's ranges do not rule out (confirmed first, the unchecked ones counted fail-closed). Outside every NVD range → `monitor`. Unresolved, disputed, or under 7/9 → `ask_owner`. Sets the target dates. | Verifier |
+| 4 | **Exposure Analyst** (`src/policy/analyst.ts`) | policy as code | KEV-listed and affecting, or potentially affecting, the installed version → `patch_now`. Starts with up to the newest 20 KEV CVEs per family, then scopes citations using NVD (confirmed first, unchecked counted fail-closed). Outside every cited CVE's NVD range → `monitor`. Unresolved, disputed, or under 7/9 → `ask_owner`. Sets the target dates. | Verifier |
 | 5 | **Verifier** (`src/agents/verifier.ts`) | code, live | Re-reads every cited KEV entry and EPSS score with fresh, single-source Zetaris queries. A mismatch blocks the line (`verified: false`, with a note). A line that cites no KEV or EPSS value (a "no KEV product" line) has nothing to re-check, and is counted apart, never as re-checked. | Reporter |
 | 6 | **Reporter** (`src/agents/reporter.ts`, `src/report/`) | template | Writes the "why" (at most two sentences) from the line's structured facts. Renders the HTML report. | output |
 
@@ -141,7 +176,7 @@ world_model      ingest_run         +1582 engine events; 0 warnings
 (Abridged from the trace's `agent`, `action` and `output_summary` fields. Each line of the file is one full JSON event.)
 
 **Policy (the user's rules, `config/policy.json`, overridable per run):**
-1. **`patch_now`:** the installed version is affected by a CVE listed in KEV, whatever its EPSS score. The report shows where KEV and EPSS disagree. The line drops only the KEV CVEs NVD places the version outside. It leads with the ones NVD places it inside and keeps the ones not version-checked, counted fail-closed, so its due date, "overdue" days, EPSS and sort order rest on every CVE that may apply and never on one that does not. Once NVD confirms one CVE, the line's other cited CVEs are looked up too, within the run's NVD budget (most urgent first), so an older CVE is dropped only on NVD's evidence. When the version cannot be confirmed (no version in the row, or NVD gives no range for it) but the match itself scores at least 7/9, the line stays `patch_now` (fail-closed), is flagged "version unconfirmed", and carries the owner question. A weaker match goes to `ask_owner`.
+1. **`patch_now`:** a KEV-listed flaw affects, or may affect, the installed product, whatever its EPSS score. The report shows where KEV and EPSS disagree. The analyst starts with up to the 20 most recently added KEV CVEs per family. Within that set, it drops CVEs only when NVD places the version outside their affected ranges. Confirmed CVEs lead the line; unchecked ones stay cited and count fail-closed. The due date, "overdue" days, EPSS and sorting use that retained subset. Once NVD confirms one CVE, the other cited CVEs are looked up too, within the run's NVD budget (most urgent first). When the version cannot be confirmed (no version in the row, or NVD gives no range for it) but the match itself scores at least 7/9, the line stays `patch_now` (fail-closed), is flagged "version unconfirmed", and carries the owner question. A weaker match goes to `ask_owner`.
 2. **`this_cycle`:** a CVE *not* in KEV affects the version, with EPSS ≥ 0.10 (≥ 0.05 if internet-facing). **This bucket is empty in this build:** finding non-KEV CVEs needs the NVD product lookup, which is not switched on (it is listed as dormant in every run's manifest).
 3. **`monitor`:** no KEV product matches, or NVD places the installed version outside every cited KEV CVE's ranges. Next review in 90 days.
 4. **`ask_owner`:** unresolved, a type or identity conflict that survives the retries, or a rubric score under 7/9. Each comes with a concrete question.
@@ -191,7 +226,7 @@ It joins our synthetic inventory (a REST table over GitHub raw) with the whole C
 
 ### Meterless World Model engine
 - **What it is:** the Meterless World Model reference engine, vendored unmodified in [`src/engine/world-model/`](src/engine/world-model/) (Apache-2.0). Our wrapper is [`src/engine/index.ts`](src/engine/index.ts).
-- **The features it powers:** the provenance of every patch line, and memory across runs (below). Each run ingests its entities (asset, software row, KEV product family, CVE) and facts (`runs`, `internet_facing`, `resolves_to`, `kev_listing`, `affects`, `epss`, `decision`). Every fact carries its source (`zetaris:el.kev`, `zetaris:epss`, `agent:jury`, … ; `snapshot:…` in sample mode) and the source's own date (the KEV catalogue version, the EPSS score date, the run's as-of date), never the wall clock. `resolves_to` facts cite the receipt IDs of the model votes.
+- **The features it powers:** provenance blocks for patch lines, and memory across runs (below). Each run ingests its entities (asset, software row, KEV product family, CVE) and selected facts (`runs`, `internet_facing`, `resolves_to`, `kev_listing`, `affects`, `epss`, `decision`). Every stored fact carries its source (`zetaris:el.kev`, `zetaris:epss`, `agent:jury`, … ; `snapshot:…` in sample mode) and the source's own date (the KEV catalogue version, the EPSS score date, the run's as-of date), never the wall clock. `resolves_to` facts cite the receipt IDs of the model votes. NVD version evidence remains in the run JSON, report and trace; it is not ingested into the World Model.
 - `explain()` gives each line its provenance block in the report. Near-duplicate KEV spellings go to the engine's merge-review queue (never auto-merged). `audit()` writes `logs/audit-<run_id>.jsonl`. The world is saved to `output/world/`.
 - **Memory across runs** (`src/pipeline/memory.ts`): for each row, the next live run reopens the saved world of the last run that included that row, read-only (the engine replays its events), and asks it, with `factsAsOf`, what it believed about the row. The trace and the report's "Since the last run" panel list the decisions that changed, the KEV CVEs cited now that were not cited then (and which KEV added after that run), and the owner questions still open; a line that was already `patch_now` keeps the earlier target date. The index (`output/world/last-runs.json`) maps each row (its source, id, asset and software text) to its last run: a pointer only. A run on another subset of the rows never resets the rows it left out; a row whose software text changes starts a new clock.
 - **The test:** `npm run verify:engine` runs the engine's **official conformance runner (8/8)** against the vendored code, its idempotency check ("diff: empty"), the same check with `--mutate` (which must say "diff: NON-EMPTY", to prove the check can fail), and a SHA-256 check that the vendored files are unmodified.
@@ -210,7 +245,7 @@ Every model call goes through Nightshift's local OpenAI-compatible endpoint (`PO
 - Headers: `Authorization: Bearer $METERLESS_RUNTIME_TOKEN`, `meterless-app: exposureledger`, `meterless-scope: user`.
 - **Pinned model IDs only, never `meterless/auto`.** Temperature 0. Lightning and Ultra are always sent `chat_template_kwargs: {"enable_thinking": false}`, and JSON mode when a JSON reply is wanted.
 - At most 4 calls at once; a 90 s timeout per attempt; up to 2 retries on 429, 5xx or network errors.
-- **A receipt for every call:** the trace and `RunResponse.receipts` record the requested model, `response.model`, Nightshift's `routed_model` and `receipt_id`, the latency and the tokens. `npm run verify` checks that every model call in the newest live trace has a receipt and a pinned routed model.
+- **Receipts for successful responses:** the trace and `RunResponse.receipts` record the requested model, `response.model`, Nightshift's `routed_model` and `receipt_id`, the latency and the tokens. `npm run verify` checks successful model responses in the newest live trace for a receipt and a pinned routed model. Failed attempts are logged separately and may have no receipt.
 - If a call still fails, that row falls back to the normaliser's deterministic vote (traced as `fallback`), and the run is marked `partial`.
 
 ### NVIDIA Nemotron: three model sizes, three roles
@@ -350,7 +385,7 @@ SAMPLE_MODE=true npm start
 
 - **The trace:** `logs/trace-<run_id>.jsonl`, one JSON event per step, also printed to stdout as `[INFO] run_id=… <agent> <action> <status> | <summary>`.
 - **Fields** (`TraceEvent` in `src/contracts.ts`): `ts`, `run_id`, `agent`, `action`, `input_summary`, `output_summary`, `target_agent`, `model`, `routed_model`, `receipt_id`, `latency_ms`, `confidence`, `retry_count`, `status` (`ok`, `error`, `fallback`, `blocked`, `sent_back`), and `details`. Each event also carries `timestamp` and `agent_name`, the names the organisers' guide recommends.
-- **What the trace shows:** every agent and handoff; every model call with its model, routed model, receipt and tokens; the jury splits and Ultra's decisions; the critic's send-backs, retries and owner questions; every Zetaris query with its SQL, row count and time; NVD lookups; the verifier's re-check; the World Model's ingest; fallbacks and errors.
+- **What the trace shows:** every agent and handoff; successful model responses with their model, routed model, receipt and tokens, plus failed attempts; the jury splits and Ultra's decisions; the critic's send-backs, retries and owner questions; every Zetaris query with its SQL, row count and time; NVD lookups; the verifier's re-check; the World Model's ingest; fallbacks and errors.
 - **The World Model audit log:** `logs/audit-<run_id>.jsonl`.
 - **NVD counts** in the run summary (`agents_summary.details.nvd`): `live_reads` (CVEs read through Zetaris in this run, always 0 in sample mode), `attempts` (the per-run budget counter), `errors`, `fallback`, `cached` (today's cache) and `skipped`.
 - **Never logged:** secret values. The tracer masks the configured credentials.
@@ -376,27 +411,57 @@ Model answers can differ slightly between identical runs (see §11), so a new ru
 
 ## 11. Evaluation
 
-**Final test: 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision.** The full write-up, with every owner row explained, is in [`docs/evaluation.md`](docs/evaluation.md); the run's files are in [`docs/eval/final-test/`](docs/eval/final-test/).
+**Why the full system is the better choice than one Ultra call, even though that call matched all 30 rows:**
+
+- **A product name is not a patch decision.** The one Ultra call returns only a product label (or "no KEV product") for each row. ExposureLedger also checks which installed versions are affected, re-reads every cited KEV and EPSS value live, sets dates under the organisation's rules and records why. The administrator gets a plan to act on, not a list of names.
+- **It made no wrong automatic answer.** "23/30 strict" means 23 right answers and 7 questions for a person, not 7 mistakes.
+- **A single call has no safety net.** When one model is wrong, nothing catches it, and Ultra alone has been wrong: it kept a wrong Word answer for "Word Online" in a recorded run (§1), and matched two look-alikes in our first probe. ExposureLedger checks every answer, so a doubtful one becomes a question, not a wrong patch recommendation.
+
+**What this test measures:** product matching against KEV families. The reference answers ignore versions, so a correct label earns credit without establishing whether a particular vulnerability affects the installed version. The table compares this matching step; the examples below show the additional work ExposureLedger performs. Patch-priority accuracy, deadline correctness and administrator time savings need their own evaluation.
+
+**Recorded result: 23 correct automatic answers, 7 referrals to the owner, and no wrong automatic product answer in one run on 30 synthetic rows.** The broader **25/30** score below includes two referrals whose reference answer is "no KEV product". All seven remain human-review cases. The full write-up, including every owner question, is in [`docs/evaluation.md`](docs/evaluation.md); the run's files are in [`docs/eval/final-test/`](docs/eval/final-test/).
 
 - **Rows:** 30 rows picked at random from the 80-row synthetic inventory (the seed is the list's SHA-256; [`data/eval/test_rows.json`](data/eval/test_rows.json)) and sealed during development.
-- **Answers:** written independently by two teammates; where they differed, one of their two answers was chosen per row, following the labelling rules ([`data/test_answers.csv`](data/test_answers.csv)).
-- **Scoring:** by KEV product family. *Strict* counts every row left to the owner as not answered.
+- **Reference answers:** written independently by two teammates; where they differed, one of their two answers was chosen per row, following the labelling rules ([`data/test_answers.csv`](data/test_answers.csv)).
+- **Scoring:** by KEV product family, accepting equivalent KEV spellings. *Strict* counts every referral as not answered: **23/30 = 13 correct KEV matches + 10 correct "no KEV product" answers**. The broader score also credits 2 no-match referrals: **25/30 = 23 automatic answers + those 2 referrals**. Of the 7 referrals, 5 have a KEV product in the reference answers and 2 have none.
 - **One run,** live, on 27 Oct 2026 at 15:26 UK, on commit `e1edc33`, with the arms below run one after another. With the same answer file, on commit `e1edc33`, the command is `npm run eval -- --set test --final --labels data/test_answers.csv` (model answers vary between runs; on later commits these 30 rows are no longer held out).
 
-| Arm | Correct (strict) | Wrong | Left to the owner | Model calls | Time |
+| Arm | Matching score (strict) | Wrong automatic answers | Referred to owner | Model calls¹ | Elapsed time² |
 |---|---|---|---|---|---|
 | **Full system** (jury + Ultra + critic) | 25/30 (strict 23/30) | **0** | 7 | 20 (Bolt 3, Lightning 5, Ultra 12) | 188.5 s (the whole pipeline) |
 | Bolt alone | 26/30 (strict 26/30) | 4 | 0 | 3 | 7.6 s |
 | Lightning alone | 23/30 (strict 23/30) | 6, and 1 row with no valid answer | 0 | 3 | 8.7 s |
-| **One Ultra call**, given all 30 rows plus the union of our normaliser's candidate shortlists | **30/30** (strict 30/30) | 0 | 0 | 1 | 10.9 s |
+| **One Ultra call**, given all 30 rows plus the union of our normaliser's candidate shortlists (120 KEV vendor/product pairs) | **30/30** (strict 30/30) | 0 | 0 | 1 | 10.9 s |
 | Normaliser alone (no model) | 25/30 (strict 25/30) | 5 | 0 | 0 | 1.1 s |
 
-- **Safety, in this test:** of the 18 rows whose answer is a KEV product, the full system matched 13 and sent 5 to the owner; none of the 18 got "no KEV product" as its answer (one of the 5, R78, went to the owner with a question that leans that way). Of the 12 rows with no KEV product, none got a KEV product as its answer: it rejected 10 and sent 2 to the owner. Alone, Bolt matched 4 of those 12 to a KEV product and Lightning 6.
-- **The 7 owner questions:** 4 named the right product and asked only for the version or build (Veeam B&R "12.0" and three Windows rows). 3 did not: a Windows Server row's question asked the owner to confirm that no KEV product matches it, and two rows with no KEV product got questions about the look-alike both small models had matched (Apache Struts for an IDE, PaperCut NG/MF for a print client).
-- **Changed after the test:** in this run, 4 of the 7 owner questions came from how the normaliser read Windows rows: it did not read "Windows11"/"Windows10" written as one word as Windows, and it read "Win Server 2022" as an application server. After the test, the normaliser was changed to read these spellings ("Windows11", "Windows10Enterprise", "Win Server") as the Windows operating system. The test was not re-run: every final-test number above is for the tested code (`e1edc33`), and on later commits these 30 rows are no longer held out.
+¹ Successful receipted model responses. The full run also had one failed Lightning HTTP 502 attempt without a receipt; its successful retry is included in the 20.
+
+² The full system's **188.5 s** covers the whole pipeline: data retrieval, version checks, model matching and retries, policy, live citation checks, World Model and reporting. It includes 55.3 s of NVD lookups. The other arms perform candidate generation and matching only. Ultra returned **30/30 in 10.9 s**, the strongest matching result here. These timings cover different workloads and do not isolate the jury and critic's cost. The full system also used more tokens: 37,787 versus Ultra's 3,465.
+
+**A wrong Ultra answer was blocked in a separate recorded run.** In the 12-row [live example](output_examples/example_1.json), the small models matched "Microsoft Word Online (browser app)" to KEV's installed Word product. Lightning retained the match on retry; [Ultra retained it too](output_examples/example_1.trace.jsonl#L67). The critic continued to flag the cloud-versus-installed-product conflict and sent the row to the owner after two retries. The report asked whether installed Word actually runs on the asset and issued no patch target for that unresolved match. Acting on the raw mapping could waste effort on an unrelated desktop patch. The recorded benefit is concrete: the workflow kept that model error out of its automatic patch recommendations. The separate 30-row Ultra baseline remained correct on all rows.
+
+**A correct product name becomes a specific action.** In the same saved run, "Apache Tomcat v9.0.54" became a `patch_now` line backed by CVE-2025-24813. NVD ranges excluded five other KEV CVEs for that version. The report set **3 November 2026** as the policy target, showed the separate **22 April 2025** KEV benchmark, and included EPSS evidence. Cited KEV and EPSS values were checked again live. A correct "Apache / Tomcat" label is the starting point for that work; the [saved output](output_examples/example_1.json) includes the evidence and dated recommendation.
+
+**The workflow adds five practical controls:**
+
+| Administrator's need | ExposureLedger's control |
+|---|---|
+| Avoid acting on a look-alike product | Product-type checks, bounded retries and explicit owner referral |
+| Understand which cited flaws may apply | NVD version ranges where data and lookup budget allow; visible unconfirmed-version warnings |
+| Plan the next action | Configurable decisions and target dates, with supporting source records |
+| Check where the answer came from | Fresh KEV/EPSS citation checks in live mode, model receipts and a query/decision trace |
+| Keep track across runs | Saved decisions, changes and earlier patch deadlines for the same product and inventory row |
+
+**Human review makes an unresolved case visible.** In the 30-row test, the workflow withheld two wrong look-alike matches made by the small models. Four other referrals came from Windows parsing/type limitations, and one from insufficient version detail. The seven referrals were explicit requests for follow-up rather than wrong automatic product answers; some were unnecessary, and three questions contained incorrect product assumptions. The detailed breakdown below keeps both the protection and its cost visible.
+
+**Automatic matching is only one step.** In this run, 9 of the 12 `patch_now` lines still had unconfirmed versions and owner questions. There were 11 owner questions in total, including the 7 `ask_owner` cases. Missing version information can therefore require human follow-up even when a product match counts as correct.
+
+- **Observed matching errors and deferrals:** of the 18 rows whose answer is a KEV product, the full system matched 13 and sent 5 to the owner; none of the 18 got "no KEV product" as its automatic answer (one of the 5, R78, went to the owner with a question that leans that way). Of the 12 rows with no KEV product, none got a KEV product as its automatic answer: it rejected 10 and sent 2 to the owner. Alone, Bolt matched 4 of those 12 to a KEV product and Lightning 6. The one-call Ultra baseline correctly matched all 18 KEV rows and rejected all 12 no-match rows.
+- **The 7 referral questions:** 4 named the right product and asked only for the version or build (Veeam B&R "12.0" and three Windows rows). 3 did not: a Windows Server row's question asked the owner to confirm that no KEV product matches it, and two rows with no KEV product got questions about the look-alike both small models had matched (Apache Struts for an IDE, PaperCut NG/MF for a print client).
+- **Changed after the test:** in this run, 4 of the 7 referrals came from how the normaliser read Windows rows: it did not read "Windows11"/"Windows10" written as one word as Windows, and it read "Win Server 2022" as an application server. After the test, the normaliser was changed to read these spellings ("Windows11", "Windows10Enterprise", "Win Server") as the Windows operating system. The test was not re-run: every final-test number above is for the tested code (`e1edc33`), and on later commits these 30 rows are no longer held out.
 - **The other 27 rows** (all but R13, R46 and R68, which are variants of the design's examples; this figure was announced before the test): full system 22/27 (strict 20/27), 0 wrong; Bolt 25/27; Lightning 22/27; one Ultra call 27/27; normaliser 22/27.
 - **Windows rows** (12 of the 30, by chance): full system 8/12, 0 wrong, 4 to the owner; Bolt, Lightning and the one Ultra call 12/12; normaliser 9/12. **The other 18 rows:** full system 17/18 (strict 15/18), 0 wrong; Bolt 14/18; Lightning 11/18; one Ultra call 18/18; normaliser 16/18.
-- **What we learned:** in this test, Ultra was the strongest matcher, and it is already the pipeline's arbiter (in this run it decided all 7 jury splits and made 12 of the 20 calls). No single model is trusted alone: in our first probe, all three models, Ultra included, matched two look-alikes (§1). The next step is Ultra-first matching, with the small models as cross-checks.
+- **What we learned:** Ultra was the strongest matcher and is already the pipeline's arbiter (in this run it decided all 7 jury splits and made 12 of the 20 calls). But Ultra alone is not safe enough to trust unchecked: it made look-alike mistakes in our first probe and kept a wrong Word answer in a recorded run (§1), so its answers keep going through the checks. These results support trying **Ultra-first matching**, keeping evidence checks and human escalation, and measuring whether small-model cross-checks add enough value to justify their cost.
 
 **Before the test: the development set.** Three live runs on the 50 development rows (`npm run eval -- --set dev --labels none`) measured what each arm named and how stable it is, with no answers yet, so no accuracy. Between two identical runs, the full system changed 0 of 50 answers, Bolt alone 2 and Lightning alone 6. Tables: [`docs/evaluation.md`](docs/evaluation.md).
 
@@ -456,12 +521,12 @@ The app has no database of its own: the live sources are read through Zetaris wh
 
 **Sponsor technology:**
 - **Zetaris:** the data layer for all four sources (KEV, EPSS, NVD, the inventory), registered as REST tables and views and queried with SQL through the REST API (§5).
-- **Meterless World Model engine:** stores every fact with its provenance; powers each line's provenance block, the merge-review queue and the audit log; tested by `npm run verify:engine` (official conformance runner 8/8) (§5).
-- **Meterless Nightshift:** the only AI provider; every call carries a receipt (§5).
+- **Meterless World Model engine:** stores selected inventory, match, KEV, EPSS and decision facts with provenance; powers each line's provenance block, the merge-review queue and the audit log; tested by `npm run verify:engine` (official conformance runner 8/8) (§5).
+- **Meterless Nightshift:** the only AI provider; successful model responses carry receipts, and failed attempts are logged separately (§5).
 - **NVIDIA:** three Nemotron model sizes in distinct roles (§5).
 
 **Development tools:**
-- Built with **Claude Code** (Anthropic's AI coding tool). AI-assisted coding was used for design, code, tests, debugging and documentation. Every change was checked by the unit tests, the engine checks and review passes; the team is accountable for the result.
+- Built with **Claude Code** (Anthropic's AI coding tool), with **Codex** used for README review and editing. AI assistance covered design, code, tests, debugging and documentation. Validation includes unit tests, engine checks and review passes (§12); the team is accountable for the result.
 - Cursor was not used.
 
 **Sample mode:** `SAMPLE_MODE=true` runs on the captured snapshot with no calls to Zetaris, Nightshift or anything else, and no model at all (§8).
@@ -477,8 +542,9 @@ The app has no database of its own: the live sources are read through Zetaris wh
 ## 17. Limitations
 
 - **The `this_cycle` bucket is empty.** Decisions come from KEV-listed CVEs and NVD version ranges. Non-KEV CVEs with a high EPSS need the NVD product lookup, which is built but switched off (dormant in every manifest).
-- **Measured once, on 30 synthetic rows.** In the final test (§11), the full system gave no wrong answer but left 7 of the 30 rows to the owner, and a single Ultra call named the right KEV product (or none) for all 30. One run on 30 rows of one synthetic inventory is a small sample, and three of the rows are variants of examples the rules were built on (§11).
-- **An owner question can start from a wrong guess.** In the final test, 3 of the 7 owner questions did not name the right product: two asked about the look-alike the small models had matched ("Which Struts version runs on comms-laptop-02?" for an IDE), and one asked the owner to confirm that a Windows Server row has no KEV product. An owner who knows the machine can correct them, but the wording can mislead.
+- **Product matching measured once, on 30 synthetic rows.** In the final test (§11), the full system gave 23 correct automatic matching answers and left 7 rows to the owner; a single Ultra call matched all 30 correctly but, unlike the full system, checks no versions and sets no dates (§11). This is a small sample from one synthetic inventory, and three rows are variants of examples the rules were built on (§11). It does not validate patch decisions, deadlines or operational savings.
+- **KEV citation and priority cap.** The analyst starts with the 20 most recently added KEV CVEs per product family. Due-date, overdue and EPSS summaries use that subset after NVD exclusions. Older CVEs outside the cap do not contribute to these summaries, even if they may apply.
+- **An owner question can start from a wrong guess.** In the final test, 3 of the 7 referral questions did not name the right product: two asked about the look-alike the small models had matched ("Which Struts version runs on comms-laptop-02?" for an IDE), and one asked the owner to confirm that a Windows Server row has no KEV product. An owner who knows the machine can correct them, but the wording can mislead.
 - **Some spellings are still not read.** A few rarer glued forms ("WinSvr 2019", "WinServer2019", "Windows10LTSC2019") are not recognised as Windows: live, the normaliser's confident "no KEV product" vote counts as dissent, so even a unanimous jury match can go to the owner (as three Windows rows did in the test); offline, such a row can come out as "no KEV product".
 - **Ultra's critique text is free text.** It can describe the jurors' votes inaccurately; the structured votes and the receipts in the run JSON are the record.
 - **Model answers vary** between identical runs at temperature 0 (single models changed 2–6 of 50 rows between two runs; the full system 0 of 50 in that test). Saved examples are one real run each.
@@ -498,7 +564,7 @@ The app has no database of its own: the live sources are read through Zetaris wh
 - **Decision support, not a scanner.** It does not probe systems, and it makes no claim that a flaw is exploitable on yours. A `patch_now` line means "a KEV-listed flaw affects, or may affect, this product", with the evidence shown.
 - **The policy is yours.** Thresholds and target days are configuration (`config/policy.json`, or per run).
 - **KEV due dates** come from a US federal directive. They are shown as a benchmark, not as a legal duty.
-- **What leaves your machine in live mode:** the software text, asset names and asset types of each row are sent to the Nemotron models (NVIDIA's cloud, through Nightshift). Don't send names you consider sensitive.
+- **What leaves your machine in live mode:** the software text, asset names, asset types and internet-facing flags are sent to the Nemotron models (NVIDIA's cloud, through Nightshift). Don't send information you consider sensitive.
 - **Secrets:** only in `.env` (git-ignored) or as container environment variables. They are never logged; `.env.example` and `.env.docker.example` hold placeholders only. A simple text search for words like "token" or "password" will still match this repository: field names (`prompt_tokens`), variable names (`METERLESS_RUNTIME_TOKEN`), KEV descriptions ("hard-coded password") and one synthetic inventory row ("password manager"). None of these is a secret value.
 - **Zetaris safety:** the client refuses `DROP`, `DELETE`, `TRUNCATE`, `ALTER`, `INSERT`, `UPDATE` and `MERGE`, creates only the app's own `EL_`/`el` objects, and refuses any query on the large `NY_TAXI` tables (a heavy scan can stall the engine).
 
