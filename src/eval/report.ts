@@ -103,7 +103,9 @@ export function renderEvalMarkdown(r: EvalResult): string {
   out.push(`- **Generated:** ${r.generated_at}`);
   out.push(`- **Rows scored:** ${r.rows_evaluated}` + (r.set === "dev" ? ` (development rows; ${plural(r.sealed_rows_excluded, "sealed test row")} withheld)` : " (the sealed test rows)"));
   out.push(`- **Answers:** ${mdCell(r.labels_source)} (human answer sheet)`);
-  out.push("- **Scoring:** by KEV family. A row is correct when the vendor matches and the product is any spelling the answer lists (case- and space-insensitive), or when the answer is `none` and the arm names no KEV product.");
+  out.push(r.scoring === "listed_spellings"
+    ? "- **Scoring:** by the spellings the answer lists. A row is correct when the vendor matches and the product is any spelling the answer lists (case- and space-insensitive), or when the answer is `none` and the arm names no KEV product."
+    : "- **Scoring:** by KEV family. A row is correct when the predicted vendor and product name the same KEV product family as a spelling the answer lists (any KEV spelling of that product counts; the normaliser's `familiesOf`), or when the answer is `none` and the arm names no KEV product.");
   out.push("- **Strict:** the same, but an abstention (left to the owner) never counts as correct.");
   out.push("- **Arms** ran one after another, never in parallel.");
   out.push("");

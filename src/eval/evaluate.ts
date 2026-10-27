@@ -1,6 +1,6 @@
 // The evaluation runner: picks the rows (dev, or the sealed test rows with --final), runs each arm through
 // the injected resolveArm one after another, and scores the predictions. It never prints per-row results.
-import type { InventoryRow, ModelKey } from "../contracts.ts";
+import type { InventoryRow, KevPair, ModelKey } from "../contracts.ts";
 import { canonRowId, normName } from "./answers.ts";
 import { scoreArm } from "./score.ts";
 import { assertSetAllowed, selectRows } from "./split.ts";
@@ -20,6 +20,8 @@ export interface EvalInput {
   clock?: () => Date;          // for generated_at
   log?: (line: string) => void; // aggregate progress only
   baselineModel?: ModelKey;
+  /** Every KEV family a pair names (A1's familiesOf): scores by KEV family (design §12). Absent: listed spellings only. */
+  families?: (p: KevPair) => string[];
 }
 
 function rowFromLabel(a: AnswerRow): InventoryRow {
@@ -115,7 +117,7 @@ export async function runEvaluation(input: EvalInput): Promise<EvalResult> {
     try {
       const out = validateOutput(await input.resolveArm(arm, structuredClone(built.rows)));
       const ms = Math.round(now() - t0);
-      const scored = scoreArm(built.answers, out.predictions, out.receipts, ms);
+      const scored = scoreArm(built.answers, out.predictions, out.receipts, ms, input.families);
       results.push({ arm, status: "ok", notes: out.notes ?? [], metrics: scored.metrics, rows: scored.rows, extra_predictions: scored.extra_predictions });
       const m = scored.metrics;
       log(`arm ${arm}: ${m.correct}/${m.rows} correct (${pct(m.accuracy)}), ${m.calls} model calls, ${(ms / 1000).toFixed(1)} s`);
@@ -140,5 +142,6 @@ export async function runEvaluation(input: EvalInput): Promise<EvalResult> {
     software_mismatches: built.software_mismatches,
     arms: results,
     ...(input.arms.includes("baseline") && input.baselineModel ? { baseline_model: input.baselineModel } : {}),
+    scoring: input.families ? "kev_family" : "listed_spellings",
   };
 }

@@ -135,7 +135,7 @@ export interface EvalWiring {
   loadInventory?: () => Promise<InventoryRow[]>;
   /** The KEV (vendor, product) pairs, to check every answer name. Required for a --final run. */
   loadKevPairs?: () => Promise<KevPair[]>;
-  /** Every KEV family a pair names (A1's familiesOf), for agreement between arms in an unlabelled run. */
+  /** Every KEV family a pair names (A1's familiesOf): agreement between arms (unlabelled) and scoring by family (labelled). */
   families?: (p: KevPair) => string[];
 }
 
@@ -260,6 +260,7 @@ export async function main(argv: string[], o: MainOptions = {}): Promise<number>
     const result = await runEvaluation({
       set: args.set, final: args.final, arms: args.arms, labels, testIds, inventory,
       resolveArm: wiring.resolveArm, clock: now, log: (s) => err(`eval: ${s}`), baselineModel: args.baselineModel,
+      ...(wiring.families ? { families: wiring.families } : {}),
     });
 
     const dir = path.resolve(root, args.outDir);

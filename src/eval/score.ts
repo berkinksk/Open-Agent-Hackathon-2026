@@ -1,7 +1,7 @@
 // Scoring against human answers, by KEV family: any listed spelling counts, and "none" is correct
 // when the prediction is null. Names are compared case- and space-insensitively.
 import { MODELS } from "../contracts.ts";
-import type { PatchLine, Receipt, Resolution } from "../contracts.ts";
+import type { KevPair, PatchLine, Receipt, Resolution } from "../contracts.ts";
 import { canonRowId, normName } from "./answers.ts";
 import type { AnswerRow, ArmMetrics, ArmPrediction, CallStats, RowOutcome, RowScore } from "./types.ts";
 
@@ -19,19 +19,37 @@ export function isNullPrediction(p: Pick<ArmPrediction, "product"> | undefined):
   return blankToNull(p?.product ?? null) === null;
 }
 
-/** True when the predicted vendor and product match the answer (any listed spelling). */
-export function matchesAnswer(p: Pick<ArmPrediction, "vendor" | "product">, a: AnswerRow): boolean {
+/** Every KEV family a (vendor, product) pair names (A1's familiesOf: combos name several); the scorer's family key. */
+export type FamiliesOf = (p: KevPair) => string[];
+
+/**
+ * True when the prediction matches the answer: the same vendor and product as one listed spelling, or, with
+ * `families`, the same KEV family as any listed spelling (design §12 "scored by KEV family"): the prediction's
+ * families and those of every vendor x product spelling of the answer intersect. So a correct prediction in another
+ * KEV spelling of the same product (Citrix "NetScaler" vs "NetScaler ADC and Gateway") is not scored wrong because
+ * the answer sheet did not list that spelling.
+ */
+export function matchesAnswer(p: Pick<ArmPrediction, "vendor" | "product">, a: AnswerRow, families?: FamiliesOf): boolean {
   if (a.is_none) return false;
   const v = blankToNull(p.vendor);
   const pr = blankToNull(p.product);
   if (v === null || pr === null) return false;
   const vendorOk = a.kev_vendors.some((x) => normName(x) === normName(v));
   const productOk = a.kev_products.some((x) => normName(x) === normName(pr));
-  return vendorOk && productOk;
+  if (vendorOk && productOk) return true;
+  if (!families) return false;
+  const predicted = new Set(families({ vendor: v, product: pr }));
+  if (!predicted.size) return false;
+  for (const av of a.kev_vendors) {
+    for (const ap of a.kev_products) {
+      if (families({ vendor: av, product: ap }).some((f) => predicted.has(f))) return true;
+    }
+  }
+  return false;
 }
 
-/** Scores one row. `p` undefined = the arm returned nothing for this row. */
-export function scoreRow(a: AnswerRow, p: ArmPrediction | undefined): RowScore {
+/** Scores one row. `p` undefined = the arm returned nothing for this row. `families`: score by KEV family. */
+export function scoreRow(a: AnswerRow, p: ArmPrediction | undefined, families?: FamiliesOf): RowScore {
   let outcome: RowOutcome;
   if (!p) outcome = "missing";
   else if (a.is_none) {
@@ -39,7 +57,7 @@ export function scoreRow(a: AnswerRow, p: ArmPrediction | undefined): RowScore {
     else outcome = p.abstained ? "none_abstained" : "none_ok";
   } else if (p.abstained) outcome = "abstained";
   else if (isNullPrediction(p)) outcome = "missed";
-  else outcome = matchesAnswer(p, a) ? "match_ok" : "wrong_match";
+  else outcome = matchesAnswer(p, a, families) ? "match_ok" : "wrong_match";
   const correct = outcome === "match_ok" || outcome === "none_ok" || outcome === "none_abstained";
   return {
     row_id: a.row_id,
@@ -65,6 +83,7 @@ export function scoreArm(
   predictions: ArmPrediction[],
   receipts: Receipt[],
   timeMs: number,
+  families?: FamiliesOf,
 ): { metrics: ArmMetrics; rows: RowScore[]; extra_predictions: string[] } {
   const byId = new Map<string, ArmPrediction>();
   for (const p of predictions) {
@@ -73,7 +92,7 @@ export function scoreArm(
   }
   const asked = new Set(answers.map((a) => a.row_id));
   const extra = [...byId.keys()].filter((id) => !asked.has(id));
-  const rows = answers.map((a) => scoreRow(a, byId.get(a.row_id)));
+  const rows = answers.map((a) => scoreRow(a, byId.get(a.row_id), families));
   const count = (o: RowOutcome) => rows.filter((r) => r.outcome === o).length;
 
   const correct = rows.filter((r) => r.correct).length;

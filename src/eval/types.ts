@@ -145,6 +145,8 @@ export interface EvalResult {
   software_mismatches: string[]; // row ids where the sheet's software differs from the inventory's
   arms: ArmResult[];
   baseline_model?: ModelKey;
+  /** How a named product was scored: by KEV family (any KEV spelling of the answer's product), or listed spellings only. */
+  scoring?: "kev_family" | "listed_spellings";
 }
 
 // ---------- unlabelled development runs (no answer sheet yet: no accuracy) ----------
