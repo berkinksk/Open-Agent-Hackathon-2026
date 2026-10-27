@@ -1,0 +1,2802 @@
+{
+  "set": "test",
+  "final": true,
+  "generated_at": "2026-10-27T15:29:51.744Z",
+  "labels_source": "test_answers.csv",
+  "rows_evaluated": 30,
+  "sealed_rows_excluded": 0,
+  "unlabelled_rows": [],
+  "rows_without_inventory": [],
+  "label_issues": [],
+  "software_mismatches": [],
+  "arms": [
+    {
+      "arm": "full",
+      "status": "ok",
+      "notes": [
+        "mode live; its time covers the whole pipeline (Zetaris queries, critic, policy, verifier), not only matching",
+        "an ask_owner line counts as an abstention; a patch_now line whose version is unconfirmed counts as its match"
+      ],
+      "metrics": {
+        "rows": 30,
+        "correct": 25,
+        "accuracy": 0.8333333333333334,
+        "correct_strict": 23,
+        "accuracy_strict": 0.7666666666666667,
+        "kev_rows": 18,
+        "kev_matched": 13,
+        "none_rows": 12,
+        "none_rejected": 12,
+        "lookalike_rows": 0,
+        "lookalike_rejected": 0,
+        "abstained": 7,
+        "missing": 0,
+        "wrong_match": 0,
+        "false_match": 0,
+        "missed": 0,
+        "ultra_rows": 8,
+        "ultra_share": 0.26666666666666666,
+        "calls": 20,
+        "calls_by_model": {
+          "nvidia/nemotron-3.5-bolt-e4b": 3,
+          "nvidia/nemotron-3.5-lightning-30b-a3b": 5,
+          "nvidia/nemotron-3-ultra-550b-a55b": 12
+        },
+        "ultra_calls": 12,
+        "call_errors": 0,
+        "prompt_tokens": 32762,
+        "completion_tokens": 5025,
+        "tokens": 37787,
+        "time_ms": 188470
+      },
+      "rows": [
+        {
+          "row_id": "R02",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R03",
+          "outcome": "abstained",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Veeam",
+            "products": [
+              "Backup & Replication"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R04",
+          "outcome": "abstained",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R09",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R11",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R13",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Log4j2"
+          },
+          "expected": {
+            "vendor": "Apache",
+            "products": [
+              "Log4j2"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R15",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Collabora",
+            "product": "Collabora Online – Built-in CODE Server"
+          },
+          "expected": {
+            "vendor": "Collabora",
+            "products": [
+              "Collabora Online – Built-in CODE Server"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R17",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R25",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Mozilla",
+            "product": "Firefox"
+          },
+          "expected": {
+            "vendor": "Mozilla",
+            "products": [
+              "Firefox"
+            ],
+            "none": false
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R26",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R28",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R29",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R32",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "PHP",
+            "product": "PHP"
+          },
+          "expected": {
+            "vendor": "PHP",
+            "products": [
+              "PHP"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R34",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R37",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R38",
+          "outcome": "abstained",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R39",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R45",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R46",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R50",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R51",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R52",
+          "outcome": "abstained",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R53",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R64",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R68",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R70",
+          "outcome": "none_abstained",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R76",
+          "outcome": "none_abstained",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R78",
+          "outcome": "abstained",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": true,
+          "lookalike": false
+        },
+        {
+          "row_id": "R79",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R80",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "OpenSSL",
+            "product": "OpenSSL"
+          },
+          "expected": {
+            "vendor": "OpenSSL",
+            "products": [
+              "OpenSSL"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        }
+      ],
+      "extra_predictions": [],
+      "label": "Full system (jury + Ultra + critic)"
+    },
+    {
+      "arm": "bolt",
+      "status": "ok",
+      "notes": [
+        "the jury's own prompt and batching, no second vote, no critic"
+      ],
+      "metrics": {
+        "rows": 30,
+        "correct": 26,
+        "accuracy": 0.8666666666666667,
+        "correct_strict": 26,
+        "accuracy_strict": 0.8666666666666667,
+        "kev_rows": 18,
+        "kev_matched": 18,
+        "none_rows": 12,
+        "none_rejected": 8,
+        "lookalike_rows": 0,
+        "lookalike_rejected": 0,
+        "abstained": 0,
+        "missing": 0,
+        "wrong_match": 0,
+        "false_match": 4,
+        "missed": 0,
+        "ultra_rows": 0,
+        "ultra_share": 0,
+        "calls": 3,
+        "calls_by_model": {
+          "nvidia/nemotron-3.5-bolt-e4b": 3
+        },
+        "ultra_calls": 0,
+        "call_errors": 0,
+        "prompt_tokens": 7107,
+        "completion_tokens": 966,
+        "tokens": 8073,
+        "time_ms": 7581
+      },
+      "rows": [
+        {
+          "row_id": "R02",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R03",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Veeam",
+            "product": "Backup & Replication"
+          },
+          "expected": {
+            "vendor": "Veeam",
+            "products": [
+              "Backup & Replication"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R04",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R09",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R11",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R13",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Log4j2"
+          },
+          "expected": {
+            "vendor": "Apache",
+            "products": [
+              "Log4j2"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R15",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Collabora",
+            "product": "Collabora Online – Built-in CODE Server"
+          },
+          "expected": {
+            "vendor": "Collabora",
+            "products": [
+              "Collabora Online – Built-in CODE Server"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R17",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R25",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Mozilla",
+            "product": "Firefox"
+          },
+          "expected": {
+            "vendor": "Mozilla",
+            "products": [
+              "Firefox"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R26",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R28",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R29",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R32",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "PHP",
+            "product": "PHP"
+          },
+          "expected": {
+            "vendor": "PHP",
+            "products": [
+              "PHP"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R34",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R37",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R38",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R39",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R45",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R46",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Exchange"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R50",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R51",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R52",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R53",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R64",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R68",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Fortinet",
+            "product": "FortiClient EMS"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R70",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "PaperCut",
+            "product": "NG/MF"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R76",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Struts"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R78",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R79",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R80",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "OpenSSL",
+            "product": "OpenSSL"
+          },
+          "expected": {
+            "vendor": "OpenSSL",
+            "products": [
+              "OpenSSL"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        }
+      ],
+      "extra_predictions": [],
+      "label": "Bolt alone"
+    },
+    {
+      "arm": "lightning",
+      "status": "ok",
+      "notes": [
+        "the jury's own prompt and batching, no second vote, no critic"
+      ],
+      "metrics": {
+        "rows": 30,
+        "correct": 23,
+        "accuracy": 0.7666666666666667,
+        "correct_strict": 23,
+        "accuracy_strict": 0.7666666666666667,
+        "kev_rows": 18,
+        "kev_matched": 18,
+        "none_rows": 12,
+        "none_rejected": 5,
+        "lookalike_rows": 0,
+        "lookalike_rejected": 0,
+        "abstained": 0,
+        "missing": 1,
+        "wrong_match": 0,
+        "false_match": 6,
+        "missed": 0,
+        "ultra_rows": 0,
+        "ultra_share": 0,
+        "calls": 3,
+        "calls_by_model": {
+          "nvidia/nemotron-3.5-lightning-30b-a3b": 3
+        },
+        "ultra_calls": 0,
+        "call_errors": 0,
+        "prompt_tokens": 7262,
+        "completion_tokens": 1401,
+        "tokens": 8663,
+        "time_ms": 8677
+      },
+      "rows": [
+        {
+          "row_id": "R02",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R03",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Veeam",
+            "product": "Backup & Replication"
+          },
+          "expected": {
+            "vendor": "Veeam",
+            "products": [
+              "Backup & Replication"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R04",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R09",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R11",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Palo Alto Networks",
+            "product": "Expedition"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R13",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Log4j2"
+          },
+          "expected": {
+            "vendor": "Apache",
+            "products": [
+              "Log4j2"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R15",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Collabora",
+            "product": "Collabora Online – Built-in CODE Server"
+          },
+          "expected": {
+            "vendor": "Collabora",
+            "products": [
+              "Collabora Online – Built-in CODE Server"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R17",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R25",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Mozilla",
+            "product": "Firefox"
+          },
+          "expected": {
+            "vendor": "Mozilla",
+            "products": [
+              "Firefox"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R26",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R28",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R29",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R32",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "PHP",
+            "product": "PHP"
+          },
+          "expected": {
+            "vendor": "PHP",
+            "products": [
+              "PHP"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R34",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Visual Basic for Applications (VBA)"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R37",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R38",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R39",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Progress",
+            "product": "Telerik UI for ASP.NET AJAX"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R45",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R46",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Exchange Server"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R50",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R51",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R52",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R53",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R64",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R68",
+          "outcome": "missing",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R70",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "PaperCut",
+            "product": "NG/MF"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R76",
+          "outcome": "false_match",
+          "correct": false,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Struts"
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R78",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R79",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R80",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "OpenSSL",
+            "product": "OpenSSL"
+          },
+          "expected": {
+            "vendor": "OpenSSL",
+            "products": [
+              "OpenSSL"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        }
+      ],
+      "extra_predictions": [],
+      "label": "Lightning alone"
+    },
+    {
+      "arm": "baseline",
+      "status": "ok",
+      "notes": [
+        "one ultra call given all 30 rows and 120 candidate pairs"
+      ],
+      "metrics": {
+        "rows": 30,
+        "correct": 30,
+        "accuracy": 1,
+        "correct_strict": 30,
+        "accuracy_strict": 1,
+        "kev_rows": 18,
+        "kev_matched": 18,
+        "none_rows": 12,
+        "none_rejected": 12,
+        "lookalike_rows": 0,
+        "lookalike_rejected": 0,
+        "abstained": 0,
+        "missing": 0,
+        "wrong_match": 0,
+        "false_match": 0,
+        "missed": 0,
+        "ultra_rows": 0,
+        "ultra_share": 0,
+        "calls": 1,
+        "calls_by_model": {
+          "nvidia/nemotron-3-ultra-550b-a55b": 1
+        },
+        "ultra_calls": 1,
+        "call_errors": 0,
+        "prompt_tokens": 2959,
+        "completion_tokens": 506,
+        "tokens": 3465,
+        "time_ms": 10862
+      },
+      "rows": [
+        {
+          "row_id": "R02",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R03",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Veeam",
+            "product": "Backup & Replication"
+          },
+          "expected": {
+            "vendor": "Veeam",
+            "products": [
+              "Backup & Replication"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R04",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R09",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R11",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R13",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Log4j2"
+          },
+          "expected": {
+            "vendor": "Apache",
+            "products": [
+              "Log4j2"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R15",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Collabora",
+            "product": "Collabora Online – Built-in CODE Server"
+          },
+          "expected": {
+            "vendor": "Collabora",
+            "products": [
+              "Collabora Online – Built-in CODE Server"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R17",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R25",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Mozilla",
+            "product": "Firefox"
+          },
+          "expected": {
+            "vendor": "Mozilla",
+            "products": [
+              "Firefox"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R26",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R28",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R29",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R32",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "PHP",
+            "product": "PHP"
+          },
+          "expected": {
+            "vendor": "PHP",
+            "products": [
+              "PHP"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R34",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R37",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R38",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R39",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R45",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R46",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R50",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R51",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R52",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R53",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R64",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R68",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R70",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R76",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R78",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R79",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R80",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "OpenSSL",
+            "product": "OpenSSL"
+          },
+          "expected": {
+            "vendor": "OpenSSL",
+            "products": [
+              "OpenSSL"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        }
+      ],
+      "extra_predictions": [],
+      "label": "One-call baseline (ultra)"
+    },
+    {
+      "arm": "normaliser",
+      "status": "ok",
+      "notes": [
+        "deterministic; no model calls"
+      ],
+      "metrics": {
+        "rows": 30,
+        "correct": 25,
+        "accuracy": 0.8333333333333334,
+        "correct_strict": 25,
+        "accuracy_strict": 0.8333333333333334,
+        "kev_rows": 18,
+        "kev_matched": 13,
+        "none_rows": 12,
+        "none_rejected": 12,
+        "lookalike_rows": 0,
+        "lookalike_rejected": 0,
+        "abstained": 0,
+        "missing": 0,
+        "wrong_match": 0,
+        "false_match": 0,
+        "missed": 5,
+        "ultra_rows": 0,
+        "ultra_share": 0,
+        "calls": 0,
+        "calls_by_model": {},
+        "ultra_calls": 0,
+        "call_errors": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "tokens": 0,
+        "time_ms": 1101
+      },
+      "rows": [
+        {
+          "row_id": "R02",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R03",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Veeam",
+            "product": "Backup & Replication"
+          },
+          "expected": {
+            "vendor": "Veeam",
+            "products": [
+              "Backup & Replication"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R04",
+          "outcome": "missed",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R09",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R11",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R13",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Apache",
+            "product": "Log4j2"
+          },
+          "expected": {
+            "vendor": "Apache",
+            "products": [
+              "Log4j2"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R15",
+          "outcome": "missed",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Collabora",
+            "products": [
+              "Collabora Online – Built-in CODE Server"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R17",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R25",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Mozilla",
+            "product": "Firefox, Firefox ESR, and Thunderbird"
+          },
+          "expected": {
+            "vendor": "Mozilla",
+            "products": [
+              "Firefox"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R26",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R28",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R29",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R32",
+          "outcome": "missed",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "PHP",
+            "products": [
+              "PHP"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R34",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R37",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R38",
+          "outcome": "missed",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R39",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R45",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R46",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R50",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R51",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R52",
+          "outcome": "missed",
+          "correct": false,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R53",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R64",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R68",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R70",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R76",
+          "outcome": "none_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": null,
+            "product": null
+          },
+          "expected": {
+            "vendor": null,
+            "products": [],
+            "none": true
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R78",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R79",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "Microsoft",
+            "product": "Windows"
+          },
+          "expected": {
+            "vendor": "Microsoft",
+            "products": [
+              "Windows"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        },
+        {
+          "row_id": "R80",
+          "outcome": "match_ok",
+          "correct": true,
+          "predicted": {
+            "vendor": "OpenSSL",
+            "product": "OpenSSL"
+          },
+          "expected": {
+            "vendor": "OpenSSL",
+            "products": [
+              "OpenSSL"
+            ],
+            "none": false
+          },
+          "used_ultra": false,
+          "lookalike": false
+        }
+      ],
+      "extra_predictions": [],
+      "label": "Normaliser alone (no model)"
+    }
+  ],
+  "baseline_model": "ultra",
+  "scoring": "kev_family"
+}
