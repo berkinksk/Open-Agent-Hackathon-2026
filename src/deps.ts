@@ -12,6 +12,7 @@ import { createTracer } from "./trace.ts";
 import { ZetarisClient } from "./adapters/zetaris.ts";
 import { createZetarisQueries } from "./adapters/queries.ts";
 import { createNightshiftLlm } from "./adapters/nightshift.ts";
+import { createNvdQueries } from "./adapters/nvd.ts";
 
 export const NIGHTSHIFT_APP_ID = "exposureledger";
 export const NIGHTSHIFT_CONCURRENCY = 4;
@@ -129,7 +130,11 @@ export function makeDeps(opts: { mode: Mode; runId?: string; policy?: Partial<Po
       const client = o.client
         ? o.client.withTracer(tracer)
         : new ZetarisClient({ restUrl: cfg.zetaris.restUrl, orgId: cfg.zetaris.orgId, apiKey: cfg.zetaris.apiKey, tracer });
-      queries = createZetarisQueries({ client, tracer, prefix: cfg.prefix });
+      // NVD per CVE through Zetaris (rate-limited, cached per day; A3); the rest of the named queries from S1
+      const nvd = createNvdQueries({ client, tracer, prefix: cfg.prefix, clock: o.clock ?? systemClock });
+      queries = Object.assign(createZetarisQueries({ client, tracer, prefix: cfg.prefix }), {
+        nvdCves: nvd.nvdCves, nvdProduct: nvd.nvdProduct, nvdStatus: () => nvd.status(), nvdCached: (id: string) => nvd.cachedCve(id),
+      });
     }
     if (needNightshift) {
       llm = createNightshiftLlm({

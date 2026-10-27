@@ -26,6 +26,37 @@ function dueClause(due: string, overdue: number | null): string {
   return `(${due}) is in ${plural(-overdue, "day")}`;
 }
 
+function kevSentence(line: PatchLine): string {
+  const name = productName(line);
+  const cves = line.kev?.cves ?? [];
+  const latest = cves[0];
+  return latest
+    ? `${name} is listed in CISA KEV as exploited in the wild: ${plural(cves.length, "cited CVE")}, most recently ${latest.cve_id} (added ${latest.date_added}).`
+    : `${name} is listed in CISA KEV as exploited in the wild.`;
+}
+
+function dueText(line: PatchLine): string {
+  return line.kev?.earliest_due ? `the US federal due date ${dueClause(line.kev.earliest_due, line.kev.overdue_days)}` : "KEV gives no due date";
+}
+
+/**
+ * A KEV-listed line whose installed version could not be confirmed (no version, or no NVD range settles it): it stays
+ * patch_now (fail-closed), and the owner question says what to confirm. `group` names a grouped question (Windows).
+ */
+export function whyVersionUnconfirmed(line: PatchLine, policy: Policy, opts: { group?: string | null; action?: string | null } = {}): string {
+  const action = opts.action ? `${opts.action}; ` : "";
+  const ask = opts.group
+    ? `the build is unconfirmed, so it stays patch_now and one question covers every ${opts.group} machine`
+    : "the version is unconfirmed, so it stays patch_now until you answer the owner question";
+  return `${kevSentence(line)} Patch by ${line.target_date} under your ${policy.sla_days.patch_now}-day rule (${dueText(line)}): ${action}${ask}.`;
+}
+
+/** A matched row whose version NVD places outside every KEV-listed CVE of its family. */
+export function whyNotAffected(line: PatchLine, policy: Policy, detail: { cves: number; version: string | null }): string {
+  const name = productName(line);
+  return `KEV lists ${plural(detail.cves, "exploited CVE")} for ${name}, but NVD's version ranges place ${detail.version ? `version ${detail.version}` : "this version"} outside all of them. Review it again by ${line.target_date} (every ${plural(policy.sla_days.monitor_review, "day")} under your rules).`;
+}
+
 /** The "why" for one line (at most two sentences). */
 export function whyFor(line: PatchLine, owner: OwnerQuestion | null, policy: Policy): string {
   const name = productName(line);

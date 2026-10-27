@@ -484,6 +484,144 @@ export async function runJury(items: JuryItem[], opts: JuryOptions): Promise<Jur
   return { resolutions: items.map((i) => out.get(i.row.row_id) as Resolution), stats };
 }
 
+// ---------------------------------------------------------------- critic send-back: the resolver re-decides
+
+export const RESOLVER_RETRY_SYSTEM = [
+  "You are the resolver in a software exposure check, re-deciding items that a critic rejected. An IT admin typed each inventory item by hand.",
+  "For each item you see the rejected answer and the critic's reason. Use the reason: choose AT MOST ONE (vendor, product) pair from that item's OWN candidate list that names the same software product AND the same kind of product, or null when none does.",
+  ...RULES,
+  'Answer ONLY with a JSON object: {"results":[{"id":"I1","vendor":"..." or null,"product":"..." or null,"product_type":"...","version":"..." or null,"confidence":0.0,"reason":"one short sentence"}]} with exactly one result per item.',
+].join("\n");
+
+export interface RetryEntry extends BatchEntry { rejected: string; note: string; }
+
+/** The re-decide prompt: each sent-back item with the rejected answer, the critic's reason and its candidates. */
+export function buildRetryPrompt(entries: RetryEntry[]): { system: string; user: string } {
+  const lines = ["Items the critic sent back (synthetic data):"];
+  for (const e of entries) {
+    lines.push(itemHeader(e), `   rejected answer: ${e.rejected}`, `   critic: ${cleanName(e.note).slice(0, 500)}`, candidateLine(e));
+  }
+  return { system: RESOLVER_RETRY_SYSTEM, user: lines.join("\n") };
+}
+
+export interface RedecideInput { item: JuryItem; previous: Resolution; note: string; }
+export interface RedecideOutcome {
+  row_id: string;
+  resolution: Resolution;
+  /** The re-decider's vote, or null when its reply had no valid answer for the row (the previous resolution stands). */
+  vote: JurorVote | null;
+  receipt: Receipt;
+  changed: boolean;
+}
+
+/** Share of the model votes that name the same family as the final answer (null = "no KEV product"). */
+function voteShare(item: JuryItem, final: Candidate | null, votes: JurorVote[]): number {
+  const model = votes.filter((v) => v.juror !== "normaliser");
+  if (!model.length) return 0;
+  const famOf = (v: JurorVote): string | null => {
+    if (!v.vendor || !v.product) return null;
+    const c = findCandidate(item.candidates, v.vendor, v.product);
+    return c ? familyKey(c.family) : `${norm(v.vendor)}|${norm(v.product)}`;
+  };
+  const target = final ? familyKey(final.family) : null;
+  return round2(model.filter((v) => famOf(v) === target).length / model.length);
+}
+
+function previousText(r: Resolution): string {
+  return r.vendor && r.product ? pairText(r.vendor, r.product) : r.status === "no_match" ? "null (no candidate fits)" : "no settled answer";
+}
+
+/**
+ * The critic sent these rows back: one model re-decides them with the critic's reason (batches of 10, one call per
+ * batch). Round 1 uses Lightning, round 2 Ultra (the caller picks). A row without a valid answer keeps its previous
+ * resolution, so the critic reviews it again and, once the rounds are spent, asks the owner.
+ * With `rowFamily` (the pipeline's row-aware family: the product of a combo spelling the row matched), the new
+ * resolution carries that family and `changed` compares row families, so a repeated answer is never "changed".
+ */
+export async function redecide(
+  inputs: RedecideInput[], model: "lightning" | "ultra",
+  opts: { llm: Llm; tracer: Tracer; round: number; batchSize?: number; rowFamily?: (row: InventoryRow, res: Resolution) => string | null },
+): Promise<RedecideOutcome[]> {
+  const size = Math.max(1, Math.floor(opts.batchSize ?? JURY_BATCH_SIZE));
+  const famOf = (row: InventoryRow, r: Resolution): string | null =>
+    r.status !== "matched" ? null : (opts.rowFamily ? opts.rowFamily(row, r) : null) ?? r.family;
+  const keyOf = (row: InventoryRow, r: Resolution): string => {
+    const f = famOf(row, r);
+    return r.status === "matched" && f ? familyKey(f) : r.status;
+  };
+  const out = new Map<string, RedecideOutcome>();
+  await Promise.all(chunk(inputs, size).map(async (group, gi) => {
+    const entries: RetryEntry[] = group.map((g, i) => ({ localId: `I${i + 1}`, item: g.item, rejected: previousText(g.previous), note: g.note }));
+    const prompt = buildRetryPrompt(entries);
+    const res = await safeChat(opts.llm, { model, agent: `resolver.retry.${model}`, system: prompt.system, user: prompt.user, json: true });
+    const ok = res.receipt.status === "ok";
+    const parsed = ok ? parseVotes(res.json, entries) : { votes: new Map<string, ParsedVote>(), problems: [`call failed: ${res.receipt.error ?? "error"}`] };
+    const decisions: Record<string, unknown>[] = [];
+    group.forEach((g, i) => {
+      const v = parsed.votes.get(`I${i + 1}`) ?? null;
+      if (!v) {
+        out.set(g.item.row.row_id, { row_id: g.item.row.row_id, resolution: g.previous, vote: null, receipt: res.receipt, changed: false });
+        decisions.push({ row_id: g.item.row.row_id, rejected: previousText(g.previous), answer: "no valid answer", changed: false });
+        return;
+      }
+      const vote = jurorVote(g.item, model, v, res.receipt);
+      const votes = [...g.previous.votes, vote];
+      const next0 = resolution(g.item, v.candidate, {
+        votes,
+        version: g.item.version ?? v.version,
+        product_type: v.product_type,
+        adjudicated_by: model,
+        confidence: voteShare(g.item, v.candidate, votes),
+      });
+      const nextFam = famOf(g.item.row, next0);
+      const next = nextFam && nextFam !== next0.family ? { ...next0, family: nextFam } : next0;
+      const changed = keyOf(g.item.row, g.previous) !== keyOf(g.item.row, next);
+      out.set(g.item.row.row_id, { row_id: g.item.row.row_id, resolution: next, vote, receipt: res.receipt, changed });
+      decisions.push({ row_id: g.item.row.row_id, rejected: previousText(g.previous), answer: describe(v), changed, reason: v.reason ?? "" });
+    });
+    const changedN = decisions.filter((d) => d.changed).length;
+    opts.tracer.emit({
+      agent: `resolver.retry.${model}`, action: "redecide", target_agent: "critic",
+      receipt_id: res.receipt.receipt_id, latency_ms: res.receipt.latency_ms, status: ok ? "ok" : "error", retry_count: opts.round,
+      input_summary: `round ${opts.round}, group ${gi + 1}: ${group.length} row(s) sent back by the critic`,
+      output_summary: `${changedN} of ${group.length} changed their answer`,
+      details: { model_id: MODELS[model], routed_model: res.receipt.routed_model, decisions, problems: parsed.problems },
+    });
+  }));
+  return inputs.map((g) => out.get(g.item.row.row_id) as RedecideOutcome);
+}
+
+// ---------------------------------------------------------------- single models (eval arms)
+
+/**
+ * One model's votes over the items, with the jury's own prompt, batching and validation, and no second vote, no
+ * Ultra and no critic: the single-model arms of the accuracy table. Rows without candidates get a null vote by rule
+ * (no call), exactly as in the jury. Rows whose reply has no valid vote are left out (the eval counts them missing).
+ */
+export async function voteWithModel(
+  model: ModelKey, items: { row: InventoryRow; candidates: Candidate[] }[], deps: { llm: Llm | null; tracer: Tracer },
+  opts: { batchSize?: number } = {},
+): Promise<{ votes: JurorVote[]; receipts: Receipt[] }> {
+  if (!deps.llm) throw new Error("voteWithModel needs a model client (live mode)");
+  const receipts: Receipt[] = [];
+  const inner = deps.llm;
+  const llm: Llm = { async chat(req) { const r = await safeChat(inner, req); receipts.push(r.receipt); return r; } };
+  const ask = items.filter((i) => i.candidates.length > 0).map((i) => ({ row: i.row, candidates: i.candidates, version: null }));
+  const resolutions = ask.length ? await runSingleJuror(ask, model, { llm, tracer: deps.tracer, batchSize: opts.batchSize }) : [];
+  const byRow = new Map(resolutions.map((r) => [r.row_id, r]));
+  const votes: JurorVote[] = [];
+  for (const it of items) {
+    if (it.candidates.length === 0) {
+      votes.push({ row_id: it.row.row_id, juror: "normaliser", vendor: null, product: null, confidence: 0.8 });
+      continue;
+    }
+    const r = byRow.get(it.row.row_id);
+    const v = r?.votes.find((x) => x.juror === model);
+    if (r && r.status !== "unresolved" && v) votes.push(v);
+  }
+  return { votes, receipts };
+}
+
 /**
  * One model alone, with the same juror prompt and validation (no Ultra): the single-model arms of the
  * accuracy table. A row without a valid vote comes back unresolved.

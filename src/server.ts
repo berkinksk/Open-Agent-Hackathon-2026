@@ -5,7 +5,7 @@
 // Runs are processed one at a time (Zetaris takes one query at a time anyway).
 import { createServer } from "node:http";
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Deps, InventoryRow, Mode, Policy, RunRequest, RunResponse } from "./contracts.ts";
 import { ConfigError, REPO_ROOT, checkConfig, isSafeId, loadConfig, parseBool } from "./config.ts";
@@ -14,6 +14,7 @@ export type RunFn = (req: RunRequest, deps: Deps) => Promise<RunResponse>;
 export type MakeDepsFn = (opts: { mode: Mode; runId?: string; policy?: Partial<Policy> }) => Deps;
 
 export const DEFAULT_OUTPUT_DIR = join(REPO_ROOT, "output");
+export const DEFAULT_LOGS_DIR = join(REPO_ROOT, "logs");
 export const MAX_ROWS = 500;
 export const MAX_BODY_BYTES = 2 * 1024 * 1024;
 export const RUN_TIMEOUT_MS = 10 * 60 * 1000;
@@ -133,6 +134,8 @@ export interface AppOptions {
   run: RunFn;
   makeDeps: MakeDepsFn;
   outputDir?: string;
+  /** Where GET /report/:id looks for the trace when it renders a report from the run file. */
+  logsDir?: string;
   forceSample?: boolean;           // SAMPLE_MODE=true: every run is a sample run
   runTimeoutMs?: number;
   maxBodyBytes?: number;
@@ -223,13 +226,18 @@ export function createApp(opts: AppOptions): Server & { busy(): number } {
     }
   }
 
-  function handleReport(id: string, res: ServerResponse): void {
+  async function handleReport(id: string, res: ServerResponse): Promise<void> {
     if (!isSafeId(id)) { sendJson(res, 400, { status: "error", error: { type: "BadRequest", message: "invalid run id", recoverable: false } }); return; }
-    const p = join(outputDir, `report-${id}.html`);
-    if (!existsSync(p)) { sendJson(res, 404, { status: "error", error: { type: "NotFound", message: `no report for run ${id}`, recoverable: false } }); return; }
-    const html = readFileSync(p);
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Content-Length": html.length });
-    res.end(html);
+    // the saved report, or one rendered from output/run-<id>.json (+ logs/trace-<id>.jsonl) when only the run file exists
+    const { loadReportHtml } = await import("./report/index.ts");
+    const html = loadReportHtml(id, { outputDir, logsDir: opts.logsDir ?? DEFAULT_LOGS_DIR });
+    if (html === null) { sendJson(res, 404, { status: "error", error: { type: "NotFound", message: `no report for run ${id}`, recoverable: false } }); return; }
+    const body = Buffer.from(html, "utf8");
+    res.writeHead(200, {
+      "Content-Type": "text/html; charset=utf-8", "Content-Length": body.length,
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+    });
+    res.end(body);
   }
 
   function handleHealth(res: ServerResponse): void {
