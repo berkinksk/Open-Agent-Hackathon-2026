@@ -18,7 +18,7 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 |---|---|---|
 | Mohd Amir Suhel (team lead) | [`Amir-007`](https://github.com/Amir-007) | test answers, fresh-download test, slide deck, demo video, submission |
 | Thant Zaw Latt | [`Z-a-w-L-a-t-t`](https://github.com/Z-a-w-L-a-t-t) | the synthetic software list, test answers |
-| Berkin Kaynar | [`berkinksk`](https://github.com/berkinksk) | system design and code (built with Claude Code), data setup |
+| Berkin Kaynar | [`berkinksk`](https://github.com/berkinksk) | system design and code, data setup |
 
 **Slide deck:** [`docs/deck.pdf`](docs/deck.pdf) · **Fresh-download test on a second computer:** [`docs/fresh-download-test/`](docs/fresh-download-test/)
 
