@@ -146,8 +146,9 @@ export function isSafeId(id: string): boolean {
   return /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/.test(id);
 }
 
+/** A default run id, e.g. 20261027-041500Z-ab12 (no "run-" prefix: the file names add their own, run-<id>.json). */
 export function newRunId(now: Date = new Date()): string {
   const t = now.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z").replace("T", "-");
   const rand = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, "0");
-  return `run-${t}-${rand}`;
+  return `${t}-${rand}`;
 }

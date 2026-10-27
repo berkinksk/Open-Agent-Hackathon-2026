@@ -73,7 +73,8 @@ test("sample without the sample store fails clearly (until src/sample/queries.ts
 test("run ids: generated when absent, refused when unsafe", () => {
   const d = makeDeps({ mode: "sample" }, { env: {}, queries: stubQueries, logDir: tmp(), stdout: false });
   assert.ok(isSafeId(d.tracer.run_id));
-  assert.match(d.tracer.run_id, /^run-/);
+  assert.match(d.tracer.run_id, /^\d{8}-\d{6}Z-[0-9a-f]{4}$/);
+  assert.match(d.tracer.file, /trace-\d{8}-\d{6}Z-[0-9a-f]{4}\.jsonl$/);
   assert.throws(() => makeDeps({ mode: "sample", runId: "../x" }, { env: {}, queries: stubQueries, logDir: tmp(), stdout: false }), ConfigError);
 });
 

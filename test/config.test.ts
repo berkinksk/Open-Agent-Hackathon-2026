@@ -67,6 +67,7 @@ test("prefixes stay in the EL_ namespace; run ids are file-name safe", () => {
   for (const id of ["run-20261026-213000Z-ab12", "demo_001", "eval-2026-10-26-213000-dev-bolt"]) assert.equal(isSafeId(id), true, id);
   for (const id of ["../etc", "a/b", "", "x".repeat(81), "-lead", "a b"]) assert.equal(isSafeId(id), false, id);
   const id = newRunId(new Date("2026-10-26T21:30:05.123Z"));
-  assert.match(id, /^run-20261026-213005Z-[0-9a-f]{4}$/);
+  // no "run-" prefix of its own: the files already add one (output/run-<id>.json, never run-run-...)
+  assert.match(id, /^20261026-213005Z-[0-9a-f]{4}$/);
   assert.equal(isSafeId(id), true);
 });
