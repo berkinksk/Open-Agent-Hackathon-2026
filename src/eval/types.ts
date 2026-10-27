@@ -37,6 +37,19 @@ export interface ArmPrediction {
   product: string | null;
   abstained?: boolean;       // the arm left the row to the owner (ask_owner / unresolved)
   used_ultra?: boolean;      // Ultra was needed for this row (adjudication or contested critique)
+  decision?: string;         // full arm only: the patch-list decision for the row
+}
+
+/** Full arm only: what the pipeline run itself reported. */
+export interface ArmRunInfo {
+  run_id: string;
+  status: string;                     // RunResponse.status
+  decisions: Record<string, number>;  // RunResponse.summary
+  owner_questions: number;
+  timing_ms: Record<string, number>;
+  trace_file: string;
+  /** Rows Ultra worked on in any role (adjudication, critique, same-product check, re-decide), from the trace. null = unknown. */
+  ultra_reviewed_rows: string[] | null;
 }
 
 /** What resolveArm returns for one arm over a set of rows. */
@@ -44,6 +57,7 @@ export interface ArmOutput {
   predictions: ArmPrediction[];
   receipts: Receipt[];       // every model call this arm made for these rows
   notes?: string[];          // e.g. "time includes the Zetaris queries of the full pipeline"
+  run?: ArmRunInfo;          // full arm only
 }
 
 /** Injected by the integration step: run one arm over the given rows. */
@@ -131,4 +145,62 @@ export interface EvalResult {
   software_mismatches: string[]; // row ids where the sheet's software differs from the inventory's
   arms: ArmResult[];
   baseline_model?: ModelKey;
+}
+
+// ---------- unlabelled development runs (no answer sheet yet: no accuracy) ----------
+
+/** Model-call totals of one arm, from its receipts. */
+export interface CallStats {
+  calls: number;
+  calls_by_model: Record<string, number>;
+  ultra_calls: number;
+  call_errors: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  tokens: number;
+}
+
+export interface UnlabelledArmMetrics extends CallStats {
+  rows: number;
+  named_kev: number;            // the arm named a KEV product
+  no_kev: number;               // the arm said "no KEV product"
+  abstained: number;            // the arm left the row to the owner
+  missing: number;              // no prediction for the row
+  ultra_rows: number;           // rows whose answer needed Ultra (split adjudication or Ultra vote)
+  ultra_share: number | null;
+  ultra_reviewed: number | null; // rows Ultra worked on in any role (full arm, from the trace); null = unknown
+  /** Agreement with the full system, on the rows both answered (same KEV family, or both "no KEV product"). */
+  agree_with_full: { compared: number; agree: number } | null;
+  time_ms: number;
+}
+
+export interface UnlabelledRow {
+  row_id: string;
+  vendor: string | null;
+  product: string | null;
+  abstained: boolean;
+  missing: boolean;
+  used_ultra: boolean;
+  decision?: string;
+}
+
+export interface UnlabelledArmResult {
+  arm: ArmName;
+  status: "ok" | "unavailable" | "error";
+  message?: string;
+  notes: string[];
+  metrics: UnlabelledArmMetrics | null;
+  run?: ArmRunInfo;
+  rows: UnlabelledRow[];        // per-row answers (dev rows only; kept out of stdout)
+  disagree_with_full: string[]; // row ids where the arm and the full system name different answers
+  extra_predictions: string[];
+}
+
+export interface UnlabelledEvalResult {
+  kind: "unlabelled";
+  set: "dev";
+  generated_at: string;
+  rows_evaluated: number;
+  sealed_rows_excluded: number;
+  arms: UnlabelledArmResult[];
 }

@@ -1,22 +1,29 @@
 // Accuracy evaluation CLI.
 //   npm run eval -- --set dev --labels <answers.csv> [--arms full,bolt,lightning,baseline,normaliser]
 //   npm run eval -- --set test --final --labels data/test_answers.csv
+//   npm run eval -- --set dev --labels none [--arms ...]   (no answer sheet yet: an unlabelled run, no accuracy)
 // Options: --test-rows <json> (default data/eval/test_rows.json) · --inventory <json>|deps|labels (default deps)
 //          --out-dir <dir> (default output) · --mode live|sample · --baseline-model bolt|lightning|ultra (default ultra)
 // The test rows are sealed: --set test is refused without --final, and the dev set never includes them.
 // Every answer name is checked against the KEV pairs (deps.queries.kevPairs()); a name not in KEV leaves its row
 // unlabelled, and a --final run refuses when that check cannot run.
 // Stdout shows only the per-arm summary; per-row results go to the output files.
+// --labels none runs the arms on the development rows (the inventory minus the sealed test rows) and reports what can
+// be measured without answers (agreement with the full system, Ultra share, calls, tokens, time, decisions); it is
+// refused for the test set.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Deps, InventoryRow, KevPair, Mode, ModelKey } from "../src/contracts.ts";
 import { checkAnswersAgainstKev, parseAnswerSheet } from "../src/eval/answers.ts";
 import { runEvaluation } from "../src/eval/evaluate.ts";
-import { evalFileStem, evalJson, plural, renderEvalMarkdown, renderSummaryTable } from "../src/eval/report.ts";
+import {
+  evalFileStem, evalJson, plural, renderEvalMarkdown, renderSummaryTable, renderUnlabelledMarkdown, renderUnlabelledSummaryTable, unlabelledJson,
+} from "../src/eval/report.ts";
 import { assertSetAllowed, DEFAULT_TEST_ROWS_PATH, parseTestRows } from "../src/eval/split.ts";
 import { ARM_NAMES, DEFAULT_ARMS } from "../src/eval/types.ts";
 import type { ArmName, EvalSet, ResolveArm } from "../src/eval/types.ts";
+import { runUnlabelledEvaluation } from "../src/eval/unlabelled.ts";
 import { createResolveArm } from "../src/eval/wiring.ts";
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -38,9 +45,10 @@ export interface EvalArgs {
 }
 
 export const USAGE = [
-  "usage: eval --labels <answers.csv> [--set dev|test] [--final] [--arms full,bolt,lightning,baseline,normaliser]",
+  "usage: eval --labels <answers.csv>|none [--set dev|test] [--final] [--arms full,bolt,lightning,baseline,normaliser]",
   "            [--test-rows data/eval/test_rows.json] [--inventory <json>|deps|labels] [--out-dir output]",
   "            [--mode live|sample] [--baseline-model bolt|lightning|ultra]",
+  "       --labels none: an unlabelled development run (no answer sheet yet; no accuracy; dev set only)",
 ].join("\n");
 
 export function parseEvalArgs(argv: string[], env: Record<string, string | undefined> = {}): EvalArgs {
@@ -92,8 +100,13 @@ export function parseEvalArgs(argv: string[], env: Record<string, string | undef
       default: throw new UsageError(`unknown option ${flag}`);
     }
   }
-  if (a.labels === "") throw new UsageError("--labels <answers.csv> is required (keep answer sheets outside the repository)");
+  if (a.labels === "") throw new UsageError("--labels <answers.csv> is required (keep answer sheets outside the repository), or --labels none for an unlabelled development run");
   return a;
+}
+
+/** True for `--labels none`: no answer sheet, so an unlabelled development run. */
+export function isUnlabelled(a: Pick<EvalArgs, "labels">): boolean {
+  return a.labels.trim().toLowerCase() === "none";
 }
 
 /** Reads an inventory JSON: an array of rows, or {items|rows|inventory: [...]}. Missing asset fields get defaults. */
@@ -122,9 +135,12 @@ export interface EvalWiring {
   loadInventory?: () => Promise<InventoryRow[]>;
   /** The KEV (vendor, product) pairs, to check every answer name. Required for a --final run. */
   loadKevPairs?: () => Promise<KevPair[]>;
+  /** Every KEV family a pair names (A1's familiesOf), for agreement between arms in an unlabelled run. */
+  families?: (p: KevPair) => string[];
 }
 
 interface DepsModule { makeDeps(opts: { mode: Mode; runId?: string }): Deps; }
+interface FamiliesModule { familiesOf?(p: KevPair): string[]; }
 
 /** The default wiring: the pipeline's makeDeps (src/deps.ts) and the arms in src/eval/wiring.ts. */
 export async function defaultWiring(args: EvalArgs, stamp: string): Promise<EvalWiring> {
@@ -138,10 +154,16 @@ export async function defaultWiring(args: EvalArgs, stamp: string): Promise<Eval
   const depsFor = (arm: string) => mod.makeDeps({ mode: args.mode, runId: `${stamp}-${arm}` });
   let data: Deps | null = null; // one Deps (one trace file) for the inventory and the KEV pairs
   const dataDeps = () => (data ??= depsFor("data"));
+  let families: ((p: KevPair) => string[]) | undefined;
+  try {
+    const norm = (await import("../src/resolve/normalise.ts")) as FamiliesModule;
+    if (typeof norm.familiesOf === "function") families = norm.familiesOf;
+  } catch { /* without the normaliser, agreement compares exact names */ }
   return {
     resolveArm: createResolveArm({ depsFor, baselineModel: args.baselineModel }),
     loadInventory: () => dataDeps().queries.inventory(),
     loadKevPairs: () => dataDeps().queries.kevPairs(),
+    ...(families ? { families } : {}),
   };
 }
 
@@ -178,6 +200,17 @@ export async function main(argv: string[], o: MainOptions = {}): Promise<number>
     return 2;
   }
   if (args.final && args.set === "dev") err("eval: --final has no effect on the dev set");
+  if (isUnlabelled(args)) {
+    if (args.set === "test") {
+      err("eval: refusing: --labels none is for development runs only; the final test run needs the agreed answers");
+      return 2;
+    }
+    if (args.inventory === "labels") {
+      err("eval: --labels none needs an inventory (--inventory deps or a JSON path), not the answer sheet's column");
+      return 2;
+    }
+    return runUnlabelled(args, { cwd, root, out, err, now, wiring: o.wiring ?? defaultWiring });
+  }
 
   try {
     const labelsPath = path.resolve(cwd, args.labels);
@@ -238,6 +271,47 @@ export async function main(argv: string[], o: MainOptions = {}): Promise<number>
 
     out(`Matching accuracy, ${result.set} set: ${plural(result.rows_evaluated, "row")}` + (result.set === "dev" ? ` (${plural(result.sealed_rows_excluded, "sealed test row")} withheld)` : " (final run)"));
     out(renderSummaryTable(result));
+    out(`Wrote ${path.relative(cwd, mdPath) || mdPath} and ${path.relative(cwd, jsonPath) || jsonPath}`);
+    return result.arms.some((a) => a.status === "ok") ? 0 : 1;
+  } catch (e) {
+    err(`eval: ${(e as Error).message}`);
+    return 1;
+  }
+}
+
+async function runUnlabelled(
+  args: EvalArgs,
+  o: { cwd: string; root: string; out: (s: string) => void; err: (s: string) => void; now: () => Date; wiring: (args: EvalArgs, stamp: string) => Promise<EvalWiring> },
+): Promise<number> {
+  const { cwd, root, out, err, now } = o;
+  try {
+    let testIds: string[];
+    try {
+      testIds = parseTestRows(JSON.parse(readFileSync(path.resolve(root, args.testRows), "utf8"))).row_ids;
+    } catch (e) {
+      err(`eval: cannot read the sealed test-row list ${args.testRows} (${(e as Error).message}); it is needed so the dev set can exclude the test rows`);
+      return 2;
+    }
+    const stamp = `${evalFileStem("dev", now())}-unlabelled`;
+    const wiring = await o.wiring(args, stamp);
+    let inventory: InventoryRow[];
+    if (args.inventory === "deps") {
+      if (!wiring.loadInventory) { err("eval: --labels none needs an inventory loader or --inventory <json>"); return 2; }
+      inventory = await wiring.loadInventory();
+    } else inventory = parseInventoryJson(JSON.parse(readFileSync(path.resolve(cwd, args.inventory), "utf8")));
+    err("eval: no answer sheet (--labels none): an unlabelled development run; nothing is scored");
+
+    const result = await runUnlabelledEvaluation({
+      arms: args.arms, inventory, testIds, resolveArm: wiring.resolveArm, families: wiring.families, clock: now, log: (s) => err(`eval: ${s}`),
+    });
+    const dir = path.resolve(root, args.outDir);
+    mkdirSync(dir, { recursive: true });
+    const mdPath = path.join(dir, `${stamp}.md`);
+    const jsonPath = path.join(dir, `${stamp}.json`);
+    writeFileSync(mdPath, renderUnlabelledMarkdown(result));
+    writeFileSync(jsonPath, JSON.stringify(unlabelledJson(result), null, 2) + "\n");
+    out(`Unlabelled development run: ${plural(result.rows_evaluated, "row")} (${plural(result.sealed_rows_excluded, "sealed test row")} withheld); no accuracy`);
+    out(renderUnlabelledSummaryTable(result));
     out(`Wrote ${path.relative(cwd, mdPath) || mdPath} and ${path.relative(cwd, jsonPath) || jsonPath}`);
     return result.arms.some((a) => a.status === "ok") ? 0 : 1;
   } catch (e) {

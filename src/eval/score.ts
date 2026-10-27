@@ -3,7 +3,7 @@
 import { MODELS } from "../contracts.ts";
 import type { PatchLine, Receipt, Resolution } from "../contracts.ts";
 import { canonRowId, normName } from "./answers.ts";
-import type { AnswerRow, ArmMetrics, ArmPrediction, RowOutcome, RowScore } from "./types.ts";
+import type { AnswerRow, ArmMetrics, ArmPrediction, CallStats, RowOutcome, RowScore } from "./types.ts";
 
 export { normName } from "./answers.ts";
 
@@ -83,17 +83,7 @@ export function scoreArm(
   const noneRejected = count("none_ok") + count("none_abstained");
   const lookalikeRows = rows.filter((r) => r.lookalike && r.expected.none);
   const ultraRows = rows.filter((r) => r.used_ultra).length;
-
-  const callsByModel: Record<string, number> = {};
-  let promptTokens = 0;
-  let completionTokens = 0;
-  let callErrors = 0;
-  for (const r of receipts) {
-    callsByModel[r.requested_model] = (callsByModel[r.requested_model] ?? 0) + 1;
-    promptTokens += r.prompt_tokens ?? 0;
-    completionTokens += r.completion_tokens ?? 0;
-    if (r.status === "error") callErrors++;
-  }
+  const s = callStats(receipts);
 
   const metrics: ArmMetrics = {
     rows: rows.length,
@@ -114,6 +104,25 @@ export function scoreArm(
     missed: count("missed"),
     ultra_rows: ultraRows,
     ultra_share: ratio(ultraRows, rows.length),
+    ...s,
+    time_ms: timeMs,
+  };
+  return { metrics, rows, extra_predictions: extra };
+}
+
+/** Model-call totals from an arm's receipts: calls per requested model, Ultra calls, failures and tokens. */
+export function callStats(receipts: Receipt[]): CallStats {
+  const callsByModel: Record<string, number> = {};
+  let promptTokens = 0;
+  let completionTokens = 0;
+  let callErrors = 0;
+  for (const r of receipts) {
+    callsByModel[r.requested_model] = (callsByModel[r.requested_model] ?? 0) + 1;
+    promptTokens += r.prompt_tokens ?? 0;
+    completionTokens += r.completion_tokens ?? 0;
+    if (r.status === "error") callErrors++;
+  }
+  return {
     calls: receipts.length,
     calls_by_model: callsByModel,
     ultra_calls: receipts.filter((r) => r.requested_model === MODELS.ultra).length,
@@ -121,9 +130,7 @@ export function scoreArm(
     prompt_tokens: promptTokens,
     completion_tokens: completionTokens,
     tokens: promptTokens + completionTokens,
-    time_ms: timeMs,
   };
-  return { metrics, rows, extra_predictions: extra };
 }
 
 /**

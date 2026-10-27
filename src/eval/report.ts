@@ -2,7 +2,7 @@
 // (dev set: misses listed in the Markdown; test set: per-row only in the JSON of the final run).
 import { MODELS } from "../contracts.ts";
 import { mdCell } from "./csv.ts";
-import type { ArmName, ArmResult, EvalResult, RowScore } from "./types.ts";
+import type { ArmName, ArmResult, EvalResult, RowScore, UnlabelledEvalResult, UnlabelledRow } from "./types.ts";
 
 const ARM_LABELS: Record<ArmName, string> = {
   full: "Full system (jury + Ultra + critic)",
@@ -134,6 +134,101 @@ export function evalJson(r: EvalResult): Record<string, unknown> {
     ...r,
     arms: r.arms.map((a: ArmResult) => ({ ...a, label: armLabel(a.arm, r), rows: keepRows ? a.rows : [] })),
   };
+}
+
+// ---------- unlabelled development runs ----------
+
+function answerText(r: UnlabelledRow | undefined): string {
+  if (!r || r.missing) return "(no prediction)";
+  if (r.abstained) return "(left to the owner)";
+  return r.product === null ? "no KEV product" : `${r.vendor ?? "?"} / ${r.product}`;
+}
+
+function share(n: number | null, d: number): string {
+  return n === null ? "n/a" : frac(n, d);
+}
+
+/** The headline table of an unlabelled run: one line per arm, no accuracy. */
+export function renderUnlabelledSummaryTable(r: UnlabelledEvalResult): string {
+  const head = "| Arm | Named a KEV product | No KEV product | Left to the owner | Agrees with the full system | Rows: split decided by Ultra | Rows: Ultra in any role | Ultra calls | Model calls | Tokens | Time |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|";
+  const lines = r.arms.map((a) => {
+    const name = mdCell(ARM_LABELS[a.arm]);
+    if (!a.metrics) return `| ${name} | not run: ${mdCell(a.message ?? a.status)} | | | | | | | | | |`;
+    const m = a.metrics;
+    const agree = a.arm === "full" ? "–" : m.agree_with_full ? frac(m.agree_with_full.agree, m.agree_with_full.compared) : "n/a";
+    const cells = [
+      name, String(m.named_kev), String(m.no_kev), String(m.abstained) + (m.missing ? ` (+${m.missing} missing)` : ""), agree,
+      frac(m.ultra_rows, m.rows), share(m.ultra_reviewed, m.rows),
+      m.calls === 0 ? "0" : `${m.ultra_calls} of ${m.calls}`, String(m.calls), int(m.tokens), secs(m.time_ms),
+    ];
+    return `| ${cells.join(" | ")} |`;
+  });
+  return [head, sep, ...lines].join("\n");
+}
+
+function unlabelledCallsTable(r: UnlabelledEvalResult): string {
+  const rows = r.arms.filter((a) => a.metrics && a.metrics.calls > 0).map((a) => {
+    const m = a.metrics!;
+    const by = (key: keyof typeof MODELS) => String(m.calls_by_model[MODELS[key]] ?? 0);
+    return `| ${mdCell(ARM_LABELS[a.arm])} | ${by("bolt")} | ${by("lightning")} | ${by("ultra")} | ${m.call_errors} | ${int(m.prompt_tokens)} | ${int(m.completion_tokens)} |`;
+  });
+  if (rows.length === 0) return "";
+  return ["| Arm | Bolt | Lightning | Ultra | Failed calls | Prompt tokens | Completion tokens |", "|---|---|---|---|---|---|---|", ...rows].join("\n");
+}
+
+export function renderUnlabelledMarkdown(r: UnlabelledEvalResult): string {
+  const out: string[] = [];
+  out.push("# Development run, unlabelled (no accuracy)", "");
+  out.push(`- **Generated:** ${r.generated_at}`);
+  out.push(`- **Rows:** ${r.rows_evaluated} development rows (the inventory minus ${plural(r.sealed_rows_excluded, "sealed test row")}, which never reached an arm).`);
+  out.push("- **No accuracy:** no human answer sheet was given, so nothing is scored. This run measures what each arm named, its agreement with the full system, the rows that needed Ultra, the model calls, the tokens, the time and the full system's decisions.");
+  out.push("- **Agreement** counts the rows both arms answered: the same KEV family (any spelling) or both \"no KEV product\". Rows left to the owner are not compared.");
+  out.push("- **Rows: split decided by Ultra** = the jurors disagreed and Ultra decided (or voted). **Rows: Ultra in any role** adds Ultra's critiques, same-product checks and re-decides (full system, read from its trace).");
+  out.push("- **Arms** ran one after another, never in parallel.");
+  out.push("");
+  out.push(renderUnlabelledSummaryTable(r), "");
+  const calls = unlabelledCallsTable(r);
+  if (calls) out.push("## Model calls by model", "", calls, "");
+
+  const full = r.arms.find((a) => a.arm === "full" && a.run);
+  if (full?.run) {
+    const d = full.run.decisions;
+    const n = (k: string) => String(d[k] ?? 0);
+    out.push("## Full system: decisions", "");
+    out.push("| patch_now | this_cycle | monitor | ask_owner | Owner questions | Run status | Run id |", "|---|---|---|---|---|---|---|");
+    out.push(`| ${n("patch_now")} | ${n("this_cycle")} | ${n("monitor")} | ${n("ask_owner")} | ${full.run.owner_questions} | ${mdCell(full.run.status)} | ${mdCell(full.run.run_id)} |`, "");
+    const t = Object.entries(full.run.timing_ms);
+    if (t.length > 0) out.push(`Pipeline timing: ${t.map(([k, v]) => `${mdCell(k)} ${secs(v)}`).join(" · ")}.`, "");
+  }
+
+  const notes: string[] = [];
+  for (const a of r.arms) {
+    for (const n of a.notes) notes.push(`${ARM_LABELS[a.arm]}: ${n}`);
+    if (a.extra_predictions.length > 0) notes.push(`${ARM_LABELS[a.arm]}: ${a.extra_predictions.length} prediction(s) for rows that were not asked (ignored)`);
+  }
+  if (notes.length > 0) out.push("## Notes", "", ...notes.map((n) => `- ${mdCell(n)}`), "");
+
+  const fullRows = new Map((r.arms.find((a) => a.arm === "full" && a.status === "ok")?.rows ?? []).map((x) => [x.row_id, x] as const));
+  const lines: string[] = [];
+  for (const a of r.arms) {
+    if (a.arm === "full") continue;
+    const by = new Map(a.rows.map((x) => [x.row_id, x] as const));
+    for (const id of a.disagree_with_full) {
+      lines.push(`| ${mdCell(id)} | ${mdCell(ARM_LABELS[a.arm])} | ${mdCell(answerText(by.get(id)))} | ${mdCell(answerText(fullRows.get(id)))} |`);
+    }
+  }
+  if (fullRows.size > 0) {
+    out.push("## Development rows where an arm and the full system differ", "");
+    out.push(lines.length === 0 ? "None." : ["| Row | Arm | Arm's answer | Full system's answer |", "|---|---|---|---|", ...lines].join("\n"), "");
+  }
+  out.push("Every number above comes from this run's real predictions and receipts; nothing is hand-entered.", "");
+  return out.join("\n");
+}
+
+/** JSON for the evidence file of an unlabelled run (dev rows only, so per-row answers are kept). */
+export function unlabelledJson(r: UnlabelledEvalResult): Record<string, unknown> {
+  return { ...r, arms: r.arms.map((a) => ({ ...a, label: ARM_LABELS[a.arm] })) };
 }
 
 /** A file stem like eval-2026-10-27-103000-test (UTC). */

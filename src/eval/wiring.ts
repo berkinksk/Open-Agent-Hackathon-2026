@@ -1,6 +1,7 @@
 // Default wiring of resolveArm onto the pipeline's fixed cross-module names. The integration step may
 // replace any arm through the options. Modules are imported lazily, so a missing module only disables
 // the arms that need it.
+import { readFileSync } from "node:fs";
 import type {
   Candidate, Deps, InventoryRow, JurorVote, KevPair, ModelKey, ParsedSoftware, Receipt, RunRequest, RunResponse,
 } from "../contracts.ts";
@@ -34,6 +35,44 @@ export interface WiringOptions {
     run?: () => Promise<RunModule>;
     jury?: () => Promise<JuryModule>;
   };
+  /** Reads the full run's trace for the rows Ultra worked on; null when unreadable. Default: the trace file. */
+  readTrace?: (file: string | undefined) => string[] | null;
+}
+
+/**
+ * The rows Ultra worked on in any role, from a pipeline trace (JSONL): the split adjudication's decisions, Ultra's
+ * re-decides, the critic rounds' Ultra critiques and the same-product checks. Lines that are not JSON are skipped.
+ */
+export function ultraRowsFromTrace(jsonl: string): string[] {
+  const ids = new Set<string>();
+  const addDecisions = (d: unknown) => {
+    if (!Array.isArray(d)) return;
+    for (const x of d) {
+      const id = (x as { row_id?: unknown } | null)?.row_id;
+      if (typeof id === "string") ids.add(id);
+    }
+  };
+  for (const line of jsonl.split("\n")) {
+    if (line.trim() === "") continue;
+    let e: { agent?: unknown; action?: unknown; details?: Record<string, unknown> };
+    try { e = JSON.parse(line); } catch { continue; }
+    const d = e.details ?? {};
+    if (e.action === "ultra_adjudication") addDecisions(d.decisions);
+    else if (e.action === "redecide" && typeof e.agent === "string" && /ultra/.test(e.agent)) addDecisions(d.decisions);
+    else if (e.action === "critic_round" && Array.isArray(d.ultra_critiques)) {
+      for (const id of d.ultra_critiques) if (typeof id === "string") ids.add(id);
+    } else if (e.action === "same_product_check" && typeof d.row_id === "string") ids.add(d.row_id);
+  }
+  return [...ids].sort();
+}
+
+function readTraceFile(file: string | undefined): string[] | null {
+  if (!file) return null;
+  try {
+    return ultraRowsFromTrace(readFileSync(file, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 function isModuleNotFound(e: unknown): boolean {
@@ -100,7 +139,7 @@ export function createResolveArm(opts: WiringOptions): ResolveArm {
         return {
           predictions: votesToPredictions(votes, arm === "ultra"),
           receipts,
-          notes: [`${arm} alone: the jury prompt, no second vote, no critic`],
+          notes: ["the jury's own prompt and batching, no second vote, no critic"],
         };
       }
       case "full": {
@@ -113,7 +152,7 @@ export function createResolveArm(opts: WiringOptions): ResolveArm {
           // an ask_owner line is an abstention (the match is left to the owner); a KEV-listed line kept at patch_now
           // with only its version unconfirmed is a prediction (the critic's L1 question there is about the version)
           predictions: res.lines.map((l) => {
-            const p = predictionFromResolution(l.resolution, null);
+            const p = { ...predictionFromResolution(l.resolution, null), ...(l.decision ? { decision: l.decision } : {}) };
             return l.decision === "ask_owner" ? { ...p, vendor: null, product: null, abstained: true } : p;
           }),
           receipts: res.receipts,
@@ -121,6 +160,15 @@ export function createResolveArm(opts: WiringOptions): ResolveArm {
             `mode ${res.mode}; its time covers the whole pipeline (Zetaris queries, critic, policy, verifier), not only matching`,
             "an ask_owner line counts as an abstention; a patch_now line whose version is unconfirmed counts as its match",
           ],
+          run: {
+            run_id: res.run_id,
+            status: res.status,
+            decisions: { ...(res.summary ?? {}) },
+            owner_questions: Array.isArray(res.owner_questions) ? res.owner_questions.length : 0,
+            timing_ms: { ...(res.timing_ms ?? {}) },
+            trace_file: res.trace_file ?? "",
+            ultra_reviewed_rows: (opts.readTrace ?? readTraceFile)(res.trace_file),
+          },
         };
       }
       default:
