@@ -164,7 +164,22 @@ const PRODUCT_VENDOR: [RegExp, string][] = [
 const VENDOR_ALIASES: Record<string, string> = {
   "pulse secure": "ivanti", "pulsesecure": "ivanti", "mobileiron": "ivanti",
   "palo alto": "palo alto networks", "paloalto networks": "palo alto networks",
+  // the same product under two KEV vendor names: "PHP / PHP" and "PHP Group / PHP"; "Langflow / Langflow" and
+  // "IBM / Langflow"
+  "php group": "php", "langflow": "ibm",
 };
+
+/**
+ * Companies whose own name is not a product: a KEV entry spelled "<vendor> / <vendor>" for one of them
+ * ("Microsoft / Microsoft", "Apache / Apache") names no product, so it is vague. Every other such entry names the
+ * vendor's eponymous product ("OpenSSL / OpenSSL", "Samba / Samba", "Sudo / Sudo", "Notepad++ / Notepad++",
+ * "Jenkins / Jenkins"), which is as specific as any other KEV product. The list: the companies of VENDOR_WORDS, and IBM.
+ */
+const UMBRELLA_VENDORS = new Set([
+  "microsoft", "apache", "citrix", "fortinet", "cisco", "google", "adobe", "ivanti", "palo alto networks", "vmware",
+  "oracle", "mozilla", "apple", "atlassian", "solarwinds", "sonicwall", "juniper", "f5", "zyxel", "zoho", "progress",
+  "rarlab", "veeam", "sap", "ibm",
+]);
 
 /** Comparison form of a vendor name: lowercase, clean, with renamed companies folded together. */
 export function normVendor(v: string | null | undefined): string {
@@ -418,6 +433,11 @@ function tokenWeight(t: string): number {
  * stop words and single letters dropped, unique, in order of appearance.
  */
 export function canonicalTokens(text: string, vendor: string | null = null): string[] {
+  return tokenize(text, vendor, false);
+}
+
+/** The canonicalTokens pipeline; `keepLetters` keeps single-letter words ("X" in "Jenkins X"). */
+function tokenize(text: string, vendor: string | null, keepLetters: boolean): string[] {
   let s = ` ${lowerClean(text).replace(PLATFORM_RE, " ")} `;
   for (const [re, rep, only] of PHRASE_ALIASES) {
     if (only && only !== vendor) continue;
@@ -426,7 +446,7 @@ export function canonicalTokens(text: string, vendor: string | null = null): str
   const out: string[] = [];
   for (const raw of s.split(/[^a-z0-9+]+/)) {
     if (!raw || !/[a-z0-9]/.test(raw)) continue;
-    if (/^[a-z]$/.test(raw)) continue;
+    if (!keepLetters && /^[a-z]$/.test(raw)) continue;
     const t = TOKEN_ALIASES.get(raw) ?? raw;
     if (STOPWORDS.has(t) || out.includes(t)) continue;
     out.push(t);
@@ -479,6 +499,8 @@ export function parseSoftware(raw: string): ParsedSoftware {
 
 interface RowParts {
   main: string; context: string[]; version: string | null; vendor: string | null; vNorm: string | null;
+  /** The vendor comes from the main text (a vendor word, or a product or platform that implies one), not a note. */
+  vendorInMain: boolean;
   product_hint: string; tokens: string[];
 }
 
@@ -498,13 +520,17 @@ function splitRow(raw: string): RowParts {
 
   // vendor: a vendor word in the main text, else a product that implies one, else a vendor word in the context
   let vendor: string | null = null;
+  let vendorInMain = false;
   let hintText = main;
   const word = firstMatch(VENDOR_WORDS, main);
   if (word) {
     vendor = word.vendor;
+    vendorInMain = true;
     hintText = main.replace(new RegExp(word.re.source, "i"), " ");
   } else {
-    vendor = firstMatch(PRODUCT_VENDOR, main)?.vendor ?? firstMatch(VENDOR_WORDS, context.join(" ; "))?.vendor ?? null;
+    const implied = firstMatch(PRODUCT_VENDOR, main)?.vendor ?? null;
+    vendorInMain = implied !== null;
+    vendor = implied ?? firstMatch(VENDOR_WORDS, context.join(" ; "))?.vendor ?? null;
   }
   const vNorm = vendor ? normVendor(vendor) : null;
 
@@ -512,7 +538,7 @@ function splitRow(raw: string): RowParts {
   if (!product_hint && vNorm && VENDOR_DEFAULT_PRODUCT[vNorm]) product_hint = VENDOR_DEFAULT_PRODUCT[vNorm];
   const tokens = canonicalTokens(product_hint, vNorm);
   if (!product_hint) product_hint = tidy(main) || text;
-  return { main, context, version, vendor, vNorm, product_hint, tokens };
+  return { main, context, version, vendor, vNorm, vendorInMain, product_hint, tokens };
 }
 
 /**
@@ -588,6 +614,12 @@ const FAMILY_RULES: { vendor: string; re: RegExp; family: string }[] = [
   { vendor: "vmware", re: /^esxi\b/, family: "vmware:esxi" },
   { vendor: "vmware", re: /^vcenter server\b/, family: "vmware:vcenter-server" },
   { vendor: "palo alto networks", re: /^pan-?os\b/, family: "palo-alto-networks:pan-os" },
+  // eponymous products whose KEV entries are split across spellings (the vendor prefix is already stripped here):
+  // Jenkins core with its CLI, UI and Stapler web framework (the plugins stay separate products); Exim, "Exim
+  // Internet Mailer" and Exim's "Mail Transfer Agent (MTA)"; GitLab, "GitLab CE/EE" and the CE/EE edition names
+  { vendor: "jenkins", re: /^(?:jenkins$|command line interface\b|user interface\b|stapler\b)/, family: "jenkins:jenkins" },
+  { vendor: "exim", re: /^(?:exim|internet mailer|mail transfer agent)\b/, family: "exim:exim" },
+  { vendor: "gitlab", re: /^(?:gitlab\b|ce\/ee\b|community\b|enterprise editions?\b)/, family: "gitlab:gitlab" },
 ];
 
 const COMBO_SPLIT = /\s*,\s*(?:and\s+)?|\s+and\s+|\s*&\s*|\s+\/\s+/;
@@ -597,14 +629,43 @@ function stripLeadingVendor(productLower: string, vNorm: string): string {
   return productLower;
 }
 
+/**
+ * A KEV entry that names no product: an empty name, "Multiple Products", or an umbrella company's own name
+ * ("Microsoft / Microsoft"). A vendor-named entry of any other vendor is its eponymous product ("OpenSSL / OpenSSL").
+ */
 function isVague(productLower: string, vNorm: string): boolean {
-  return !productLower || productLower === vNorm || /\bmultiple products\b/.test(productLower);
+  if (!productLower || /\bmultiple products\b/.test(productLower)) return true;
+  return productLower === vNorm && UMBRELLA_VENDORS.has(vNorm);
 }
+
+/**
+ * A vendor-named product ("OpenSSL / OpenSSL", "Sudo / Sudo", "Langflow / Langflow" and "IBM / Langflow"): its name is
+ * a brand, not a description, so a neighbouring brand is a different product ("OpenSSH" is not OpenSSL, "GitLab Runner"
+ * is not GitLab). Such a name is matched exactly, never through a typo, and the vote names it only when the row adds no
+ * other product words (see eponymousDoubt).
+ */
+function isEponymous(productLower: string, vNorm: string): boolean {
+  if (isVague(productLower, vNorm)) return false;
+  return productLower === vNorm || VENDOR_ALIASES[productLower] === vNorm;
+}
+
+/**
+ * Words that qualify a vendor-named product without naming another one: editions and release tracks ("GitLab CE",
+ * "Jenkins LTS", "Samba server") and distribution packaging ("openssl-libs", "samba-common", "sudo (Ubuntu package)").
+ */
+const SAME_PRODUCT_WORDS = new Set([
+  "server", "core", "edition", "editions", "community", "enterprise", "ce", "ee", "oss", "lts", "stable", "standard",
+  "pro", "professional",
+  "package", "pkg", "deb", "rpm", "dfsg", "lib", "libs", "common", "bin", "ubuntu", "debian", "rhel", "centos", "alpine",
+  "fedora", "suse",
+]);
 
 /**
  * One key per product family across KEV's spellings, "<vendor>:<product>" in slug form. Examples:
  * every Citrix ADC/NetScaler/Gateway spelling -> "citrix:netscaler-adc-gateway"; "Exchange" and "Exchange Server"
  * -> "microsoft:exchange-server"; "Windows " -> "microsoft:windows"; the FortiOS combos -> "fortinet:fortios".
+ * A vendor's eponymous product has its own family ("OpenSSL / OpenSSL" -> "openssl:openssl"); an umbrella
+ * company's own name names none ("Microsoft / Microsoft" -> "microsoft:multiple-products").
  * Otherwise: the first product of a combo, without parentheses, platform qualifiers or "software"/"series".
  */
 export function familyOf(p: KevPair): string {
@@ -616,7 +677,7 @@ export function familyOf(p: KevPair): string {
   const main = prod.replace(/\([^)]*\)/g, " ").replace(PLATFORM_RE, " ").trim();
   const first = main.split(COMBO_SPLIT).find((x) => x.trim()) ?? main;
   const slug = slugify(first.replace(/\b(?:software|series)\b/g, " "));
-  if (!slug || slug === vSlug) return `${vSlug}:multiple-products`;
+  if (!slug || (slug === vSlug && UMBRELLA_VENDORS.has(vNorm))) return `${vSlug}:multiple-products`;
   return `${vSlug}:${slug}`;
 }
 
@@ -727,12 +788,13 @@ function withinOneEdit(a: string, b: string): boolean {
 /**
  * A typo of a long word ("exchnage"), not a different product: words two edits apart ("workplace"/"workspace"),
  * a different first letter ("vcenter"/"center"), short codes ("iosxe"/"iosxr") or numbered names ("smbv1"/"smbv3").
+ * Never applied to a vendor-named product's name: "openssh" is not a typo of "openssl" (see isEponymous).
  */
 const isTypo = (a: string, b: string): boolean =>
   a.length >= 6 && b.length >= 6 && a[0] === b[0] && !/\d/.test(a + b) && withinOneEdit(a, b);
 
-/** Weighted Dice overlap; a one-letter typo of a long token counts as 0.9 of a match. */
-function softDice(P: string[], Q: string[]): { dice: number; matched: string[] } {
+/** Weighted Dice overlap; a one-letter typo of a long token counts as 0.9 of a match, unless `typos` is false. */
+function softDice(P: string[], Q: string[], typos = true): { dice: number; matched: string[] } {
   if (!P.length || !Q.length) return { dice: 0, matched: [] };
   const used = new Array<boolean>(P.length).fill(false);
   let inter = 0;
@@ -744,7 +806,7 @@ function softDice(P: string[], Q: string[]): { dice: number; matched: string[] }
       if (used[i]) continue;
       let m = 0;
       if (P[i] === q) m = 1;
-      else if (isTypo(P[i], q)) m = 0.9;
+      else if (typos && isTypo(P[i], q)) m = 0.9;
       if (m > bm) { bm = m; bi = i; }
     }
     if (bi >= 0) {
@@ -768,7 +830,7 @@ interface KevPart {
 }
 interface KevInfo {
   vNorm: string; vendorTokens: string[]; parts: KevPart[]; type: ProductType; family: string; families: string[];
-  vague: boolean; key: string; clean: boolean;
+  vague: boolean; eponymous: boolean; key: string; clean: boolean;
 }
 
 const KEV_MEMO = new Map<string, KevInfo>();
@@ -821,6 +883,7 @@ function kevInfo(p: KevPair): KevInfo {
     family,
     families,
     vague: isVague(prod, vNorm),
+    eponymous: isEponymous(prod, vNorm),
     key: `${vNorm}|${lowerClean(p.product)}`,
     clean: cleanText(p.product) === p.product && cleanText(p.vendor) === p.vendor,
   };
@@ -828,16 +891,35 @@ function kevInfo(p: KevPair): KevInfo {
   return info;
 }
 
-interface InvCtx { tokens: string[]; str: string; vNorm: string | null; rawTokens: Set<string>; type: ProductType; }
+interface InvCtx {
+  tokens: string[]; str: string; vNorm: string | null; rawTokens: Set<string>; type: ProductType;
+  /** The product words with single letters kept ("jenkins x"), for eponymousDoubt. */
+  words: string[];
+  /** The vendor named or implied by the main text, normalised; null when there is none or it comes from a note. */
+  mainVendor: string | null;
+}
+
+/** A version wildcard ("1.1.x", "8.x"): not a product word. */
+const VERSION_WILDCARD = /(?<![\w.])\d+(?:\.\d+)*\.[x*](?![\w.])/gi;
 
 function invContext(parsed: ParsedSoftware | null | undefined): InvCtx {
   const tokens = Array.isArray(parsed?.tokens) ? parsed.tokens : [];
+  const vNorm = parsed?.vendor_hint ? normVendor(parsed.vendor_hint) : null;
+  const hint = typeof parsed?.product_hint === "string" ? parsed.product_hint.replace(VERSION_WILDCARD, " ") : "";
+  const words = hint ? tokenize(hint, vNorm, true) : tokens;
+  let mainVendor: string | null = null;
+  if (vNorm && typeof parsed?.raw === "string") {
+    const r = splitRow(parsed.raw);
+    if (r.vendorInMain && r.vNorm === vNorm) mainVendor = vNorm;
+  }
   return {
     tokens,
     str: tokens.join(" "),
-    vNorm: parsed?.vendor_hint ? normVendor(parsed.vendor_hint) : null,
+    vNorm,
     rawTokens: new Set(canonicalTokens(parsed?.raw ?? "")),
     type: parsed?.product_type ?? "unknown",
+    words,
+    mainVendor,
   };
 }
 
@@ -858,7 +940,7 @@ const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
 function bestPart(ctx: InvCtx, info: KevInfo): { name: number; dice: number; jw: number; matched: string[]; part: KevPart | null } {
   let best = { name: 0, dice: 0, jw: 0, matched: [] as string[], part: info.parts[0] ?? null };
   for (const part of info.parts) {
-    const { dice, matched } = softDice(ctx.tokens, part.tokens);
+    const { dice, matched } = softDice(ctx.tokens, part.tokens, !info.eponymous); // a brand name is matched exactly
     const jw = ctx.str && part.str ? jaroWinkler(ctx.str, part.str) : 0;
     const name = (0.8 * dice + 0.2 * jw) * part.penalty;
     if (name > best.name) best = { name, dice, jw, matched, part };
@@ -917,9 +999,9 @@ const cmpStr = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
  * The top-k KEV candidate pairs for one parsed row, best first, each with its family, score in [0, 1] and reason.
  * Score = 0.75 x name (alias-expanded weighted token Dice 0.8 + Jaro-Winkler 0.2, best over the KEV name, its combo
  * parts and bracketed abbreviation) + 0.15 x vendor fit + 0.10 x type fit; x0.6 on a type conflict; x0.5 for a vague
- * KEV entry ("Multiple Products"). Spellings that differ only in case or spacing appear once (the clean one), at most
- * family_cap spellings per family. Same-vendor look-alikes stay in the list on purpose: the jury and the critic must
- * see them. Pairs with no name overlap and no vendor fit are left out.
+ * KEV entry ("Multiple Products"); a vendor-named product's name gets no typo credit. Spellings that differ only in case
+ * or spacing appear once (the clean one), at most family_cap spellings per family. Same-vendor look-alikes stay in the
+ * list on purpose: the jury and the critic must see them. Pairs with no name overlap and no vendor fit are left out.
  */
 export function topCandidates(parsed: ParsedSoftware, pairs: KevPair[], k = 12): Candidate[] {
   if (!Array.isArray(pairs) || !pairs.length || !(k > 0)) return [];
@@ -965,8 +1047,13 @@ export function voteKind(v: Pick<JurorVote, "vendor" | "product" | "confidence">
  * lists the same product is not a rival, and "Workstation" in "ESXi and Workstation" is typed as a client).
  * A candidate is blocked when its type conflicts with the row's
  * (cloud vs on-prem, client vs server/console/appliance), when the asset cannot run it (a laptop running a server
- * product), or when the KEV entry is vague. Otherwise the vote is null: confidence >= no_match_confidence_min means
- * "no KEV product matches" (nothing resembles it, or only a blocked look-alike does); lower means "unsure".
+ * product), or when the KEV entry is vague ("Multiple Products", "Microsoft / Microsoft"; a vendor's eponymous product
+ * such as "OpenSSL / OpenSSL" is not vague). Otherwise the vote is null: confidence >= no_match_confidence_min means
+ * "no KEV product matches" (nothing resembles it, or only a blocked look-alike does); lower means "unsure", which is
+ * also the vote when a vague entry resembles the row (KEV may list the product under that name).
+ * A vendor-named product ("OpenSSL / OpenSSL", "GitLab / GitLab") is matched by its exact name, never through a typo
+ * ("OpenSSH" is a confident no-match, not OpenSSL), and the vote abstains when the row may be a neighbouring product of
+ * the brand ("GitLab Runner", "jQuery UI", "Jenkins X") or another vendor's ("Sudo for Windows"): see eponymousDoubt.
  * A cloud type that rests only on a bracketed note ("Exchange (M365)", "ActiveMQ (cloud)") may block a match, but never
  * earns a confident "no KEV product": the note may only say where an on-prem product is hosted. Such a row abstains when
  * it has a look-alike, or when its main text alone would have matched or abstained; the owner is asked.
@@ -1005,6 +1092,33 @@ export function normaliserVote(row: InventoryRow, parsed: ParsedSoftware, cands:
   return nullVote(b.confidence);
 }
 
+/**
+ * Why a row that matched a vendor-named KEV product may be another product of that brand, or another company's product
+ * of the same name: the main text names a different vendor ("Sudo for Windows" is Microsoft's), or the row has product
+ * words the KEV name does not account for ("runner" in "GitLab Runner", "ui" in "jQuery UI", "lfs" in "Git LFS", "x" in
+ * "Jenkins X", "desktop client" in "ownCloud desktop client"). Not counted: words of the same family's other KEV
+ * spellings in the candidate list ("ce" in "GitLab CE", "cli" in "Jenkins CLI", "mta" in "Exim MTA"), the vendor's names,
+ * edition and packaging words (SAME_PRODUCT_WORDS), "v" and anything with a digit (versions, builds). Returns the reason,
+ * or null when the match stands. Only vendor-named entries are checked: their name is a brand, so a longer name built on
+ * it is a different product as often as not, and KEV lists the brand's own product only.
+ */
+function eponymousDoubt(ctx: InvCtx, pick: Candidate, list: Candidate[]): string | null {
+  const info = kevInfo(pick);
+  if (!info.eponymous) return null;
+  if (ctx.mainVendor && ctx.mainVendor !== info.vNorm) return `the row names another vendor (${ctx.mainVendor})`;
+  const known = new Set<string>();
+  for (const c of list) {
+    const ci = kevInfo(c);
+    if (!ci.families.includes(info.family)) continue;
+    for (const part of ci.parts) for (const t of part.tokens) known.add(t);
+    for (const t of [...ci.vendorTokens, ...canonicalTokens(c.vendor)]) known.add(t);
+  }
+  // the vendor's other KEV names ("PHP Group" for PHP), whose spellings topCandidates may have folded into one
+  for (const [alias, to] of Object.entries(VENDOR_ALIASES)) if (to === info.vNorm) for (const t of canonicalTokens(alias)) known.add(t);
+  const extra = ctx.words.filter((w) => !known.has(w) && !SAME_PRODUCT_WORDS.has(w) && w !== "v" && !/\d/.test(w));
+  return extra.length ? `words beyond the KEV name: ${extra.join(" ")}` : null;
+}
+
 /** One reading of the candidates for a row of a given type: a pick (with its confidence), or a null vote's confidence. */
 function ballot(ctx: InvCtx, list: Candidate[], asset: AssetContext): { pick: Candidate | null; kevType: ProductType; confidence: number } {
   const none = (confidence: number) => ({ pick: null, kevType: "unknown" as ProductType, confidence });
@@ -1023,12 +1137,17 @@ function ballot(ctx: InvCtx, list: Candidate[], asset: AssetContext): { pick: Ca
     const rival = ok.find((x) => !sameProduct(x.s, best.s));
     const margin = best.s.score - (rival ? rival.s.score : 0);
     if (margin < T.margin_min) return none(CONF_ABSTAIN);
+    // a vendor-named product the row may only be a neighbour of ("GitLab Runner", "Sudo for Windows"): unsure
+    if (eponymousDoubt(ctx, best.c, list)) return none(CONF_ABSTAIN);
     const confidence = Math.min(0.95,
       0.55 + 0.25 * clamp01((best.s.score - T.match_min) / (1 - T.match_min)) + 0.15 * clamp01(margin / 0.3));
     return { pick: best.c, kevType: best.s.kevType, confidence: round(confidence, 2) };
   }
   const bestOk = best ? best.s.score : 0;
   if (bestOk >= T.no_match_max) return none(CONF_ABSTAIN);
+  // a vague KEV entry that resembles the row ("Microsoft / Microsoft", "<vendor> / Multiple Products") may list the
+  // row's product under that name: unsure, never a confident "no KEV product"
+  if (scored.some((x) => x.s.vague && x.s.name >= T.lookalike_name_min)) return none(CONF_ABSTAIN);
   const near = scored.filter((x) => x.blocked && !x.s.vague && x.s.name >= T.lookalike_name_min);
   // the asset column contradicts the best name match (vCenter on a laptop): unsure, not "no match"
   if (near.some((x) => x.s.typeRel !== "conflict")) return none(CONF_ABSTAIN);

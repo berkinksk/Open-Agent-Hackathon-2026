@@ -650,3 +650,96 @@ test("one-word spellings of Ivanti's gateways read as the KEV names (integration
   assert.ok(canonicalTokens("PolicySecure NAC").includes("policy"));
   assert.equal(parseSoftware("ConnectSecure 22.7R2 (remote access)").vendor_hint, "Ivanti");
 });
+
+test("vendor-named KEV entries: an eponymous product is specific; an umbrella company's own name stays vague (sample-mode finding)", () => {
+  // real KEV spellings (catalog 2026.10.23), added to the fixture inline
+  const extra: KevPair[] = [
+    { vendor: "OpenSSL", product: "OpenSSL" }, { vendor: "Samba", product: "Samba" }, { vendor: "Notepad++", product: "Notepad++" },
+    { vendor: "Jenkins", product: "Jenkins" }, { vendor: "Jenkins", product: "Jenkins Command Line Interface (CLI)" },
+    { vendor: "Jenkins", product: "Jenkins Stapler Web Framework" }, { vendor: "Jenkins", product: "Jenkins User Interface (UI)" },
+    { vendor: "Jenkins", product: "Script Security Plugin" },
+    { vendor: "Exim", product: "Exim" }, { vendor: "Exim", product: "Exim Internet Mailer" }, { vendor: "Exim", product: "Mail Transfer Agent (MTA)" },
+    { vendor: "GitLab", product: "GitLab" }, { vendor: "GitLab", product: "GitLab CE/EE" }, { vendor: "GitLab", product: "Community and Enterprise Editions" },
+    { vendor: "PHP", product: "PHP" }, { vendor: "PHP Group", product: "PHP" }, { vendor: "Langflow", product: "Langflow" }, { vendor: "IBM", product: "Langflow" },
+  ];
+  const all = [...PAIRS, ...extra];
+  assert.equal(fam("OpenSSL", "OpenSSL"), "openssl:openssl");
+  assert.equal(fam("Notepad++", "Notepad++"), "notepad++:notepad++");
+  assert.equal(fam("Microsoft", "Microsoft"), "microsoft:multiple-products");
+  assert.equal(fam("Apache", "Apache"), "apache:multiple-products");
+  for (const p of ["Jenkins Command Line Interface (CLI)", "Jenkins Stapler Web Framework", "Jenkins User Interface (UI)"]) assert.equal(fam("Jenkins", p), "jenkins:jenkins", p);
+  assert.notEqual(fam("Jenkins", "Script Security Plugin"), "jenkins:jenkins", "a plugin is its own product");
+  for (const p of ["Exim Internet Mailer", "Mail Transfer Agent (MTA)"]) assert.equal(fam("Exim", p), "exim:exim", p);
+  for (const p of ["GitLab CE/EE", "Community and Enterprise Editions"]) assert.equal(fam("GitLab", p), "gitlab:gitlab", p);
+  assert.equal(fam("PHP Group", "PHP"), fam("PHP", "PHP"));
+  assert.equal(fam("IBM", "Langflow"), fam("Langflow", "Langflow"));
+
+  const vote = (software: string, asset_type = "server") => {
+    const parsed = parseSoftware(software);
+    return normaliserVote(row(software, asset_type), parsed, topCandidates(parsed, all));
+  };
+  for (const [software, family, asset] of [
+    ["OpenSSL 1.0.1f", "openssl:openssl", "server"], ["Samba 4.5.9", "samba:samba", "server"], ["Notepad++ 8.6.2", "notepad++:notepad++", "laptop"],
+    ["Jenkins 2.440", "jenkins:jenkins", "server"], ["Exim 4.92", "exim:exim", "server"], ["GitLab 16.0", "gitlab:gitlab", "server"], ["PHP 8.1.2", "php:php", "server"],
+  ] as const) {
+    const v = vote(software, asset);
+    assert.equal(voteKind(v), "match", software);
+    assert.equal(voteFamily(v), family, software);
+  }
+  assert.equal(pairsMentioning("jenkins:jenkins", all).length, 4, "Jenkins core: the product and its CLI, UI and web framework");
+  assert.equal(pairsMentioning("php:php", all).length, 2, "both vendor spellings of PHP");
+  // a row that resembles a vague entry is unsure, never a confident "no KEV product"
+  assert.equal(voteKind(vote("Fortinet Multiple Products 7.0")), "abstain");
+  assert.equal(voteKind(vote("Microsoft Teams", "laptop")), "no_match", "software KEV does not list stays a confident no-match");
+});
+
+test("vendor-named KEV entries: an exact brand name only; a neighbouring product or another vendor's is never matched (sample-mode review, round 2)", () => {
+  // real KEV spellings (catalog 2026.10.23), added to the fixture inline; KEV lists none of the look-alike products below
+  const extra: KevPair[] = [
+    { vendor: "OpenSSL", product: "OpenSSL" }, { vendor: "OpenBSD", product: "OpenSMTPD" }, { vendor: "Samba", product: "Samba" },
+    { vendor: "GitLab", product: "GitLab" }, { vendor: "GitLab", product: "GitLab CE/EE" }, { vendor: "GitLab", product: "Community and Enterprise Editions" },
+    { vendor: "PHP", product: "PHP" }, { vendor: "PHP Group", product: "PHP" }, { vendor: "PHP", product: "PHPMailer" },
+    { vendor: "JQuery", product: "JQuery" }, { vendor: "Git", product: "Git" }, { vendor: "Sudo", product: "Sudo" },
+    { vendor: "Jenkins", product: "Jenkins" }, { vendor: "Jenkins", product: "Jenkins Command Line Interface (CLI)" },
+    { vendor: "Jenkins", product: "Jenkins User Interface (UI)" }, { vendor: "ownCloud", product: "ownCloud" },
+    { vendor: "Exim", product: "Exim" }, { vendor: "Exim", product: "Mail Transfer Agent (MTA)" },
+    { vendor: "BeyondTrust", product: "Remote Support (RS) and Privileged Remote Access (PRA)" },
+  ];
+  const all = [...PAIRS, ...extra];
+  const vote = (software: string, asset_type = "server") => {
+    const parsed = parseSoftware(software);
+    return normaliserVote(row(software, asset_type), parsed, topCandidates(parsed, all));
+  };
+  // a one-letter neighbour of a brand is another product, not a typo: a confident "no KEV product", as before the
+  // vendor-named entries became specific
+  for (const raw of ["OpenSSH 9.6p1", "OpenSSH for Windows 9.5"]) {
+    const v = vote(raw);
+    assert.equal(voteKind(v), "no_match", raw);
+    const ssl = topCandidates(parseSoftware(raw), all).find((c) => c.product === "OpenSSL");
+    assert.ok(!ssl || ssl.score < NORMALISER_THRESHOLDS.no_match_max, `${raw}: OpenSSL gets no typo credit (${ssl?.score})`);
+  }
+  // another product built on the brand's name, or another vendor's product of that name: unsure (ask the owner)
+  for (const [raw, asset] of [
+    ["GitLab Runner 16.0", "server"], ["PHP Composer 2.6", "server"], ["jQuery UI 1.12.1", "server"], ["jQuery Migrate 3.4", "server"],
+    ["Git LFS 3.4", "laptop"], ["Sudo for Windows", "laptop"], ["sudo-rs 0.2", "server"], ["Jenkins X", "server"], ["Jenkins X 3.10", "server"],
+    ["ownCloud desktop client 4.0", "laptop"],
+  ] as const) {
+    const v = vote(raw, asset);
+    assert.equal(voteKind(v), "abstain", `${raw}: never a confident match (got ${v.vendor}/${v.product} ${v.confidence})`);
+  }
+  // the brand's own product still matches: bare, versioned, with an edition, release-track or packaging word, with a word
+  // of another KEV spelling of the same family ("CE", "CLI", "MTA"), the vendor's other KEV name, or a vendor in a note
+  for (const [raw, family] of [
+    ["OpenSSL 1.0.1f", "openssl:openssl"], ["OpenSSL 1.1.x", "openssl:openssl"], ["openssl 3.0.2-0ubuntu1.10", "openssl:openssl"],
+    ["OpenSSL 1.1.1k (bundled in Apache 2.4)", "openssl:openssl"], ["Samba 4.5.9", "samba:samba"], ["Samba server 4.5.9", "samba:samba"],
+    ["Jenkins 2.440", "jenkins:jenkins"], ["Jenkins LTS 2.440", "jenkins:jenkins"], ["Jenkins CLI 2.440", "jenkins:jenkins"],
+    ["GitLab 16.0", "gitlab:gitlab"], ["GitLab CE 16.0", "gitlab:gitlab"], ["Exim MTA 4.92", "exim:exim"], ["PHP 8.1.2", "php:php"],
+    ["PHP Group PHP 8.1", "php:php"], ["jQuery 3.4.1", "jquery:jquery"], ["Git 2.39.1", "git:git"], ["Sudo 1.9.5p2", "sudo:sudo"],
+  ] as const) {
+    const v = vote(raw);
+    assert.equal(voteKind(v), "match", raw);
+    assert.equal(voteFamily(v), family, raw);
+  }
+  // typo credit stays for every other KEV name
+  assert.equal(voteFamily(vote("Exchnage Server 2016")), "microsoft:exchange-server");
+});
