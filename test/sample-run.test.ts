@@ -355,3 +355,33 @@ test("the CLI runs sample mode with an empty environment (no .env, no Zetaris, n
     rmSync(TMP, { recursive: true, force: true });
   }
 });
+
+test("glued 'Windows11' and 'Win Server/Svr' rows offline: Microsoft / Windows like their spaced form, never monitor or 'no KEV product'", async () => {
+  const id = `test-sample-winspell-${process.pid}`;
+  const pairs: [string, string, string][] = [
+    ["Windows11 Home", "Windows 11 Home", "laptop"],
+    ["Windows10 Enterprise 21H2", "Windows 10 Enterprise 21H2", "desktop"],
+    ["Win Server 2016 Std (file share)", "Windows Server 2016 Std (file share)", "server"],
+    ["MS Win Svr 2012 R2", "MS Windows Svr 2012 R2", "server"],
+    ["Windows11Pro", "Windows 11 Pro", "laptop"],
+    ["WinServer 2022 Std", "Windows Server 2022 Std", "server"],
+  ];
+  const rows = pairs.flatMap(([glued, spaced, asset_type], i) => [glued, spaced].map((software, j) => ({
+    row_id: `WS${i}${j ? "s" : "g"}`, asset_id: `ws${i}`, asset_name: `ws${i}`, asset_type, internet_facing: false, owner_team: "IT", software,
+  }))) as InventoryRow[];
+  const res = await withNetworkGuard(() => runWith({ run_id: id, inventory: rows }, sampleDeps(id), { outputDir: null, logsDir: null }));
+  assert.equal(res.status, "success");
+  assert.equal(res.receipts.length, 0, "no model call");
+  const by = new Map(res.lines.map((l) => [l.row_id, l]));
+  pairs.forEach(([glued, spaced], i) => {
+    const g = by.get(`WS${i}g`)!;
+    const s = by.get(`WS${i}s`)!;
+    assert.equal(g.resolution.status, "matched", glued);
+    assert.equal(g.resolution.family, "microsoft:windows", glued);
+    assert.equal(g.resolution.product_type, "os", glued);
+    assert.notEqual(g.decision, "monitor", `${glued}: KEV lists Windows, never monitor`);
+    assert.doesNotMatch(g.why, /no CISA KEV product/i, glued);
+    assert.equal(g.decision, s.decision, `${glued} is decided like ${spaced}`);
+    assert.equal(g.critic?.rubric.total, s.critic?.rubric.total, `${glued}: the same rubric as ${spaced}`);
+  });
+});

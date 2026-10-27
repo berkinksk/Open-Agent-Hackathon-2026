@@ -504,9 +504,22 @@ interface RowParts {
   product_hint: string; tokens: string[];
 }
 
+/**
+ * Windows written as one word with its number ("Windows11", "WINDOWS8.1"), with its edition too ("Windows11Pro",
+ * "Win10Enterprise"), or as "Win" before a server word ("Win Server", "Win Svr", "win-srv", "WinServer"): spelled out
+ * ("Windows 11 Pro", "Windows Server"), so the row parses exactly like its spaced form (Microsoft, an os, the Windows
+ * family). Only edition names are split off: "Windows11Toolkit" stays as written. "Win 10" and "Win11" are read by the
+ * patterns themselves; "WinSCP", "Darwin" and "Twin Server" are not Windows.
+ */
+const GLUED_EDITION = /\b(win(?:dows)? ?(?:7|8\.1|8|10|11))(home|pro|professional|enterprise|education|ultimate|starter|business|ltsc|ltsb|iot)\b/gi;
+const GLUED_WINDOWS = /\b(windows)(7|8|10|11)\b/gi;
+const WIN_SERVER = /\bwin(?:[ -](?=(?:server|svr|srv)\b)|(?=server\b))/gi;
+const spellOutWindows = (s: string): string =>
+  s.replace(GLUED_EDITION, "$1 $2").replace(GLUED_WINDOWS, "$1 $2").replace(WIN_SERVER, "Windows ");
+
 /** The pieces of one inventory string: main text (no version, noise or notes), notes, version, vendor, hint, tokens. */
 function splitRow(raw: string): RowParts {
-  const text = cleanText(raw);
+  const text = spellOutWindows(cleanText(raw));
   const { main: withVersion, context } = splitContext(text);
 
   let { version, rest } = extractVersion(withVersion);

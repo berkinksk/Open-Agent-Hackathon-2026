@@ -833,3 +833,85 @@ test("a KEV vendor whose KEV product name is only generic words (WordPress / Cor
   assert.equal(control.vendor, null);
   assert.ok(control.confidence >= NORMALISER_THRESHOLDS.no_match_confidence_min);
 });
+
+// Windows written as one word with its number, or "Win" before a server word (post-test fix, 27 Oct; new strings only,
+// none of them an inventory row): the row must parse exactly like its spaced form.
+const SPELLED_OUT: [string, string][] = [
+  ["Windows11 Home", "Windows 11 Home"],
+  ["Windows10 Enterprise 21H2", "Windows 10 Enterprise 21H2"],
+  ["MS Windows7 SP1", "MS Windows 7 SP1"],
+  ["WINDOWS8.1 Pro (kiosk)", "WINDOWS 8.1 Pro (kiosk)"],
+  ["Microsoft Windows11 Education 24H2", "Microsoft Windows 11 Education 24H2"],
+  ["Win Server 2016 Std (file share)", "Windows Server 2016 Std (file share)"],
+  ["MS Win Svr 2012 R2", "MS Windows Svr 2012 R2"],
+  ["Win Srv 2008 R2 SP1 (legacy DC)", "Windows Srv 2008 R2 SP1 (legacy DC)"],
+  ["Win-Server 2019 Essentials", "Windows Server 2019 Essentials"],
+  ["Citrix Workspace app for Windows10", "Citrix Workspace app for Windows 10"],
+  ["Sudo for Windows11", "Sudo for Windows 11"],
+  // the edition glued on as well, and "WinServer" as one word
+  ["Windows11Pro", "Windows 11 Pro"],
+  ["Windows10Enterprise", "Windows 10 Enterprise"],
+  ["Windows11Home", "Windows 11 Home"],
+  ["Win11Pro", "Win11 Pro"],
+  ["WINDOWS10LTSC (kiosk)", "WINDOWS 10 LTSC (kiosk)"],
+  ["Windows8.1Pro", "Windows 8.1 Pro"],
+  ["WinServer 2022 Std", "Windows Server 2022 Std"],
+  ["MS WinServer 2012 R2 (print)", "MS Windows Server 2012 R2 (print)"],
+];
+
+test("glued 'Windows11' and 'Win Server/Svr/Srv' parse exactly like the spaced form: hint, type, tokens, candidates, vote", () => {
+  for (const [glued, spaced] of SPELLED_OUT) {
+    const g = resolve(glued);
+    const s = resolve(spaced);
+    const { raw: _g, ...gp } = g.parsed;
+    const { raw: _s, ...sp } = s.parsed;
+    assert.deepEqual(gp, sp, `${glued} parses like ${spaced}`);
+    assert.deepEqual(g.cands, s.cands, `${glued}: the same candidates`);
+    assert.deepEqual(g.vote, s.vote, `${glued}: the same vote`);
+  }
+  assert.equal(parseSoftware("Windows11 Home").product_hint, "Windows 11 Home");
+  assert.equal(parseSoftware("MS Win Svr 2012 R2").product_hint, "Windows Svr");
+});
+
+test("glued 'Windows10/11/7' and 'Win Server/Svr/Srv' vote Microsoft / Windows as an os (never 'no KEV product')", () => {
+  const rows: [string, string][] = [
+    ["Windows11 Home", "laptop"], ["Windows10 Enterprise 21H2", "desktop"], ["MS Windows7 SP1", "desktop"],
+    ["Win Server 2016 Std (file share)", "server"], ["MS Win Svr 2012 R2", "server"], ["win srv 2019 datacenter", "server"],
+    ["Windows11Pro", "laptop"], ["Windows10Enterprise", "desktop"], ["Windows11Home", "laptop"], ["WinServer 2022 Std", "server"],
+  ];
+  for (const [sw, asset] of rows) {
+    const { parsed, vote } = resolve(sw, asset);
+    assert.equal(parsed.vendor_hint, "Microsoft", sw);
+    assert.equal(parsed.product_type, "os", `${sw} is an operating system, not an application server`);
+    assert.equal(voteKind(vote), "match", `${sw}: ${JSON.stringify(vote)}`);
+    assert.equal(voteFamily(vote), "microsoft:windows", sw);
+    assert.equal(vote.product_type, "os", sw);
+  }
+});
+
+test("Windows spelling fix: look-alike words and the spellings read before are unchanged", () => {
+  for (const sw of ["Darwin Server 3.0", "Twin Server Pro", "Edwin Server 2.0", "WinSCP 6.1"]) {
+    const { parsed, vote } = resolve(sw);
+    assert.notEqual(parsed.vendor_hint, "Microsoft", sw);
+    assert.notEqual(parsed.product_type, "os", sw);
+    assert.notEqual(voteFamily(vote), "microsoft:windows", sw);
+  }
+  // a product named after Windows is not split: only an edition name after the number is ("Windows11Pro")
+  for (const [sw, hint] of [["Windows11Toolkit 2.3", "Windows11Toolkit"], ["Windows10Debloater", "Windows10Debloater"],
+    ["Windows11ProTools", "Windows11ProTools"], ["WinServerManager 3", "WinServerManager 3"]]) {
+    const { parsed, vote } = resolve(sw, "laptop");
+    assert.equal(parsed.product_hint, hint, `${sw} stays as written`);
+    assert.notEqual(parsed.product_type, "os", sw);
+    assert.notEqual(voteFamily(vote), "microsoft:windows", sw);
+  }
+  // "Win 10" and "Win11" were already read by the patterns themselves: their hint stays as written
+  for (const [sw, hint] of [["Win 11 Pro", "Win 11 Pro"], ["Win10 Enterprise", "Win10 Enterprise"]]) {
+    const { parsed, vote } = resolve(sw, "laptop");
+    assert.equal(parsed.product_hint, hint, sw);
+    assert.equal(parsed.product_type, "os", sw);
+    assert.equal(voteFamily(vote), "microsoft:windows", sw);
+  }
+  // a product for Windows stays that product
+  assert.equal(voteFamily(resolve("Citrix Workspace app for Windows10", "laptop").vote), "citrix:workspace-app");
+  assert.equal(resolve("Sudo for Windows11").vote.vendor, null, "Microsoft's Sudo for Windows is not the Sudo project's product");
+});
