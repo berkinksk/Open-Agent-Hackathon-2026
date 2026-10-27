@@ -14,6 +14,9 @@
     "verify:engine": "node --experimental-transform-types --no-warnings scripts/verify-engine.ts",
     "verify": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/verify.ts",
     "eval": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/eval.ts",
-    "snapshot": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/snapshot.ts"
+    "snapshot": "node --experimental-transform-types --no-warnings --env-file-if-exists=.env scripts/snapshot.ts",
+    "convert-inventory": "node --experimental-transform-types --no-warnings scripts/convert-inventory.ts",
+    "pick-test-rows": "node --experimental-transform-types --no-warnings scripts/pick-test-rows.ts",
+    "compare-answers": "node --experimental-transform-types --no-warnings scripts/compare-answers.ts"
   }
 }
