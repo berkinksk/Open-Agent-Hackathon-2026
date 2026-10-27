@@ -1,0 +1,31 @@
+Meterless World Model reference implementation (vendored copy)
+
+Source:   https://github.com/Meterless/Meterless
+Commit:   1742dec56a66e58eef9dda2d2b865823758ca8cd (1742dec, 19 Oct 2026)
+Path:     engines/world-model/
+Licence:  Apache License 2.0 (see LICENSE in this directory)
+
+Files copied, byte for byte and unmodified, keeping the upstream layout so
+the official conformance runner's relative paths still work:
+
+  LICENSE
+  conformance/README.md
+  conformance/runner.ts
+  reference/scripts/idempotency-check.ts
+  reference/src/index.ts
+  reference/src/ingest.ts
+  reference/src/resolve.ts
+  reference/src/stableIds.ts
+  reference/src/store.ts
+  reference/src/types.ts
+
+SHA256SUMS lists the SHA-256 of each copied file; scripts/verify-engine.ts
+checks them, so any local edit to the vendored code is detected.
+
+Not copied: node_modules, package.json, tests, docs, examples, the control
+plane and the browser bundle scripts. The files run with no install, using
+Node 25's built-in TypeScript support:
+  node --experimental-transform-types --no-warnings <file>.ts
+
+Our own wrapper lives one level up, in src/engine/index.ts. It is not part
+of the upstream project.
