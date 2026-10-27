@@ -123,8 +123,12 @@ export interface Assessment { line: PatchLine; owner: OwnerQuestion | null; }
 
 const JUROR_NAMES: Record<JurorVote["juror"], string> = { bolt: "Bolt", lightning: "Lightning", ultra: "Ultra", normaliser: "the normaliser" };
 
-function productLabel(vendor: string | null, product: string | null): string {
-  return `${cleanName(vendor ?? "")} ${cleanName(product ?? "")}`.trim();
+/** "Vendor Product", with the vendor named once when the product name already starts with it ("Jenkins / Jenkins" -> "Jenkins"). */
+export function productLabel(vendor: string | null, product: string | null): string {
+  const v = cleanName(vendor ?? "");
+  const p = cleanName(product ?? "");
+  const repeats = v !== "" && p.toLowerCase().startsWith(v.toLowerCase()) && !/[\p{L}\p{N}]/u.test(p.charAt(v.length));
+  return (repeats ? p : `${v} ${p}`).trim();
 }
 
 /** One clause of error text: single line, inner sentence breaks turned into semicolons, at most 120 chars. */

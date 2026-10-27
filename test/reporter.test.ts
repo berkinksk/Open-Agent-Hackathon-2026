@@ -72,6 +72,24 @@ test("monitor: no KEV match, and matched without a KEV entry", () => {
   assert.match(quiet, /^Apache Tomcat matched this row, but KEV lists no exploited CVE for it\. Review it again by 2027-01-24/);
 });
 
+test("a KEV product name that already starts with its vendor names the vendor once (PHP / PHP is 'PHP', not 'PHP PHP')", () => {
+  const base = assessRow(row("R1", "PHP 8.1.2"), res("no_match"), ctx()).line;
+  const named = (vendor: string, product: string): string =>
+    whyFor({ ...base, resolution: res("matched", vendor, product) }, null, DEFAULT_POLICY).replace(/ matched this row, .*$/, "");
+  assert.equal(named("PHP", "PHP"), "PHP");
+  assert.equal(named("Notepad++", " Notepad++ "), "Notepad++");
+  assert.equal(named("Roundcube", "Roundcube Webmail"), "Roundcube Webmail");
+  assert.equal(named("jenkins", "Jenkins"), "Jenkins");
+  // a product that does not start with the whole vendor word keeps the vendor
+  assert.equal(named("Apache", "Tomcat"), "Apache Tomcat");
+  assert.equal(named("Fortinet", "FortiOS"), "Fortinet FortiOS");
+  assert.equal(named("SAP", "SAPgui"), "SAP SAPgui");
+  // the confirmed "why" reads "PHP 8.1.2"
+  const c = ctx({ kevByFamily: new Map([[familyKey("PHP PHP"), [kev("CVE-2024-4577", "PHP", "PHP", "2024-06-12", "2024-07-03")]]]) });
+  const line = assessRow(row("R1", "PHP 8.1.2"), res("matched", "PHP", "PHP"), c).line;
+  assert.match(whyConfirmed(line, DEFAULT_POLICY, { version: "8.1.2" }), /^NVD places PHP 8\.1\.2 inside the affected range of CVE-2024-4577, /);
+});
+
 test("ask_owner after an incomplete KEV read says so, in two sentences", () => {
   const { text } = why("Tomcat 9", res("matched", "Apache", "Tomcat"));
   assert.ok(sentences(text) <= 2, text);

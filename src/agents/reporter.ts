@@ -14,9 +14,15 @@ function sentence(s: string): string {
   return /[.?!]$/.test(t) ? t : `${t}.`;
 }
 
+/** "Vendor Product", with the vendor named once when KEV's product name already starts with it ("PHP / PHP" -> "PHP"). */
 function productName(line: PatchLine): string {
   const r = line.resolution;
-  return `${cleanName(r.vendor ?? "")} ${cleanName(r.product ?? "")}`.trim() || "This product";
+  const vendor = cleanName(r.vendor ?? "");
+  const product = cleanName(r.product ?? "");
+  const v = vendor.toLowerCase();
+  const p = product.toLowerCase();
+  const repeats = v !== "" && p.startsWith(v) && !/[\p{L}\p{N}]/u.test(p.charAt(v.length));
+  return (repeats ? product : `${vendor} ${product}`).trim() || "This product";
 }
 
 function dueClause(due: string, overdue: number | null): string {

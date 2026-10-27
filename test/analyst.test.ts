@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { DEFAULT_POLICY } from "../src/contracts.ts";
 import type { EpssScore, InventoryRow, KevEntry, PatchLine, Resolution } from "../src/contracts.ts";
 import {
-  addDays, assessRow, citeKev, dayDiff, isIsoDate, MAX_CITED_KEV, maxEpss, mergePolicy, PolicyError, scopeKevToVersion, sortLines, summarise,
+  addDays, assessRow, citeKev, dayDiff, isIsoDate, MAX_CITED_KEV, maxEpss, mergePolicy, PolicyError, productLabel, scopeKevToVersion, sortLines, summarise,
 } from "../src/policy/analyst.ts";
 import type { AnalystContext } from "../src/policy/analyst.ts";
 import { familyKey } from "../src/resolve/candidates.ts";
@@ -315,4 +315,14 @@ describe("scopeKevToVersion: a line cites the KEV CVEs NVD does not rule out for
     assert.ok(!out.line.evidence.some((e) => e.field === "kev_cves_not_version_checked"));
     assert.match(out.line.evidence.find((e) => e.field === "kev_basis")?.value ?? "", /not version-checked/);
   });
+});
+
+test("productLabel names the vendor once when the product already starts with it", () => {
+  assert.equal(productLabel("Jenkins", "Jenkins"), "Jenkins");
+  assert.equal(productLabel("PHP", "PHP"), "PHP");
+  assert.equal(productLabel("OpenSSL", "OpenSSL"), "OpenSSL");
+  assert.equal(productLabel("Microsoft", "Microsoft Exchange"), "Microsoft Exchange");
+  assert.equal(productLabel("Apache", "Log4j2"), "Apache Log4j2");
+  assert.equal(productLabel("Ivanti", "Ivantium Gateway"), "Ivanti Ivantium Gateway");
+  assert.equal(productLabel(null, null), "");
 });
