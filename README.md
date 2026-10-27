@@ -227,6 +227,7 @@ The models run in NVIDIA's cloud, reached through Nightshift. The receipts show 
 - **For live mode:**
   - Zetaris running locally in Docker (REST API at `http://localhost:8888/api/v1.0`), with an API key and org ID;
   - the Meterless Nightshift app open (`http://127.0.0.1:8088/v1`), with your NVIDIA API key in its Providers tab and a runtime token from its Console.
+  - **How to install them:** follow the organisers' *Participant Setup Guide* (HackOS Resource Center): Zetaris in "Data" §1.1–1.9, Nightshift and the NVIDIA provider in "Power" §4.2–4.6. Public references: Zetaris's getting-started instructions (https://github.com/zetaris/getting-started/blob/main/README.md) and the Nightshift download (the install cards at the bottom of https://meterless.ai).
 - **For sample mode:** nothing else. No Zetaris, no Nightshift, no network.
 - Docker is optional (§7).
 
@@ -359,11 +360,13 @@ The three outputs are **real runs**, made live (Zetaris + Nightshift) with `npm 
 
 "Re-checked" counts the lines whose cited KEV and EPSS values the verifier compared with fresh Zetaris reads. A line that cites none (a "no KEV product" line) has nothing to re-check and is counted apart.
 
+All three inputs are synthetic: example 1 picks rows of the synthetic inventory; examples 2 and 3 are rows we made up.
+
 | Input | What it shows | Result (live) |
 |---|---|---|
 | [`example_1.json`](input_examples/example_1.json): 12 rows of the registered inventory, by `row_ids` | the inventory read through Zetaris; discovery and the plain SQL join (9 of 12 hit, 3 of them look-alikes); jury splits decided by Ultra (Veeam Agent is not Veeam Backup & Replication; a Windows Server "mail host" is Windows, not Exchange Server; after the split and with no build number it scores 6/9 and goes to the owner); the critic catching a cloud look-alike (Word Online, sent to the owner after two re-decides); lines whose cited KEV CVEs follow NVD's per-CVE check (Tomcat and Exchange drop the CVEs NVD rules out; HTTP Server 2.4.49 keeps CVE-2021-41773, due 2021-11-17); fail-closed `patch_now` with version questions | 30.3 s · 7 patch_now / 0 this_cycle / 3 monitor / 2 ask_owner · 9 model calls (Bolt 2, Lightning 3, Ultra 4) · 9 re-checked + 3 with nothing to re-check |
-| [`example_2.json`](input_examples/example_2.json): 6 rows of your own, with all fields | rows that are not in the bundled inventory, joined in Zetaris as an inline `VALUES` table; a one-letter look-alike (OpenSSH, not OpenSSL) → no KEV product; KEV and EPSS disagreeing (Notepad++: KEV-listed, EPSS 0.018) | 24.0 s · 5 / 0 / 1 / 0 · 2 model calls · 5 re-checked + 1 with nothing to re-check |
-| [`example_3.json`](input_examples/example_3.json): 6 rows with only `software`, plus a policy override (`patch_now` within 3 days) | the minimal input; 2026 KEV entries (WordPress, Roundcube, MikroTik RouterOS, SolarWinds Web Help Desk); a cloud look-alike (SharePoint Online) sent back and corrected | 19.6 s · 4 / 0 / 2 / 0 · 4 model calls (Ultra 1) · 4 re-checked + 2 with nothing to re-check |
+| [`example_2.json`](input_examples/example_2.json): 6 made-up rows (not in the bundled inventory), with all fields | rows that are not in the bundled inventory, joined in Zetaris as an inline `VALUES` table; a one-letter look-alike (OpenSSH, not OpenSSL) → no KEV product; KEV and EPSS disagreeing (Notepad++: KEV-listed, EPSS 0.018) | 24.0 s · 5 / 0 / 1 / 0 · 2 model calls · 5 re-checked + 1 with nothing to re-check |
+| [`example_3.json`](input_examples/example_3.json): 6 made-up rows with only `software`, plus a policy override (`patch_now` within 3 days) | the minimal input; 2026 KEV entries (WordPress, Roundcube, MikroTik RouterOS, SolarWinds Web Help Desk); a cloud look-alike (SharePoint Online) sent back and corrected | 19.6 s · 4 / 0 / 2 / 0 · 4 model calls (Ultra 1) · 4 re-checked + 2 with nothing to re-check |
 
 Each output has three files: `example_N.json` (the `RunResponse`), `example_N.trace.jsonl` (the trace) and `example_N.report.html` (the report). Inside `example_N.json`, the `trace_file` and `report_file` fields keep the paths the run wrote (`logs/trace-example-N.jsonl`, `output/report-example-N.html`); the committed copies of those two files are `output_examples/example_N.trace.jsonl` and `output_examples/example_N.report.html`.
 
@@ -421,6 +424,8 @@ npm run verify           # env, Zetaris SELECT 1, Nightshift /v1/models (all 3 p
 | `EL_PREFIX` | `EL_` | prefix of every Zetaris object the app creates |
 | `INVENTORY_URL` | the public data repo's `data/inventory.json` | the inventory file Zetaris reads |
 | `EL_NVD_BUDGET_S` | `60` | seconds of NVD lookups per run (NVD's keyless rate limit makes a first lookup slow) |
+
+There is no `METERLESS_MODEL` setting (the organisers' example uses the `meterless/auto` routing mode): the three Nemotron model IDs are pinned in `src/contracts.ts`, so every receipt shows the pinned model that answered.
 
 The npm scripts load `.env` automatically (`node --env-file-if-exists=.env`). For Docker, use `.env.docker.example`. **The policy** is in [`config/policy.json`](config/policy.json) (EPSS thresholds, target days, the rubric minimum, the critic's rounds) and can be overridden per run with `RunRequest.policy`.
 

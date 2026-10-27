@@ -1,0 +1,74 @@
+{
+  "project": "ExposureLedger",
+  "summary": "Agents that turn a small organisation's messy software list into a dated, evidence-backed patch list.",
+  "track": "Solving Fragmented Intelligence",
+  "team": {
+    "name": "Megatron's Interns",
+    "members": [
+      {
+        "name": "Mohd Amir Suhel",
+        "github": "Amir-007",
+        "role": "team lead"
+      },
+      {
+        "name": "Thant Zaw Latt",
+        "github": "Z-a-w-L-a-t-t"
+      },
+      {
+        "name": "Berkin Kaynar",
+        "github": "berkinksk"
+      }
+    ]
+  },
+  "sponsor_technology": {
+    "zetaris": {
+      "role": "data layer for all four sources (synthetic inventory, CISA KEV, FIRST EPSS, NIST NVD), registered as REST tables and views and queried with SQL through the Zetaris REST API",
+      "where": [
+        "src/adapters/zetaris.ts",
+        "src/adapters/queries.ts",
+        "scripts/setup.ts",
+        "README.md section 5"
+      ]
+    },
+    "meterless_engines": [
+      {
+        "engine": "World Model",
+        "source": "github.com/Meterless/Meterless at commit 1742dec, engines/world-model (Apache-2.0), vendored unmodified",
+        "features": [
+          "provenance block on every patch line",
+          "memory across runs (Since the last run; kept target dates)",
+          "merge-review queue for near-duplicate KEV names",
+          "audit log"
+        ],
+        "where": [
+          "src/engine/world-model/",
+          "src/engine/index.ts",
+          "src/pipeline/memory.ts"
+        ],
+        "test": "npm run verify:engine (official conformance runner 8/8, idempotency check, --mutate check, vendored files unmodified)"
+      }
+    ],
+    "meterless_nightshift": {
+      "role": "the only AI provider: every model call goes to Nightshift's OpenAI-compatible endpoint with a pinned Nemotron model ID, and each call's receipt (routed model, receipt ID) is logged",
+      "where": [
+        "src/adapters/nightshift.ts"
+      ]
+    },
+    "nvidia": {
+      "models": {
+        "nvidia/nemotron-3.5-bolt-e4b": "first juror on every row",
+        "nvidia/nemotron-3.5-lightning-30b-a3b": "second juror; first re-decide of a row the critic sends back",
+        "nvidia/nemotron-3-ultra-550b-a55b": "decides jury splits; critiques contested matches; same-product check; second re-decide"
+      },
+      "evidence": "every model call in logs/trace-<run_id>.jsonl and in RunResponse.receipts carries the requested model, the routed model and the Nightshift receipt ID"
+    },
+    "cursor": "not used; built with Claude Code"
+  },
+  "links": {
+    "readme": "README.md",
+    "evaluation": "docs/evaluation.md"
+  },
+  "pre_existing_components": [
+    "Meterless World Model reference engine (Apache-2.0), vendored unmodified from github.com/Meterless/Meterless at commit 1742dec"
+  ]
+}
