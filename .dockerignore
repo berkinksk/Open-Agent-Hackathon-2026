@@ -1,0 +1,24 @@
+# Secrets: never in the image. The placeholder-only examples may go in.
+.env
+.env.*
+!.env.example
+!.env.docker.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Runtime output, created fresh inside the container
+logs
+output
+.world
+
+# Version control, dependencies and local clutter
+.git
+node_modules
+npm-debug.log*
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
