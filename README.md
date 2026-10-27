@@ -365,7 +365,7 @@ Model answers can differ slightly between identical runs (see §11), so a new ru
 **Final test: 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision.** The full write-up, with every owner row explained, is in [`docs/evaluation.md`](docs/evaluation.md); the run's files are in [`docs/eval/final-test/`](docs/eval/final-test/).
 
 - **Rows:** 30 rows picked at random from the 80-row synthetic inventory (the seed is the list's SHA-256; [`data/eval/test_rows.json`](data/eval/test_rows.json)) and sealed during development.
-- **Answers:** written by two teammates; where their sheets differed, one of their two answers was chosen per row, following the labelling rules ([`data/test_answers.csv`](data/test_answers.csv)).
+- **Answers:** written independently by two teammates; where they differed, one of their two answers was chosen per row, following the labelling rules ([`data/test_answers.csv`](data/test_answers.csv)).
 - **Scoring:** by KEV product family. *Strict* counts every row left to the owner as not answered.
 - **One run,** live, on 27 Oct 2026 at 15:26 UK, on commit `e1edc33`, with the arms below run one after another. With the same answer file, on commit `e1edc33`, the command is `npm run eval -- --set test --final --labels data/test_answers.csv` (model answers vary between runs; on later commits these 30 rows are no longer held out).
 
