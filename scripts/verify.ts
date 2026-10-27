@@ -8,7 +8,8 @@
 //   receipts    every model call in the newest run trace that has model calls (logs/trace-*.jsonl, setup
 //               traces ignored) has a receipt_id and a pinned routed_model. The trace is chosen and read
 //               before the other checks run, so traces they write can't change it. In live mode, a chosen
-//               trace with no completed model call FAILs.
+//               trace with no completed model call FAILs. With no live trace in logs/ (a fresh clone), the
+//               committed example traces (output_examples/*.trace.jsonl) are audited instead, labelled so.
 // Each check prints PASS, FAIL or SKIP with a reason. In SAMPLE_MODE the live checks are skipped.
 // The exit code is 1 if any check fails, 2 on a usage error.
 //
@@ -517,8 +518,19 @@ function pickNote(p: TracePick): string {
   return parts.join("; ");
 }
 
+/** The committed example traces (output_examples/*.trace.jsonl), sorted by name. */
+export function exampleTraces(root: string): string[] {
+  const dir = path.join(root, "output_examples");
+  try {
+    return readdirSync(dir).filter((n) => /\.trace\.jsonl$/.test(n)).sort().map((n) => path.join(dir, n));
+  } catch {
+    return [];
+  }
+}
+
 /**
- * The receipts check. With --trace it audits that file; otherwise the trace chosen by pickTrace.
+ * The receipts check. With --trace it audits that file; otherwise the trace chosen by pickTrace; with no live trace
+ * in logs/ (a fresh clone), the committed example traces, labelled as such.
  * The detail always names the audited file and says how it was chosen.
  */
 export function checkReceipts(root: string, traceFile?: string, opts: { live?: boolean } = {}): CheckResult {
@@ -537,6 +549,22 @@ export function checkReceipts(root: string, traceFile?: string, opts: { live?: b
   const pick = pickTrace(path.join(root, "logs"));
   const how = pickNote(pick);
   if (!pick.file || !pick.audit) {
+    // a fresh clone has no live trace yet: audit the committed example traces instead, and say so
+    const examples = exampleTraces(root);
+    if (examples.length) {
+      const results = examples.map((f) => {
+        let text = "";
+        try { text = readFileSync(f, "utf8"); } catch { /* audited as empty, so it cannot pass */ }
+        return receiptsResult(f, auditReceipts(text), { live: true });
+      });
+      const failed = results.filter((r) => r.status !== "PASS");
+      const label = `no live trace in logs/ yet${how ? ` (${how})` : ""}, so the committed example traces in output_examples/ were audited instead`;
+      return timed({
+        id: "receipts", status: failed.length ? "FAIL" : "PASS", ms: 0,
+        detail: `${label}: ${results.map((r) => r.detail.replace(/ carry a receipt_id and a pinned routed_model/, "")).join("; ")}; a live run writes its own trace (npm run cli, without --sample)`,
+        ...(failed.length ? { tail: failed.flatMap((r) => r.tail ?? [r.detail]).slice(0, 8) } : {}),
+      });
+    }
     const hint = "a live run writes one (npm run cli, without --sample), then verify again";
     const detail = how
       ? `no run trace in logs/ has a model call, so no receipt was checked (${how}); ${hint}`

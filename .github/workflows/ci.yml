@@ -1,0 +1,25 @@
+# Offline checks on every push and pull request: zero dependencies, no credentials, no services.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 25
+      - name: Unit tests (node:test; no network)
+        run: npm test
+      - name: World Model engine (official conformance runner 8/8, idempotency, --mutate, vendored files unmodified)
+        run: npm run verify:engine
+      - name: Sample mode end to end (network guard on, no model, no Zetaris)
+        run: npm run cli -- --input input_examples/example_2.json --sample
