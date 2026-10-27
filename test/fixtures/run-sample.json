@@ -102,7 +102,9 @@
       "evidence": [
         { "source": "zetaris:kev", "query": "kevVerify", "sql_hash": "sha-kev-04", "field": "due_date", "value": "2026-10-28", "as_of": "2026-10-23", "live": true },
         { "source": "zetaris:epss", "query": "epssVerify", "sql_hash": "sha-epss-05", "field": "epss", "value": "0.013", "as_of": "2026-10-25", "live": true },
-        { "source": "agent", "query": "jury.adjudicate", "field": "receipt_id", "value": "rcpt-fx-ultra-1", "live": true }
+        { "source": "agent", "query": "jury.adjudicate", "field": "receipt_id", "value": "rcpt-fx-ultra-1", "live": true },
+        { "source": "world_model", "query": "explain(r-002)", "field": "provenance", "value": "6 current fact(s) about this row, its asset and 1 CVE(s), from agent:analyst, agent:jury, zetaris:el.kev, zetaris:epss", "as_of": "2026-10-26T00:00:00.000Z", "live": false },
+        { "source": "world_model", "query": "explain(r-002)", "field": "resolves_to <- agent:jury", "value": "matched by ultra; receipts rcpt-fx-lightning-1, rcpt-fx-ultra-1", "as_of": "2026-10-26T00:00:00.000Z", "live": false }
       ],
       "critic": {
         "row_id": "r-002", "verdict": "approve", "round": 1,

@@ -9,16 +9,17 @@ import { MODELS } from "../src/contracts.ts";
 import type { ChatRequest, Deps, InventoryRow, KevPair, Llm, Receipt, Resolution, RunResponse } from "../src/contracts.ts";
 import { CsvError, detectDelimiter, mdCell, parseCsv, parseCsvObjects } from "../src/eval/csv.ts";
 import { answerKey, checkAnswersAgainstKev, isNoneWithExtraText, isNoneWord, normName, parseAnswerSheet } from "../src/eval/answers.ts";
-import { isNullPrediction, matchesAnswer, predictionFromResolution, scoreArm, scoreRow } from "../src/eval/score.ts";
+import { callStats, isNullPrediction, matchesAnswer, predictionFromResolution, scoreArm, scoreRow } from "../src/eval/score.ts";
 import { assertSetAllowed, parseTestRows, pickTestRows, selectRows } from "../src/eval/split.ts";
 import { buildEvalRows, runEvaluation, withholdSealedIssues } from "../src/eval/evaluate.ts";
-import { evalFileStem, evalJson, renderEvalMarkdown, renderSummaryTable } from "../src/eval/report.ts";
+import { evalFileStem, evalJson, renderEvalMarkdown, renderSummaryTable, renderUnlabelledMarkdown, renderUnlabelledSummaryTable } from "../src/eval/report.ts";
 import { classifyPair, compareAnswerSheets, renderComparisonMarkdown } from "../src/eval/compare.ts";
 import { buildBaselinePrompt, extractJson, parseBaselineReply, runBaseline, uniqueCandidates } from "../src/eval/baseline.ts";
-import { createResolveArm } from "../src/eval/wiring.ts";
+import { createResolveArm, ultraRowsFromTrace } from "../src/eval/wiring.ts";
+import { devRowsOf, runUnlabelledEvaluation, sameAnswer, summariseUnlabelledArm } from "../src/eval/unlabelled.ts";
 import { ArmUnavailableError } from "../src/eval/types.ts";
-import type { AnswerRow, ArmName, ArmOutput, ArmPrediction } from "../src/eval/types.ts";
-import { main as evalMain, parseEvalArgs, parseInventoryJson, UsageError } from "../scripts/eval.ts";
+import type { AnswerRow, ArmName, ArmOutput, ArmPrediction, UnlabelledRow } from "../src/eval/types.ts";
+import { isUnlabelled, main as evalMain, parseEvalArgs, parseInventoryJson, UsageError } from "../scripts/eval.ts";
 import { main as compareMain, parseCompareArgs } from "../scripts/compare-answers.ts";
 
 // ---------- fixtures (synthetic) ----------
@@ -875,5 +876,170 @@ describe("scripts/compare-answers.ts", () => {
     const c = capture();
     assert.equal(await compareMain([path.join(inbox, "labels.csv"), path.join(inbox, "bad.csv")], { stdout: c.stdout, stderr: c.stderr }), 1);
     assert.match(c.err.join("\n"), /missing column/);
+  });
+});
+
+// ---------- unlabelled development runs (no answer sheet yet) ----------
+describe("unlabelled development runs", () => {
+  const families = (p: KevPair): string[] => {
+    const v = p.vendor.trim().toLowerCase();
+    const pr = p.product.trim().toLowerCase();
+    if (v === "citrix" && /netscaler|application delivery controller/.test(pr)) return ["citrix:netscaler-adc-gateway"];
+    if (v === "microsoft" && /^exchange/.test(pr)) return ["microsoft:exchange-server"];
+    return [`${v}:${pr.replace(/\s+/g, "-")}`];
+  };
+  const row = (id: string, vendor: string | null, product: string | null, extra: Partial<UnlabelledRow> = {}): UnlabelledRow =>
+    ({ row_id: id, vendor, product, abstained: false, missing: false, used_ultra: false, ...extra });
+
+  test("dev rows: the inventory minus the sealed test rows, first row per id", () => {
+    const r = devRowsOf([inv("R01", "a"), inv("r02", "b"), inv("R03", "c"), inv("R01", "dup")], ["R02"]);
+    assert.deepEqual(r.rows.map((x) => x.software), ["a", "c"]);
+    assert.equal(r.sealed_excluded, 1);
+  });
+  test("sameAnswer: both none agree; any spelling of one family agrees; abstentions are not compared", () => {
+    assert.equal(sameAnswer(row("R1", null, null), row("R1", null, null)), true);
+    assert.equal(sameAnswer(row("R1", "Citrix", "NetScaler"), row("R1", "citrix", "netscaler ")), true);
+    assert.equal(sameAnswer(row("R1", "Citrix", "NetScaler"), row("R1", "Citrix", "NetScaler ADC and Gateway")), false);
+    assert.equal(sameAnswer(row("R1", "Citrix", "NetScaler"), row("R1", "Citrix", "NetScaler ADC and Gateway"), families), true);
+    assert.equal(sameAnswer(row("R1", "Microsoft", "Exchange Server"), row("R1", null, null), families), false);
+    assert.equal(sameAnswer(row("R1", "Microsoft", "Exchange Server"), row("R1", null, null, { abstained: true })), null);
+    assert.equal(sameAnswer(row("R1", null, null, { missing: true }), row("R1", null, null)), null);
+  });
+  test("summary counts what each arm named, Ultra rows and calls; a vendor without a product is no KEV product", () => {
+    const out: ArmOutput = {
+      predictions: [
+        { row_id: "R01", vendor: "Apache", product: "Log4j2", used_ultra: true },
+        { row_id: "R03", vendor: "Microsoft", product: null },
+        { row_id: "R04", vendor: null, product: null, abstained: true },
+        { row_id: "R99", vendor: null, product: null },
+      ],
+      receipts: [receipt(MODELS.bolt), receipt(MODELS.ultra, 50, 10, "error")],
+      run: { run_id: "x", status: "success", decisions: {}, owner_questions: 0, timing_ms: {}, trace_file: "", ultra_reviewed_rows: ["R01", "R03", "R50"] },
+    };
+    const s = summariseUnlabelledArm(["R01", "R03", "R04", "R06"], out, 1234);
+    assert.deepEqual([s.metrics.named_kev, s.metrics.no_kev, s.metrics.abstained, s.metrics.missing], [1, 1, 1, 1]);
+    assert.equal(s.metrics.ultra_rows, 1);
+    assert.equal(s.metrics.ultra_share, 0.25);
+    assert.equal(s.metrics.ultra_reviewed, 2); // R50 was not asked
+    assert.equal(s.metrics.calls, 2);
+    assert.equal(s.metrics.ultra_calls, 1);
+    assert.equal(s.metrics.call_errors, 1);
+    assert.equal(s.metrics.tokens, 180);
+    assert.deepEqual(s.extra_predictions, ["R99"]);
+    assert.deepEqual(callStats([]), { calls: 0, calls_by_model: {}, ultra_calls: 0, call_errors: 0, prompt_tokens: 0, completion_tokens: 0, tokens: 0 });
+  });
+  test("run: test rows never reach an arm, arms run one at a time, agreement with the full system, failures recorded", async () => {
+    const answers: Record<string, [string | null, string | null]> = {
+      R01: ["Apache", "Log4j2"], R03: [null, null], R04: ["Microsoft", "Exchange Server"], R06: ["Fortinet", "FortiClient EMS"],
+    };
+    const f = fakeArms({
+      full: (rows) => ({
+        predictions: rows.map((r) => r.row_id === "R06"
+          ? { row_id: r.row_id, vendor: null, product: null, abstained: true, decision: "ask_owner" }
+          : { row_id: r.row_id, vendor: answers[r.row_id][0], product: answers[r.row_id][1], decision: answers[r.row_id][1] ? "patch_now" : "monitor", used_ultra: r.row_id === "R04" }),
+        receipts: [receipt(MODELS.bolt), receipt(MODELS.ultra)],
+        run: { run_id: "eval-full", status: "success", decisions: { patch_now: 2, this_cycle: 0, monitor: 1, ask_owner: 1 }, owner_questions: 1, timing_ms: { jury: 1000 }, trace_file: "t", ultra_reviewed_rows: ["R04", "R06"] },
+      }),
+      bolt: (rows) => ({ predictions: rows.map((r) => ({ row_id: r.row_id, vendor: answers[r.row_id][0], product: answers[r.row_id][1] })), receipts: [receipt(MODELS.bolt)] }),
+      normaliser: allNull,
+      lightning: () => { throw new Error("boom"); },
+    });
+    let t = 0;
+    const r = await runUnlabelledEvaluation({
+      arms: ["full", "bolt", "normaliser", "lightning", "ultra"], inventory: INVENTORY, testIds: ["R02", "R05"], resolveArm: f.resolveArm, families,
+      now: () => (t += 100), clock: () => new Date("2026-10-27T02:00:00Z"),
+    });
+    for (const s of f.seen) assert.deepEqual(s.ids, ["R01", "R03", "R04", "R06"]);
+    assert.equal(f.maxActive(), 1);
+    assert.equal(r.kind, "unlabelled");
+    assert.equal(r.rows_evaluated, 4);
+    assert.equal(r.sealed_rows_excluded, 2);
+    const [full, bolt, norm, light, ultra] = r.arms;
+    assert.equal(full.metrics?.agree_with_full, null);
+    assert.equal(full.metrics?.ultra_reviewed, 2);
+    assert.equal(full.run?.decisions.patch_now, 2);
+    assert.equal(full.rows.find((x) => x.row_id === "R06")?.decision, "ask_owner");
+    assert.deepEqual(bolt.metrics?.agree_with_full, { compared: 3, agree: 3 }); // R06 left to the owner by full: not compared
+    assert.deepEqual(norm.metrics?.agree_with_full, { compared: 3, agree: 1 });
+    assert.deepEqual(norm.disagree_with_full, ["R01", "R04"]);
+    assert.equal(light.status, "error");
+    assert.equal(ultra.status, "unavailable");
+    assert.equal(r.generated_at, "2026-10-27T02:00:00.000Z");
+
+    const md = renderUnlabelledMarkdown(r);
+    assert.match(md, /no accuracy/i);
+    assert.match(md, /\| 2 \| 0 \| 1 \| 1 \| 1 \| success \| eval-full \|/);
+    assert.match(md, /\| R01 \| Normaliser alone \(no model\) \| no KEV product \| Apache \/ Log4j2 \|/);
+    const table = renderUnlabelledSummaryTable(r);
+    assert.match(table, /Bolt alone \| 3 \| 1 \| 0 \| 3\/3 \(100\.0%\)/);
+    assert.match(table, /Lightning alone \| not run: boom/);
+    assert.doesNotMatch(table, /R0\d|Log4j2/);
+  });
+  test("without a full arm, no agreement is reported; with no dev rows the run stops", async () => {
+    const r = await runUnlabelledEvaluation({ arms: ["normaliser"], inventory: INVENTORY, testIds: [], resolveArm: fakeArms({ normaliser: allNull }).resolveArm });
+    assert.equal(r.arms[0].metrics?.agree_with_full, null);
+    assert.equal(r.rows_evaluated, 6);
+    await assert.rejects(runUnlabelledEvaluation({ arms: ["normaliser"], inventory: [inv("R01", "x")], testIds: ["R01"], resolveArm: fakeArms({}).resolveArm }), /no dev rows/);
+  });
+  test("ultraRowsFromTrace: adjudications, Ultra re-decides, critiques and same-product checks; Lightning re-decides and bad lines ignored", () => {
+    const lines = [
+      { agent: "jury.adjudicate", action: "ultra_adjudication", details: { decisions: [{ row_id: "R01" }, { row_id: "R43" }] } },
+      { agent: "resolver.retry.lightning", action: "redecide", details: { decisions: [{ row_id: "R20" }] } },
+      { agent: "resolver.retry.ultra", action: "redecide", details: { decisions: [{ row_id: "R71" }] } },
+      { agent: "critic", action: "critic_round", details: { sent_back: ["R07"], ultra_critiques: ["R12", "R01"] } },
+      { agent: "critic.match_check", action: "same_product_check", details: { row_id: "R31" } },
+    ].map((e) => JSON.stringify(e));
+    assert.deepEqual(ultraRowsFromTrace([...lines, "not json", ""].join("\n")), ["R01", "R12", "R31", "R43", "R71"]);
+  });
+  test("full arm wiring: decisions, owner questions and the Ultra rows from the run's trace", async () => {
+    const res = (row_id: string): Resolution => ({ row_id, status: "matched", vendor: "Apache", product: "Log4j2", family: null, version: null, product_type: "library", votes: [], adjudicated_by: null, confidence: 1 });
+    const run = async () => ({
+      run: async () => ({
+        run_id: "eval-run", mode: "live", status: "success", receipts: [], trace_file: "logs/trace-eval-run.jsonl",
+        summary: { patch_now: 1, this_cycle: 0, monitor: 0, ask_owner: 1 }, timing_ms: { jury: 5 }, owner_questions: [{}, {}],
+        lines: [{ row_id: "R01", decision: "patch_now", resolution: res("R01"), critic: null }, { row_id: "R04", decision: "ask_owner", resolution: res("R04"), critic: null }],
+      }) as unknown as RunResponse,
+    });
+    let asked = "";
+    const out = await createResolveArm({ depsFor: () => fakeDeps(), load: { run }, readTrace: (f) => { asked = f ?? ""; return ["R04"]; } })("full", [inv("R01", "x"), inv("R04", "y")]);
+    assert.equal(asked, "logs/trace-eval-run.jsonl");
+    assert.deepEqual(out.run?.decisions, { patch_now: 1, this_cycle: 0, monitor: 0, ask_owner: 1 });
+    assert.equal(out.run?.owner_questions, 2);
+    assert.deepEqual(out.run?.ultra_reviewed_rows, ["R04"]);
+    assert.deepEqual(out.predictions.map((p) => p.decision), ["patch_now", "ask_owner"]);
+    // An unreadable trace leaves the count unknown, never zero.
+    const out2 = await createResolveArm({ depsFor: () => fakeDeps(), load: { run } })("full", [inv("R01", "x")]);
+    assert.equal(out2.run?.ultra_reviewed_rows, null);
+  });
+  test("CLI --labels none: dev rows only, files written, stdout has only the summary", async () => {
+    assert.equal(isUnlabelled(parseEvalArgs(["--labels", "none"], {})), true);
+    assert.equal(isUnlabelled(parseEvalArgs(["--labels", "x.csv"], {})), false);
+    const { root, inbox } = workspace();
+    const f = fakeArms({ full: (rows) => ({ predictions: rows.map((r) => ({ row_id: r.row_id, vendor: null, product: null })), receipts: [] }), normaliser: allNull });
+    const c = capture();
+    const code = await evalMain(
+      ["--labels", "none", "--inventory", path.join(inbox, "inventory.json"), "--arms", "full,normaliser"],
+      { repoRoot: root, cwd: root, stdout: c.stdout, stderr: c.stderr, env: {}, now: () => new Date("2026-10-27T02:00:00Z"), wiring: async () => ({ resolveArm: f.resolveArm }) },
+    );
+    assert.equal(code, 0, c.err.join("\n"));
+    for (const s of f.seen) assert.deepEqual(s.ids, ["R01", "R03", "R04", "R06"]);
+    assert.deepEqual(readdirSync(path.join(root, "output")).sort(), ["eval-2026-10-27-020000-dev-unlabelled.json", "eval-2026-10-27-020000-dev-unlabelled.md"]);
+    assert.match(c.out.join("\n"), /4 rows \(2 sealed test rows withheld\); no accuracy/);
+    assert.doesNotMatch(c.out.join("\n"), /R0\d/);
+    assert.match(c.err.join("\n"), /nothing is scored/);
+    const json = JSON.parse(readFileSync(path.join(root, "output", "eval-2026-10-27-020000-dev-unlabelled.json"), "utf8"));
+    assert.equal(json.kind, "unlabelled");
+    assert.deepEqual(json.arms[1].metrics.agree_with_full, { compared: 4, agree: 4 });
+  });
+  test("CLI --labels none is refused for the test set and with the answer sheet as inventory", async () => {
+    const { root } = workspace();
+    const f = fakeArms({ full: allNull });
+    for (const argv of [["--set", "test", "--final", "--labels", "none"], ["--labels", "none", "--inventory", "labels"]]) {
+      const c = capture();
+      const code = await evalMain(argv, { repoRoot: root, cwd: root, stdout: c.stdout, stderr: c.stderr, env: {}, wiring: async () => ({ resolveArm: f.resolveArm }) });
+      assert.equal(code, 2, argv.join(" "));
+    }
+    assert.equal(f.seen.length, 0);
+    assert.equal(existsSync(path.join(root, "output")), false);
   });
 });
