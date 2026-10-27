@@ -719,7 +719,8 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
     await facts.settle();
     // Zetaris answered from the client's saved copy (the live read failed): that data is labelled not live, the run is
     // partial, and no line is relaxed to monitor on it (BUILD_KIT: "the cached snapshot, labelled"; design §5.5)
-    const fallbackReads = live ? ((deps.queries as ReadStatusAware).sourceStatus?.() ?? []).filter((x) => x.fromCache) : [];
+    const readStatus = live ? ((deps.queries as ReadStatusAware).sourceStatus?.() ?? []) : [];
+    const fallbackReads = readStatus.filter((x) => x.fromCache);
     const staleOf = (qs: string[]): { day: string } | null => {
       const hit = fallbackReads.filter((x) => qs.includes(x.query));
       if (!hit.length) return null;
@@ -745,13 +746,22 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
     const nvdLooked = [...facts.nvdState.entries()].filter(([c]) => facts.nvdLooked(c)).map(([c]) => c);
     if (facts.nvdDormant) helpers_dormant.push("nvdCves");
     else if (nvdLooked.length) helpers_live.push("nvdCves");
+    // KEV and EPSS are labelled live only when this run read something from them (a read served from the saved copy is
+    // the stale case above). Nothing read (Zetaris unreachable with no saved copy, a failed read, or no KEV CVE to
+    // score) is labelled not live. KEV: the name list is read first, and every other KEV read needs it.
+    const readLive = (qs: string[]): boolean => readStatus.some((x) => qs.includes(x.query) && !x.fromCache);
+    const kevRead = !kevPairsError || readLive(["kevPairs", "kevByProducts"]);
+    const epssRead = facts.epssScores().length > 0 || readLive(["epss"]);
+    const notRead = (o: string, what: string): string => `${o} (no ${what} read in this run)`;
     const catalog = facts.catalogVersion();
     sources.push(staleKev
       ? { name: "CISA KEV", object: cachedObject(`el.kev${catalog ? `, catalog ${catalog}` : ""}`, staleKev.day), live: false, as_of: staleKev.day }
+      : live && !kevRead ? { name: "CISA KEV", object: notRead("el.kev", "value"), live: false }
       : { name: "CISA KEV", object: live ? "el.kev" : "sample snapshot (el.kev)", live, ...(catalog ? { as_of: catalog } : {}) });
     const epssDate = facts.epssScores().map((s) => s.score_date).filter(Boolean).sort().pop();
     sources.push(staleEpss
       ? { name: "FIRST EPSS", object: cachedObject(`EL_EPSS.el_epss_<batch>${epssDate ? `, scores of ${epssDate}` : ""}`, staleEpss.day), live: false, as_of: staleEpss.day }
+      : live && !epssRead ? { name: "FIRST EPSS", object: notRead("EL_EPSS.el_epss_<batch>", "score"), live: false }
       : { name: "FIRST EPSS", object: live ? "EL_EPSS.el_epss_<batch>" : "sample snapshot (EPSS)", live, ...(epssDate ? { as_of: epssDate } : {}) });
     // NVD is "live" only when this run read some CVE through Zetaris; today's cache is labelled with its day
     const nvdLiveCves = nvdLooked.filter((c) => facts.nvdLive(c));
@@ -779,8 +789,14 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
     const notAffected: string[] = [];
     const notAffectedHeld: string[] = [];
     const versionScoped: { row_id: string; basis: VersionScopeResult["basis"]; cited: string[]; inside: string[]; outside: string[]; unchecked_cited: string[] }[] = [];
+    // a row the jury never saw (the KEV names could not be read) is unresolved, with the version parsed from its text,
+    // as the jury's own unresolved rows carry it (the report's "Resolved" column shows it)
+    const noJuryResolution = (row: InventoryRow): Resolution => ({
+      row_id: row.row_id, status: "unresolved", vendor: null, product: null, family: null,
+      version: itemsById.get(row.row_id)?.version ?? null, product_type: "unknown", votes: [], adjudicated_by: null, confidence: 0,
+    });
     const lines0: PatchLine[] = await timed("analyst", () => rows.map((row) => {
-      let res = finalRes.get(row.row_id);
+      let res = finalRes.get(row.row_id) ?? noJuryResolution(row);
       const o = outcomes.get(row.row_id);
       // the critic rejected the match and no retry fixed it: nothing is matched, the owner decides
       if (res && o && o.verdict.verdict !== "approve" && res.status === "matched" && hasBlocker(o)) {
@@ -1075,7 +1091,12 @@ export async function runWith(req: RunRequest, deps: Deps, opts: RunOptions = {}
         details: { jury: juryStats, critic: loopStats, nvd: { ...facts.nvdCounts(live), ms: facts.nvdMs, states: Object.fromEntries(facts.nvdState) } },
       });
     }
-    helpers_live.unshift("normaliser", "resolver_jury");
+    // the jury runs only after the KEV names are read; without them no model was asked, so it is listed as dormant
+    if (juryStats) helpers_live.unshift("normaliser", "resolver_jury");
+    else {
+      helpers_live.unshift("normaliser");
+      helpers_dormant.push("resolver_jury (skipped: KEV names unavailable, rows fail closed)");
+    }
     helpers_live.push("report");
     return respond(problems.length ? "partial" : "success", lines, owner_questions);
   } catch (e) {

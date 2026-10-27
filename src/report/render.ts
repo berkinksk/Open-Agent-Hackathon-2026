@@ -426,8 +426,9 @@ function sinceLastRunSection(c: Ctx): string {
 function sourcesAndRules(c: Ctx): string {
   const { resp, policy, sample } = c;
   const sources = objs(resp.manifest?.sources);
+  // a source that is not live says only "not live": its object says why (a dated cached copy, the run request, nothing read)
   const srcRows = sources.map((s) => `<tr><td>${txt(s?.name)}</td><td class="mono">${txt(s?.object)}</td><td class="nw">${
-    s?.live ? badge("live", "live") : badge(sample ? "snapshot" : "not live (cache)", "notlive")
+    s?.live ? badge("live", "live") : badge(sample ? "snapshot" : "not live", "notlive")
   }</td><td class="nw">${txt(s?.as_of)}</td></tr>`);
   const srcTable = sources.length
     ? table(["Source", "Object", "Read", "As of"], srcRows, "compact")

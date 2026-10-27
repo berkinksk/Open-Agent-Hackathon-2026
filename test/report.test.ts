@@ -168,6 +168,21 @@ describe("renderReport: summary, sources and rules", () => {
     }
   });
 
+  test("a live run's source that was not read live says 'not live', and its object says why (never an invented cache)", () => {
+    const r = fixture();
+    r.manifest.sources = [
+      { name: "Inventory (request rows)", object: "run request", live: false, as_of: "2026-10-26" },
+      { name: "CISA KEV", object: "el.kev (no value read in this run)", live: false },
+      { name: "FIRST EPSS", object: "EL_EPSS.el_epss_<batch> (cached copy saved 2026-10-25; the live read failed)", live: false, as_of: "2026-10-25" },
+      { name: "NIST NVD", object: "EL_NVD.el_nvd_<cve>", live: true, as_of: "2026-10-26" },
+    ];
+    const src = sectionOf(renderReport(r), "sources");
+    assert.equal(count(src, 'class="badge live"'), 1);
+    assert.equal(count(src, '<span class="badge notlive">not live</span>'), 3);
+    assert.ok(!src.includes("(cache)<"), "no source is labelled a cache by the badge");
+    assert.ok(src.includes("el.kev (no value read in this run)") && src.includes("cached copy saved 2026-10-25"));
+  });
+
   test("no policy in the manifest: says so instead of inventing defaults", () => {
     const r = fixture();
     (r.manifest as { policy?: unknown }).policy = undefined;

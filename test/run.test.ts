@@ -755,6 +755,12 @@ describe("failures degrade, never crash", () => {
     assert.equal(r.summary.patch_now, 4);
     assert.equal(r.summary.monitor, 0);
     assert.equal(r.summary.ask_owner, 2);
+    // the manifest never calls a source live when nothing was read from it in this run; KEV was read, so it stays live
+    const epssSrc = r.manifest.sources.find((x) => x.name === "FIRST EPSS");
+    assert.equal(epssSrc?.live, false);
+    assert.equal(epssSrc?.as_of, undefined);
+    assert.match(epssSrc?.object ?? "", /no score read in this run/);
+    assert.equal(r.manifest.sources.find((x) => x.name === "CISA KEV")?.live, true);
   });
 
   test("EPSS unreadable + NVD 'not affected' -> ask_owner with the NVD finding, never monitor", async () => {
@@ -798,6 +804,48 @@ describe("failures degrade, never crash", () => {
     assert.equal(ok.status, "success");
     assert.equal(by(ok).R03.decision, "monitor");
     assert.equal(ok.manifest.sources.find((x) => x.name === "CISA KEV")?.live, true);
+  });
+
+  test("Zetaris unreachable and no cached copy: KEV and EPSS are not labelled live, every row fails closed", async () => {
+    const down = async (): Promise<never> => { throw new Error("connect ECONNREFUSED 127.0.0.1:8888"); };
+    // the live adapter's shape: every read fails and no read was served from a saved copy (sourceStatus lists nothing)
+    const q = Object.assign(mockQueries({ inventory: down, kevPairs: down, kevByProducts: down, kevVerify: down, epss: down, epssVerify: down, nvdCves: down }), {
+      sourceStatus: () => [], discover: down, naiveJoin: down,
+    });
+    const rows = INVENTORY.slice(0, 3); // R01 log4j, R02 PAN-OS (both KEV-listed when KEV can be read), R03 Notepad++
+    const r = await runWith({ inventory: rows }, deps({ queries: q }), NO_FILES);
+    assert.equal(r.status, "partial");
+    assert.deepEqual(r.summary, { patch_now: 0, this_cycle: 0, monitor: 0, ask_owner: 3 });
+    const src = Object.fromEntries(r.manifest.sources.map((s) => [s.name, s]));
+    assert.deepEqual(Object.keys(src), ["Inventory (request rows)", "CISA KEV", "FIRST EPSS", "NIST NVD"]);
+    assert.ok(r.manifest.sources.every((s) => s.live === false), JSON.stringify(r.manifest.sources));
+    assert.match(src["CISA KEV"].object, /^el\.kev \(no value read in this run\)$/);
+    assert.match(src["FIRST EPSS"].object, /^EL_EPSS\.el_epss_<batch> \(no score read in this run\)$/);
+    assert.equal(src["CISA KEV"].as_of, undefined);
+    assert.equal(src["FIRST EPSS"].as_of, undefined);
+    // nor does any line's evidence claim a live read
+    assert.ok(r.lines.every((l) => l.evidence.every((e) => e.live === false)), JSON.stringify(r.lines.map((l) => l.evidence)));
+    // rows the jury never saw stay unresolved, with the version parsed from their text (as the jury's own unresolved rows)
+    assert.deepEqual(r.lines.map((l) => [l.row_id, l.resolution.status, l.resolution.version]).sort(),
+      [["R01", "unresolved", "2.14.1"], ["R02", "unresolved", "10.2.7"], ["R03", "unresolved", "8.6"]]);
+    // no model was asked, so the jury is listed as dormant, not live
+    assert.equal(r.receipts.length, 0);
+    assert.ok(!r.manifest.helpers_live.includes("resolver_jury"), JSON.stringify(r.manifest.helpers_live));
+    assert.ok(r.manifest.helpers_dormant.some((h) => h.startsWith("resolver_jury")), JSON.stringify(r.manifest.helpers_dormant));
+
+    // the same rows with Zetaris answering: KEV and EPSS read live, labelled live with their dates (unchanged behaviour)
+    const ok = await runWith({ inventory: rows }, deps(), NO_FILES);
+    const okSrc = Object.fromEntries(ok.manifest.sources.map((s) => [s.name, s]));
+    assert.deepEqual([okSrc["CISA KEV"].live, okSrc["CISA KEV"].object, okSrc["CISA KEV"].as_of], [true, "el.kev", "2026.10.23"]);
+    assert.deepEqual([okSrc["FIRST EPSS"].live, okSrc["FIRST EPSS"].object, okSrc["FIRST EPSS"].as_of], [true, "EL_EPSS.el_epss_<batch>", "2026-10-25"]);
+    assert.ok(ok.manifest.helpers_live.includes("resolver_jury") && !ok.manifest.helpers_dormant.some((h) => h.startsWith("resolver_jury")));
+
+    // KEV read, but no row names a KEV product: no EPSS score is asked for, so EPSS is not labelled live either
+    const none = await runWith({ inventory: [INVENTORY[2]] }, deps(), NO_FILES);
+    assert.equal(none.status, "success");
+    assert.equal(none.manifest.sources.find((x) => x.name === "CISA KEV")?.live, true);
+    const noneEpss = none.manifest.sources.find((x) => x.name === "FIRST EPSS");
+    assert.deepEqual([noneEpss?.live, noneEpss?.object], [false, "EL_EPSS.el_epss_<batch> (no score read in this run)"]);
   });
 
   test("notAffectedBlock: relax only with KEV and EPSS read, and every cited CVE checked", () => {
