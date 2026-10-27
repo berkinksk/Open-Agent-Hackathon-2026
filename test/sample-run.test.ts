@@ -189,9 +189,22 @@ const LOOKALIKE_ROWS: { row: Partial<InventoryRow>; kevName: RegExp; cves: strin
   { row: { row_id: "N9", software: "sudo-rs 0.2", asset_type: "server" }, kevName: /\bIs Sudo\b/i, cves: ["CVE-2021-3156"] },
   { row: { row_id: "N10", software: "Jenkins X 3.10", asset_type: "server" }, kevName: /\bIs Jenkins\b/, cves: ["CVE-2024-23897"] },
   { row: { row_id: "N11", software: "ownCloud desktop client 4.0", asset_type: "laptop" }, kevName: /\bIs ownCloud\b/, cves: [] },
+  // the same look-alikes with the extra words in a bracketed note (review round 3); before the fix each was matched to the
+  // brand, cited its CVEs and asked "Is GitLab 16.0 ... affected by ...?" or "Which Sudo version runs on ...?"
+  { row: { row_id: "N12", software: "GitLab 16.0 (Runner)", asset_type: "server" }, kevName: /\b(?:Is|Which) GitLab\b/, cves: ["CVE-2021-22205", "CVE-2023-7028"] },
+  { row: { row_id: "N13", software: "jQuery 1.12.1 (UI)", asset_type: "server" }, kevName: /\b(?:Is|Which) JQuery\b/i, cves: ["CVE-2020-11023"] },
+  { row: { row_id: "N14", software: "Git 3.4 (LFS)", asset_type: "laptop" }, kevName: /\b(?:Is|Which) Git\b/, cves: ["CVE-2025-48384"] },
+  { row: { row_id: "N15", software: "Sudo (for Windows)", asset_type: "laptop" }, kevName: /\b(?:Is|Which) Sudo\b/i, cves: ["CVE-2021-3156", "CVE-2025-32463"] },
+  { row: { row_id: "N16", software: "ownCloud 4.0 (desktop client)", asset_type: "laptop" }, kevName: /\b(?:Is|Which) ownCloud\b/, cves: ["CVE-2023-49103", "CVE-2023-49105"] },
+  { row: { row_id: "N17", software: "MinIO 2024 (client)", asset_type: "server" }, kevName: /\b(?:Is|Which) MinIO\b/, cves: ["CVE-2023-28432", "CVE-2023-28434"] },
+  { row: { row_id: "N18", software: "OpenSSL 3.2 (Ruby gem)", asset_type: "server" }, kevName: /\b(?:Is|Which) OpenSSL\b/, cves: ["CVE-2014-0160"] },
+  { row: { row_id: "N19", software: "Strapi (Cloud)", asset_type: "server" }, kevName: /\b(?:Is|Which) Strapi\b/, cves: ["CVE-2023-22894"] },
+  { row: { row_id: "N20", software: "Metabase (Cloud)", asset_type: "server" }, kevName: /\b(?:Is|Which) Metabase\b/, cves: ["CVE-2021-41277"] },
+  { row: { row_id: "N21", software: "dotCMS (Cloud)", asset_type: "server" }, kevName: /\b(?:Is|Which) dotCMS\b/, cves: ["CVE-2022-26352"] },
 ];
 
 test("vendor-named look-alikes offline: OpenSSH is no KEV product, and a brand's other products are never shown as the KEV product", async () => {
+  for (const { cves } of LOOKALIKE_ROWS) for (const c of cves) assert.ok(SNAP.kev_entries.some((e) => e.cve_id === c), `${c} is in the snapshot's KEV`);
   const id = `test-sample-lookalike-${process.pid}`;
   const rows = LOOKALIKE_ROWS.map(({ row }, i) => ({ asset_id: `n${i}`, asset_name: `n${i}`, internet_facing: false, owner_team: "IT", ...row })) as InventoryRow[];
   const res = await withNetworkGuard(() => runWith({ run_id: id, inventory: rows }, sampleDeps(id), { outputDir: null, logsDir: null }));
@@ -217,6 +230,43 @@ test("vendor-named look-alikes offline: OpenSSH is no KEV product, and a brand's
     const l = by.get(row.row_id!)!;
     assert.equal(l.decision, "ask_owner", `${row.row_id} "${row.software}": unsure -> ask the owner`);
     assert.ok(res.owner_questions.some((q) => q.row_id === l.row_id), `${row.row_id} has an owner question`);
+  }
+});
+
+/**
+ * KEV-listed products with a bracketed note that names no other product. The note may cost the normaliser's match (a
+ * short note's role or host words count like the same words in the name: the owner is asked), but it never turns the row
+ * into another product or a confident "no KEV product". A "bundled in" clause and a note with no product word keep it.
+ */
+const NOTED_ROWS: { row: Partial<InventoryRow>; family: string; mayAbstain: boolean }[] = [
+  { row: { row_id: "M1", software: "OpenSSL 1.1.1k (bundled in Apache 2.4)", asset_type: "server" }, family: "openssl:openssl", mayAbstain: false },
+  { row: { row_id: "M2", software: "Samba 4.15 (file shares)", asset_type: "server" }, family: "samba:samba", mayAbstain: true },
+  { row: { row_id: "M3", software: "Jenkins 2.440 (controller)", asset_type: "server" }, family: "jenkins:jenkins", mayAbstain: true },
+  { row: { row_id: "M4", software: "PHP 8.1.2 (Apache module)", asset_type: "server" }, family: "php:php", mayAbstain: true },
+  { row: { row_id: "M5", software: "Notepad++ 8.6.2 (64-bit)", asset_type: "laptop" }, family: "notepad++:notepad++", mayAbstain: false },
+  { row: { row_id: "M6", software: "log4j-core 2.14.1 (bundled in ERP WAR)", asset_type: "server" }, family: "apache:log4j", mayAbstain: false },
+];
+
+test("KEV-listed products with a bracketed note offline: their own product or the owner is asked; never another product, never 'no KEV product'", async () => {
+  const id = `test-sample-noted-${process.pid}`;
+  const rows = NOTED_ROWS.map(({ row }, i) => ({ asset_id: `m${i}`, asset_name: `m${i}`, internet_facing: false, owner_team: "IT", ...row })) as InventoryRow[];
+  const res = await withNetworkGuard(() => runWith({ run_id: id, inventory: rows }, sampleDeps(id), { outputDir: null, logsDir: null }));
+  assert.equal(res.status, "success");
+  assert.equal(res.receipts.length, 0, "no model call");
+  const by = new Map(res.lines.map((l) => [l.row_id, l]));
+  for (const { row, family, mayAbstain } of NOTED_ROWS) {
+    const l = by.get(row.row_id!)!;
+    const tag = `${row.row_id} "${row.software}"`;
+    assert.notEqual(l.resolution.status, "no_match", `${tag} is KEV-listed: never a confident "no KEV product"`);
+    assert.doesNotMatch(l.why, /no CISA KEV product/i, tag);
+    if (l.resolution.status === "matched") assert.equal(l.resolution.family, family, `${tag} resolves to its own product`);
+    else {
+      assert.ok(mayAbstain, `${tag} keeps its match (got ${l.resolution.status})`);
+      assert.equal(l.decision, "ask_owner", tag);
+      assert.ok(res.owner_questions.some((q) => q.row_id === l.row_id), `${tag} has an owner question`);
+    }
+    const vote = l.resolution.votes.find((v) => v.juror === "normaliser");
+    if (vote?.vendor && vote.product) assert.equal(familyOf({ vendor: vote.vendor, product: vote.product }), family, `${tag}: the normaliser names no other product`);
   }
 });
 

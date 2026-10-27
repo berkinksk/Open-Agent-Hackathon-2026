@@ -897,10 +897,24 @@ interface InvCtx {
   words: string[];
   /** The vendor named or implied by the main text, normalised; null when there is none or it comes from a note. */
   mainVendor: string | null;
+  /**
+   * What the row's short notes add to its name, for eponymousDoubt: "GitLab 16.0 (Runner)" reads as "GitLab Runner",
+   * "Sudo (for Windows)" as "Sudo for Windows". The notes' product words (single letters kept), and the vendor a note
+   * names or implies. The part of a note about the host ("bundled in ...", "on RHEL 8", "via Docker") and longer notes
+   * are left out.
+   */
+  noteWords: string[];
+  noteVendor: string | null;
+  /** A client, cloud_service or library type that the row takes from a note, its main text alone typing it otherwise. */
+  noteType: ProductType | null;
 }
 
 /** A version wildcard ("1.1.x", "8.x"): not a product word. */
 const VERSION_WILDCARD = /(?<![\w.])\d+(?:\.\d+)*\.[x*](?![\w.])/gi;
+/** Where a note turns to the product's host or delivery: "(bundled in Apache 2.4)", "(on RHEL 8)", "(Runner on build server)". */
+const HOST_NOTE = /\b(?:bundled|embedded|shipped|included|packaged|vendored|in|inside|into|on|with|via|part of)\b/i;
+/** A note (up to a host word) of at most this many words may be the rest of the product's name: "(Runner)", "(Ruby gem)". */
+const SHORT_NOTE_WORDS = 3;
 
 function invContext(parsed: ParsedSoftware | null | undefined): InvCtx {
   const tokens = Array.isArray(parsed?.tokens) ? parsed.tokens : [];
@@ -908,9 +922,21 @@ function invContext(parsed: ParsedSoftware | null | undefined): InvCtx {
   const hint = typeof parsed?.product_hint === "string" ? parsed.product_hint.replace(VERSION_WILDCARD, " ") : "";
   const words = hint ? tokenize(hint, vNorm, true) : tokens;
   let mainVendor: string | null = null;
-  if (vNorm && typeof parsed?.raw === "string") {
+  const noteWords: string[] = [];
+  let noteVendor: string | null = null;
+  let noteType: ProductType | null = null;
+  if (typeof parsed?.raw === "string") {
     const r = splitRow(parsed.raw);
-    if (r.vendorInMain && r.vNorm === vNorm) mainVendor = vNorm;
+    if (vNorm && r.vendorInMain && r.vNorm === vNorm) mainVendor = vNorm;
+    // a note's name part ends at its first host word: "Runner on build server" -> "Runner"; "bundled in Apache 2.4" -> ""
+    const short = r.context.map((n) => { const h = HOST_NOTE.exec(n); return (h ? n.slice(0, h.index) : n).trim(); })
+      .filter((n) => n && n.split(/\s+/).length <= SHORT_NOTE_WORDS);
+    for (const n of short) noteWords.push(...tokenize(n.replace(VERSION_WILDCARD, " "), vNorm, true));
+    const implied = short.map((n) => firstMatch(VENDOR_WORDS, n) ?? firstMatch(PRODUCT_VENDOR, n)).find((x) => x);
+    if (implied) noteVendor = normVendor(implied.vendor);
+    // the row's type with its notes, except a "bundled in" clause, which types the host ("(bundled in ERP WAR)")
+    const t = rowType({ ...r, context: r.context.filter((n) => !BUNDLED_RE.test(n)) }, true);
+    if ((t === "client" || t === "cloud_service" || t === "library") && t !== rowType(r, false)) noteType = t;
   }
   return {
     tokens,
@@ -920,6 +946,9 @@ function invContext(parsed: ParsedSoftware | null | undefined): InvCtx {
     type: parsed?.product_type ?? "unknown",
     words,
     mainVendor,
+    noteWords,
+    noteVendor,
+    noteType,
   };
 }
 
@@ -1053,7 +1082,8 @@ export function voteKind(v: Pick<JurorVote, "vendor" | "product" | "confidence">
  * also the vote when a vague entry resembles the row (KEV may list the product under that name).
  * A vendor-named product ("OpenSSL / OpenSSL", "GitLab / GitLab") is matched by its exact name, never through a typo
  * ("OpenSSH" is a confident no-match, not OpenSSL), and the vote abstains when the row may be a neighbouring product of
- * the brand ("GitLab Runner", "jQuery UI", "Jenkins X") or another vendor's ("Sudo for Windows"): see eponymousDoubt.
+ * the brand ("GitLab Runner", "jQuery UI", "Jenkins X") or another vendor's ("Sudo for Windows"), in the name or in a
+ * bracketed note ("GitLab 16.0 (Runner)", "MinIO (client)", "Sudo (for Windows)"): see eponymousDoubt.
  * A cloud type that rests only on a bracketed note ("Exchange (M365)", "ActiveMQ (cloud)") may block a match, but never
  * earns a confident "no KEV product": the note may only say where an on-prem product is hosted. Such a row abstains when
  * it has a look-alike, or when its main text alone would have matched or abstained; the owner is asked.
@@ -1101,11 +1131,17 @@ export function normaliserVote(row: InventoryRow, parsed: ParsedSoftware, cands:
  * edition and packaging words (SAME_PRODUCT_WORDS), "v" and anything with a digit (versions, builds). Returns the reason,
  * or null when the match stands. Only vendor-named entries are checked: their name is a brand, so a longer name built on
  * it is a different product as often as not, and KEV lists the brand's own product only.
+ * A bracketed note gets the same checks: a short note, up to any host word, counts as part of the name ("GitLab 16.0
+ * (Runner)", "jQuery (UI in intranet)", "Sudo (for Windows)"; "(64-bit)" adds nothing, "(bundled in Apache 2.4)" and
+ * "(on RHEL 8)" nothing but the host), and a note that types the row as a client, cloud service or library unlike the
+ * KEV product ("MinIO (client)", "Strapi (Cloud)") is a doubt too.
  */
 function eponymousDoubt(ctx: InvCtx, pick: Candidate, list: Candidate[]): string | null {
   const info = kevInfo(pick);
   if (!info.eponymous) return null;
-  if (ctx.mainVendor && ctx.mainVendor !== info.vNorm) return `the row names another vendor (${ctx.mainVendor})`;
+  const vendor = ctx.mainVendor ?? ctx.noteVendor; // as in the name, the first vendor wins: "7-Zip (for Windows)" is 7-Zip's
+  if (vendor && vendor !== info.vNorm) return `the row names another vendor (${vendor})`;
+  if (ctx.noteType && ctx.noteType !== info.type) return `a note types the row ${ctx.noteType}, the KEV product ${info.type}`;
   const known = new Set<string>();
   for (const c of list) {
     const ci = kevInfo(c);
@@ -1115,7 +1151,7 @@ function eponymousDoubt(ctx: InvCtx, pick: Candidate, list: Candidate[]): string
   }
   // the vendor's other KEV names ("PHP Group" for PHP), whose spellings topCandidates may have folded into one
   for (const [alias, to] of Object.entries(VENDOR_ALIASES)) if (to === info.vNorm) for (const t of canonicalTokens(alias)) known.add(t);
-  const extra = ctx.words.filter((w) => !known.has(w) && !SAME_PRODUCT_WORDS.has(w) && w !== "v" && !/\d/.test(w));
+  const extra = [...ctx.words, ...ctx.noteWords].filter((w) => !known.has(w) && !SAME_PRODUCT_WORDS.has(w) && w !== "v" && !/\d/.test(w));
   return extra.length ? `words beyond the KEV name: ${extra.join(" ")}` : null;
 }
 

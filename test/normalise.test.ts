@@ -744,6 +744,73 @@ test("vendor-named KEV entries: an exact brand name only; a neighbouring product
   assert.equal(voteFamily(vote("Exchnage Server 2016")), "microsoft:exchange-server");
 });
 
+test("vendor-named KEV entries: a bracketed note counts like the name ('GitLab 16.0 (Runner)', 'MinIO (client)', 'Sudo (for Windows)'); its host part does not (review round 3)", () => {
+  // real KEV spellings (catalog 2026.10.23, as in data/sample/snapshot.json), added to the fixture inline; KEV lists none
+  // of the look-alike products below
+  const extra: KevPair[] = [
+    { vendor: "OpenSSL", product: "OpenSSL" }, { vendor: "Samba", product: "Samba" }, { vendor: "Notepad++", product: "Notepad++" },
+    { vendor: "7-Zip", product: "7-Zip" }, { vendor: "GitLab", product: "GitLab" }, { vendor: "GitLab", product: "GitLab CE/EE" },
+    { vendor: "PHP", product: "PHP" }, { vendor: "PHP Group", product: "PHP" }, { vendor: "JQuery", product: "JQuery" }, { vendor: "Git", product: "Git" },
+    { vendor: "Sudo", product: "Sudo" }, { vendor: "Jenkins", product: "Jenkins" }, { vendor: "Jenkins", product: "Jenkins Command Line Interface (CLI)" },
+    { vendor: "ownCloud", product: "ownCloud" }, { vendor: "MinIO", product: "MinIO" }, { vendor: "Strapi", product: "Strapi" },
+    { vendor: "Metabase", product: "Metabase" }, { vendor: "dotCMS", product: "dotCMS" }, { vendor: "Exim", product: "Exim" },
+    { vendor: "Exim", product: "Mail Transfer Agent (MTA)" },
+  ];
+  const all = [...PAIRS, ...extra];
+  const vote = (software: string, asset_type = "server") => {
+    const parsed = parseSoftware(software);
+    return normaliserVote(row(software, asset_type), parsed, topCandidates(parsed, all));
+  };
+  // round 2's look-alikes with the extra word in a note were confident matches (0.91-0.95); now unsure (ask the owner):
+  // a short note's words (Runner, UI, LFS, Ruby gem, X), also before a host word ("on build server"), the vendor or
+  // platform a note names (for Windows, Microsoft), and a note that types the row a client or cloud service unlike the KEV
+  // product, even a long one or one naming a host
+  for (const [raw, asset] of [
+    ["GitLab 16.0 (Runner)", "server"], ["jQuery 1.12.1 (UI)", "server"], ["Git 3.4 (LFS)", "laptop"], ["OpenSSL 3.2 (Ruby gem)", "server"], ["Jenkins (X)", "server"],
+    ["GitLab 16.0 (Runner on build server)", "server"], ["jQuery 1.12.1 (UI in intranet)", "server"], ["Git 2.43 (LFS via Homebrew)", "laptop"],
+    ["OpenSSL 3.2 (Ruby gem in Rails app)", "server"], ["MinIO 2024 (client on backup server)", "server"],
+    ["Sudo (for Windows)", "laptop"], ["Sudo 1.9 (Microsoft)", "laptop"],
+    ["ownCloud 4.0 (desktop client)", "laptop"], ["MinIO 2024 (client)", "server"], ["Strapi (Cloud)", "server"], ["Metabase (Cloud)", "server"], ["dotCMS (Cloud)", "server"],
+    ["MinIO 2024 (client for the backup jobs)", "server"], ["Strapi (Cloud, managed by the vendor)", "server"], ["ownCloud 4.0 (desktop client on staff laptops)", "laptop"],
+  ] as const) {
+    const v = vote(raw, asset);
+    assert.equal(voteKind(v), "abstain", `${raw}: never a confident match (got ${v.vendor}/${v.product} ${v.confidence})`);
+  }
+  // the P4 look-alikes stay a confident "no KEV product"
+  for (const raw of ["FortiClient VPN (laptops)", "Exchange Online (M365 tenant)"]) assert.equal(voteKind(vote(raw, "laptop")), "no_match", raw);
+  // still matched: a note with no product word, a "bundled in" clause (it names the host, and its type is the host's), a
+  // note about the host, a longer note (a description, not a name), a word of another KEV spelling of the family, the
+  // vendor's other KEV name, a version, and a platform after a main text that names the vendor itself
+  for (const [raw, family, asset] of [
+    ["OpenSSL 1.1.1k (bundled in Apache 2.4)", "openssl:openssl", "server"], ["Notepad++ 8.6.2 (64-bit)", "notepad++:notepad++", "laptop"],
+    ["Samba 4.15 (shared drives for the finance team)", "samba:samba", "server"],
+    ["log4j-core 2.14.1 (bundled in ERP WAR)", "apache:log4j", "server"], ["jQuery 1.12.1 (bundled in ERP WAR)", "jquery:jquery", "server"],
+    ["PHP 8.1.2 (on Windows Server)", "php:php", "server"], ["Samba 4.15 (on NAS)", "samba:samba", "server"], ["Git 2.39.1 (via Homebrew)", "git:git", "laptop"],
+    ["Jenkins 2.440 (CLI)", "jenkins:jenkins", "server"],
+    ["GitLab 16.0 (CE)", "gitlab:gitlab", "server"], ["Exim 4.92 (MTA)", "exim:exim", "server"], ["PHP 8.1.2 (PHP Group)", "php:php", "server"],
+    ["OpenSSL (1.1.1k)", "openssl:openssl", "server"], ["OpenSSL (1.1.x)", "openssl:openssl", "server"], ["7-Zip 23.01 (for Windows)", "7-zip:7-zip", "laptop"],
+    // a type from the main text is not a note's: "lib" is a packaging word there
+    ["jQuery lib 3.4.1", "jquery:jquery", "server"],
+  ] as const) {
+    const v = vote(raw, asset);
+    assert.equal(voteKind(v), "match", raw);
+    assert.equal(voteFamily(v), family, raw);
+  }
+  // a role or host word in a short note counts like the same word in the name ("Samba file shares", "Samba installed"): the
+  // row's own product or, at worst, unsure (fail-closed); never another product, never a confident "no KEV product"
+  for (const [raw, family] of [
+    ["Samba 4.15 (file shares)", "samba:samba"], ["Jenkins 2.440 (controller)", "jenkins:jenkins"], ["PHP 8.1.2 (Apache module)", "php:php"],
+    ["Samba 4.15 (installed on NAS)", "samba:samba"],
+  ] as const) {
+    const v = vote(raw);
+    const kind = voteKind(v);
+    assert.ok(kind === "abstain" || (kind === "match" && voteFamily(v) === family), `${raw}: ${kind} ${v.vendor}/${v.product}`);
+  }
+  // only the vote changes: the row's type, which the critic uses, is still the parse's
+  assert.equal(parseSoftware("MinIO 2024 (client)").product_type, "client");
+  assert.equal(parseSoftware("Strapi (Cloud)").product_type, "cloud_service");
+});
+
 test("a KEV vendor whose KEV product name is only generic words (WordPress / Core): unsure, never a confident none", () => {
   const pairs = [
     { vendor: "WordPress", product: "Core" }, { vendor: "WordPress", product: "Social Warfare Plugin" },
