@@ -10,6 +10,16 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 
 **At a glance:** 0 wrong answers on 30 held-out rows (one run): 23 of 23 answered rows right; 7 sent to the owner with a question instead of a decision. The rows come from the synthetic inventory and the answers from two teammates. In the same test, a single Ultra call, given all 30 rows and the union of our normaliser's candidate shortlists, named the right KEV product (or none) for all 30. Details: [§11](#11-evaluation) and [`docs/evaluation.md`](docs/evaluation.md).
 
+## Team
+
+**Megatron's Interns**, for the GenAI.works Open Agent Hackathon 2026, track **Solving Fragmented Intelligence**.
+
+| Name | GitHub | Role |
+|---|---|---|
+| Mohd Amir Suhel (team lead) | [`Amir-007`](https://github.com/Amir-007) | test answers, fresh-download test, slide deck, demo video, submission |
+| Thant Zaw Latt | [`Z-a-w-L-a-t-t`](https://github.com/Z-a-w-L-a-t-t) | the synthetic software list, test answers |
+| Berkin Kaynar | [`berkinksk`](https://github.com/berkinksk) | system design and code (built with Claude Code), data setup |
+
 ---
 
 ## Contents
@@ -32,7 +42,6 @@ It is built for the **Solving Fragmented Intelligence** challenge: the facts it 
 17. [Limitations](#17-limitations)
 18. [Security caveats](#18-security-caveats)
 19. [Future work](#19-future-work)
-20. [Team](#20-team)
 
 ---
 
@@ -492,7 +501,3 @@ The app has no database of its own: the live sources are read through Zetaris wh
 - Reopen a decision automatically when a product is added to KEV, or when an owner answers a question (the "since the last run" diff already lists newly cited KEV CVEs and open questions).
 - Vendor advisories as a fifth source; export to a ticket system; a scheduled daily run.
 - A view for IT providers who look after several small organisations.
-
-## 20. Team
-
-Team Megatron's Interns, GenAI.works Open Agent Hackathon 2026.
