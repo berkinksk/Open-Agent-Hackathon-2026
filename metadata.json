@@ -68,7 +68,8 @@
     "readme": "README.md",
     "evaluation": "docs/evaluation.md",
     "slide_deck": "docs/deck.pdf",
-    "fresh_download_test": "docs/fresh-download-test/"
+    "fresh_download_test": "docs/fresh-download-test/",
+    "demo_video": "https://youtu.be/BanXoHVBOpM"
   },
   "pre_existing_components": [
     "Meterless World Model reference engine (Apache-2.0), vendored unmodified from github.com/Meterless/Meterless at commit 1742dec"
