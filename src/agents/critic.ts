@@ -90,6 +90,8 @@ export interface CriticCheck { rule: CriticRule; pass: boolean; detail: string; 
  * n/a: no version check (no match, a type conflict, or no KEV CVE for the family).
  */
 export type VersionStatus = "affected" | "not_affected" | "unknown" | "missing" | "not_needed" | "n/a";
+/** One KEV CVE's version check (see CriticOutcome.cve_status). */
+export type CveVersionStatus = "inside" | "outside" | "unchecked";
 export interface CriticOutcome {
   verdict: CriticVerdict;
   checks: CriticCheck[];
@@ -110,6 +112,12 @@ export interface CriticOutcome {
   version_status: VersionStatus;
   /** The KEV CVEs of the claimed family (what the claim rests on). */
   family_cves: string[];
+  /**
+   * The version check per family CVE: "inside" (NVD places the version inside an affected range, or marks every version
+   * affected), "outside" (NVD places it outside every range of that CVE) or "unchecked" (not looked up, no ranges, or a
+   * version too vague to place). Empty when no version check ran (no claim, no KEV CVE, a type conflict).
+   */
+  cve_status?: Record<string, CveVersionStatus>;
   claimed: KevPair | null;
   asset_name: string;
   software: string;
@@ -289,12 +297,14 @@ export function critique(input: CriticInput, opts: CriticOptions = {}): CriticOu
   let fixed: string | null = null;
   let nvdNeeded: string[] = [];   // name-only: family CVEs with no NVD record yet (a retry could bring evidence)
   let nameOnlyQuestion: string | null = null;
+  const cveStatus: Record<string, CveVersionStatus> = {};
   if (claimed && familyCves.length > 0 && !conflict) { // a type conflict makes the version question moot
     const ranges = input.nvd_ranges ?? null;
     const perCve = familyCves.map((cve) => {
       const rs = ranges ? rangesForProduct(ranges.filter((r) => cveKey(r?.cve_id) === cve), claimed.vendor, claimed.product) : [];
       return { cve, rs, hit: isAffected(version, rs) };
     });
+    for (const p of perCve) cveStatus[p.cve] = p.hit === true ? "inside" : p.hit === false ? "outside" : "unchecked";
     if (perCve.some((p) => p.rs.some(isAllVersions))) versionStatus = "not_needed";
     else if (!hasVersion(version)) versionStatus = "missing";
     else {
@@ -461,6 +471,7 @@ export function critique(input: CriticInput, opts: CriticOptions = {}): CriticOu
     kev_type: kevType,
     version_status: versionStatus,
     family_cves: familyCves,
+    cve_status: cveStatus,
     claimed,
     asset_name: asset,
     software,
@@ -635,7 +646,7 @@ export function criticTraceEvent(outcome: CriticOutcome): Omit<TraceEvent, "ts" 
     status: v.verdict === "approve" ? "ok" : v.verdict === "send_back" ? "sent_back" : "blocked",
     details: {
       rubric: v.rubric, reasons: v.reasons, checks: outcome.checks, row_type: outcome.row_type, kev_type: outcome.kev_type,
-      version_status: outcome.version_status, family_cves: outcome.family_cves, contested: outcome.contested,
+      version_status: outcome.version_status, family_cves: outcome.family_cves, cve_status: outcome.cve_status ?? {}, contested: outcome.contested,
       send_back_note: outcome.send_back_note, nvd_needed: outcome.nvd_needed, owner_question: outcome.owner_question?.question ?? null,
     },
   };

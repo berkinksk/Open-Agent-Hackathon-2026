@@ -56,6 +56,23 @@ export interface CriticLoopInput {
    * does not back; a definite "different product" is a blocker (send back, then ask the owner).
    */
   ultraMatchCheck?: boolean;
+  /**
+   * Completing the version check (after the loop): for an approved match that NVD already places inside one KEV CVE,
+   * the family's other CVEs to look up in NVD now, in priority order (the run passes the cited ones not checked yet,
+   * earliest due date first). They are looked up within the run's NVD budget (today's cache is free), round-robin over
+   * the rows, internet-facing first, and the row's per-CVE check is redone with them, so a CVE NVD places the version
+   * outside is dropped on evidence instead of being counted fail-closed. Absent: no completion.
+   */
+  completeVersionCheck?: (row: InventoryRow, res: Resolution, o: CriticOutcome) => string[];
+}
+
+export interface VersionCompletionStats {
+  rows: number;
+  requested: number;
+  looked_up: number;
+  now_inside: number;
+  now_outside: number;
+  still_unchecked: number;
 }
 
 export interface CriticLoopStats {
@@ -72,6 +89,7 @@ export interface CriticLoopStats {
   match_checks: number;
   match_disputes: number;
   match_disputed_rows: string[];
+  version_completion?: VersionCompletionStats;
 }
 
 export interface CriticLoopResult {
@@ -204,7 +222,7 @@ export async function runCriticLoop(input: CriticLoopInput): Promise<CriticLoopR
     return input.familyOf(p);
   };
 
-  const review = (row: InventoryRow, round: number): CriticOutcome => {
+  const review = (row: InventoryRow, round: number, counted = true): CriticOutcome => {
     const res = resolutions.get(row.row_id) as Resolution;
     const parsed = input.parsed.get(row.row_id) as ParsedSoftware;
     const family = rowFamOf(row, res);
@@ -215,7 +233,7 @@ export async function runCriticLoop(input: CriticLoopInput): Promise<CriticLoopR
     // CVEs outside this row's NVD plan, or given up on (budget, dormant helper, failed lookup), are never re-requested
     const skipped = familyCves.filter((c) => !facts.nvdLooked(c) && (!plan.has(c) || facts.nvdGivenUp(c)));
     const claimed = res.status === "matched" && res.vendor && res.product ? { vendor: res.vendor, product: res.product } : null;
-    stats.reviews++;
+    if (counted) stats.reviews++;
     return critique({
       row, parsed, resolution: res, kev_entries: entries, evidence: input.evidenceFor(row, res),
       nvd_ranges: looked.length ? (input.rangesFilter ? input.rangesFilter(row, res, facts.rangesFor(looked)) : facts.rangesFor(looked)) : null,
@@ -403,7 +421,68 @@ export async function runCriticLoop(input: CriticLoopInput): Promise<CriticLoopR
     for (const x of sendBacks) rounds.set(x.id, (rounds.get(x.id) ?? 0) + 1);
     pending = sendBacks.map((x) => x.id);
   }
+  if (input.completeVersionCheck) stats.version_completion = await completeVersionChecks(input, outcomes, resolutions, review);
   return { resolutions, outcomes, receipts, stats };
+}
+
+/**
+ * Once NVD places a match's version inside one KEV CVE, the other cited CVEs of its family are looked up too (within the
+ * run's NVD budget; today's cache is free), and only the per-CVE check (`cve_status`) of the outcome is updated: the
+ * verdict, rubric and checks stand (more ranges cannot turn "affected" into anything else). A CVE NVD now places the
+ * version outside is then dropped from the line on evidence; one still unchecked stays cited, counted fail-closed.
+ */
+async function completeVersionChecks(
+  input: CriticLoopInput, outcomes: Map<string, CriticOutcome>, resolutions: Map<string, Resolution>,
+  review: (row: InventoryRow, round: number, counted?: boolean) => CriticOutcome,
+): Promise<VersionCompletionStats> {
+  const { facts, tracer } = input;
+  const want = input.rows
+    .map((row) => {
+      const o = outcomes.get(row.row_id);
+      const res = resolutions.get(row.row_id);
+      if (!o || !res || res.status !== "matched" || !o.claimed || o.verdict.verdict !== "approve") return null;
+      if (!Object.values(o.cve_status ?? {}).includes("inside")) return null;
+      const st = o.cve_status ?? {};
+      const cves = [...new Set((input.completeVersionCheck?.(row, res, o) ?? []).map(cveKey))]
+        .filter((c) => c && (st[c] ?? "unchecked") === "unchecked" && !facts.nvdLooked(c) && !facts.nvdGivenUp(c));
+      return cves.length ? { row, o, cves } : null;
+    })
+    .filter((x): x is { row: InventoryRow; o: CriticOutcome; cves: string[] } => !!x)
+    .sort((a, b) => Number(b.row.internet_facing) - Number(a.row.internet_facing));
+  const out: VersionCompletionStats = { rows: want.length, requested: 0, looked_up: 0, now_inside: 0, now_outside: 0, still_unchecked: 0 };
+  if (!want.length) return out;
+  // round-robin: each row's most urgent unchecked CVE first, so one large family cannot take the whole budget
+  const order: string[] = [];
+  for (let i = 0; want.some((w) => i < w.cves.length); i++) {
+    for (const w of want) if (i < w.cves.length && !order.includes(w.cves[i])) order.push(w.cves[i]);
+  }
+  out.requested = order.length;
+  const done = await facts.ensureNvd(order, `completing the version check of ${want.length} confirmed match(es) (${want.map((w) => w.row.row_id).join(", ")}): the other cited KEV CVEs of the family, earliest due date first`);
+  out.looked_up = done.length;
+  const changes: { row_id: string; inside: string[]; outside: string[]; unchecked: string[] }[] = [];
+  for (const w of want) {
+    const fresh = review(w.row, w.o.verdict.round, false).cve_status ?? {};
+    const prev = w.o.cve_status ?? {};
+    const merged: Record<string, "inside" | "outside" | "unchecked"> = { ...prev };
+    const ch = { row_id: w.row.row_id, inside: [] as string[], outside: [] as string[], unchecked: [] as string[] };
+    for (const c of w.cves) {
+      const s = (prev[c] ?? "unchecked") === "unchecked" ? fresh[c] ?? "unchecked" : prev[c];
+      merged[c] = s;
+      ch[s].push(c);
+    }
+    out.now_inside += ch.inside.length;
+    out.now_outside += ch.outside.length;
+    out.still_unchecked += ch.unchecked.length;
+    outcomes.set(w.row.row_id, { ...w.o, cve_status: merged });
+    changes.push(ch);
+  }
+  tracer.emit({
+    agent: "critic", action: "version_check_completed", target_agent: "exposure_analyst", status: "ok",
+    input_summary: `${want.length} approved match(es) NVD places inside a KEV CVE; ${order.length} other cited CVE(s) of their families not checked yet`,
+    output_summary: `${out.looked_up} looked up in NVD: ${out.now_inside} now inside, ${out.now_outside} now outside (dropped on evidence), ${out.still_unchecked} still unchecked (counted fail-closed)`,
+    details: { rows: changes, budget_left_ms: Math.max(0, Math.round(facts.budgetLeftMs())) },
+  });
+  return out;
 }
 
 /** The final normaliser vote stays in the votes, so the critic can score agreement with the deterministic reader. */

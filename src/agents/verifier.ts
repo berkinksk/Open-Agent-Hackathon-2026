@@ -239,16 +239,19 @@ export async function verifyLive(
   const source = opts.source ?? (opts.mode === "sample" ? "snapshot" : "live");
   const out = verifyLines(lines, liveKev, liveEpss, { ...opts, source });
   const blockedRows = out.filter((l) => !l.verified).map((l) => l.row_id);
+  // "verified" on a line that cites no KEV or EPSS value means nothing was compared: counted apart, never as re-checked
+  const nothing = out.filter((l) => l.verified && l.verifier_notes.some((n) => /nothing to re-check/.test(n))).length;
+  const rechecked = out.length - blockedRows.length - nothing;
 
   if (opts.tracer) {
     try {
       opts.tracer.emit({
         agent: "verifier", action: "recheck", target_agent: "reporter",
         input_summary: `${lines.length} line(s); ${ids.kev.length} KEV + ${ids.epss.length} EPSS CVE(s), re-queried ${source}`,
-        output_summary: `${out.length - blockedRows.length}/${out.length} verified; ${blockedRows.length} blocked${errors.length ? `; ${errors.length} source error(s)` : ""}`,
+        output_summary: `${rechecked} re-checked and matched, ${nothing} with nothing to re-check, ${blockedRows.length} blocked (of ${out.length})${errors.length ? `; ${errors.length} source error(s)` : ""}`,
         latency_ms: Date.now() - t0,
         status: errors.length ? "error" : blockedRows.length ? "blocked" : "ok",
-        details: { source, kev_ids: ids.kev, epss_ids: ids.epss, blocked_rows: blockedRows, errors },
+        details: { source, rechecked, nothing_to_recheck: nothing, blocked: blockedRows.length, kev_ids: ids.kev, epss_ids: ids.epss, blocked_rows: blockedRows, errors },
       });
       for (const l of out) {
         if (l.verified) continue;

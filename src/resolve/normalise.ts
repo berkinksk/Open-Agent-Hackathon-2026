@@ -1119,6 +1119,16 @@ function eponymousDoubt(ctx: InvCtx, pick: Candidate, list: Candidate[]): string
   return extra.length ? `words beyond the KEV name: ${extra.join(" ")}` : null;
 }
 
+/**
+ * A KEV product named only with generic words ("Core", "Platform", "Enterprise", "Web Server"), not a vague umbrella
+ * ("Multiple Products" is handled as vague): under a vendor the row names, it may well be the row's product.
+ */
+function genericOnlyProduct(c: KevPair): boolean {
+  if (kevInfo(c).vague) return false;
+  const words = canonicalTokens(c.product, normVendor(c.vendor)).filter((t) => !/^\d/.test(t));
+  return words.length > 0 && words.every((t) => GENERIC.has(t));
+}
+
 /** One reading of the candidates for a row of a given type: a pick (with its confidence), or a null vote's confidence. */
 function ballot(ctx: InvCtx, list: Candidate[], asset: AssetContext): { pick: Candidate | null; kevType: ProductType; confidence: number } {
   const none = (confidence: number) => ({ pick: null, kevType: "unknown" as ProductType, confidence });
@@ -1148,6 +1158,10 @@ function ballot(ctx: InvCtx, list: Candidate[], asset: AssetContext): { pick: Ca
   // a vague KEV entry that resembles the row ("Microsoft / Microsoft", "<vendor> / Multiple Products") may list the
   // row's product under that name: unsure, never a confident "no KEV product"
   if (scored.some((x) => x.s.vague && x.s.name >= T.lookalike_name_min)) return none(CONF_ABSTAIN);
+  // the row names a KEV vendor whose KEV product name is only generic words ("WordPress / Core", "Drupal / Core",
+  // "XWiki / Platform", "Splunk / Enterprise"): no product word can match, so the vendor is the only signal. Unsure (the
+  // jury, or the owner, decides), never a confident "no KEV product" (design §5.5: thin evidence never relaxes a line)
+  if (scored.some((x) => !x.blocked && x.s.vendor === "match" && genericOnlyProduct(x.c))) return none(CONF_ABSTAIN);
   const near = scored.filter((x) => x.blocked && !x.s.vague && x.s.name >= T.lookalike_name_min);
   // the asset column contradicts the best name match (vCenter on a laptop): unsure, not "no match"
   if (near.some((x) => x.s.typeRel !== "conflict")) return none(CONF_ABSTAIN);

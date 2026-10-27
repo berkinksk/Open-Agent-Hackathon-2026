@@ -55,8 +55,11 @@ export class FactStore {
   readonly nvdState = new Map<string, NvdOutcome>();
   /** The day each looked-up CVE's NVD data was read (the adapter's status as_of): today, or the cache day. */
   readonly nvdAsOf = new Map<string, string>();
-  /** Live NVD lookups (cached ones are free and not counted). */
-  nvdCalls = 0;
+  /**
+   * The per-run budget counter: NVD lookups attempted outside today's cache (failed attempts and the client's fallback
+   * copies included), counted against nvdMaxCves. It is not a count of live reads: see nvdCounts().
+   */
+  nvdAttempts = 0;
   nvdCachedHits = 0;
   nvdMs = 0;
 
@@ -208,6 +211,21 @@ export class FactStore {
     return s !== undefined && NVD_READ_LIVE.has(s);
   }
 
+  /**
+   * The run's NVD counts for the trace. live_reads = CVEs read through Zetaris to NVD in this run (states ok,
+   * no_configurations, not_found), and only in live mode: a sample run reads the snapshot, so it is always 0.
+   * attempts is the budget counter; errors, fallback (the client's saved copy), cached (today's cache), skipped (budget)
+   * and dormant are counted apart.
+   */
+  nvdCounts(live: boolean): { live_reads: number; attempts: number; errors: number; fallback: number; cached: number; skipped: number; dormant: number } {
+    const states = [...this.nvdState.values()];
+    const n = (s: NvdOutcome): number => states.filter((x) => x === s).length;
+    return {
+      live_reads: live ? states.filter((x) => NVD_READ_LIVE.has(x)).length : 0,
+      attempts: this.nvdAttempts, errors: n("error"), fallback: n("fallback"), cached: n("cached"), skipped: n("skipped_budget"), dormant: n("dormant"),
+    };
+  }
+
   /** Was this CVE given up on (budget spent, helper dormant or a failed lookup)? Never asked for again. */
   nvdGivenUp(cve: string): boolean {
     const s = this.nvdState.get(cveKey(cve));
@@ -238,7 +256,7 @@ export class FactStore {
         if (this.nvdDormant) { this.nvdState.set(cve, "dormant"); skipped.push(cve); continue; }
         // today's cache costs no NVD request, so it never counts against the budget or the cap
         const cached = this.#o.queries.nvdCached?.(cve) === true;
-        if (!cached && (this.nvdCalls >= this.#o.nvdMaxCves || this.budgetLeftMs() <= 0)) { this.nvdState.set(cve, "skipped_budget"); skipped.push(cve); continue; }
+        if (!cached && (this.nvdAttempts >= this.#o.nvdMaxCves || this.budgetLeftMs() <= 0)) { this.nvdState.set(cve, "skipped_budget"); skipped.push(cve); continue; }
         if (!cached && this.#nvdFirstStart === null) this.#nvdFirstStart = this.#now();
         const t0 = this.#now();
         try {
@@ -248,7 +266,7 @@ export class FactStore {
           const known: NvdOutcome[] = ["ok", "cached", "fallback", "no_configurations", "not_found", "error"];
           this.nvdState.set(cve, known.includes(state) ? state : "error");
           if (st?.as_of) this.nvdAsOf.set(cve, st.as_of);
-          if (state === "cached") this.nvdCachedHits++; else this.nvdCalls++;
+          if (state === "cached") this.nvdCachedHits++; else this.nvdAttempts++;
           if (state !== "error") {
             this.nvdRanges.set(cve, ranges.filter((r) => cveKey(r.cve_id) === cve));
             done.push(cve);
@@ -258,7 +276,7 @@ export class FactStore {
             this.nvdDormant = msg(e);
             this.nvdState.set(cve, "dormant");
           } else {
-            this.nvdCalls++;
+            this.nvdAttempts++;
             this.nvdState.set(cve, "error");
           }
           skipped.push(cve);

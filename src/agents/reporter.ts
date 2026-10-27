@@ -26,12 +26,13 @@ function dueClause(due: string, overdue: number | null): string {
   return `(${due}) is in ${plural(-overdue, "day")}`;
 }
 
-function kevSentence(line: PatchLine): string {
+function kevSentence(line: PatchLine, outside = 0): string {
   const name = productName(line);
   const cves = line.kev?.cves ?? [];
   const latest = cves[0];
+  const out = outside > 0 ? `; NVD places the version outside the ranges of ${plural(outside, "other KEV CVE")}` : "";
   return latest
-    ? `${name} is listed in CISA KEV as exploited in the wild: ${plural(cves.length, "cited CVE")}, most recently ${latest.cve_id} (added ${latest.date_added}).`
+    ? `${name} is listed in CISA KEV as exploited in the wild: ${plural(cves.length, "cited CVE")}, most recently ${latest.cve_id} (added ${latest.date_added})${out}.`
     : `${name} is listed in CISA KEV as exploited in the wild.`;
 }
 
@@ -43,12 +44,50 @@ function dueText(line: PatchLine): string {
  * A KEV-listed line whose installed version could not be confirmed (no version, or no NVD range settles it): it stays
  * patch_now (fail-closed), and the owner question says what to confirm. `group` names a grouped question (Windows).
  */
-export function whyVersionUnconfirmed(line: PatchLine, policy: Policy, opts: { group?: string | null; action?: string | null } = {}): string {
+export function whyVersionUnconfirmed(line: PatchLine, policy: Policy, opts: { group?: string | null; action?: string | null; outside?: number } = {}): string {
   const action = opts.action ? `${opts.action}; ` : "";
   const ask = opts.group
     ? `the build is unconfirmed, so it stays patch_now and one question covers every ${opts.group} machine`
     : "the version is unconfirmed, so it stays patch_now until you answer the owner question";
-  return `${kevSentence(line)} Patch by ${line.target_date} under your ${policy.sla_days.patch_now}-day rule (${dueText(line)}): ${action}${ask}.`;
+  return `${kevSentence(line, opts.outside ?? 0)} Patch by ${line.target_date} under your ${policy.sla_days.patch_now}-day rule (${dueText(line)}): ${action}${ask}.`;
+}
+
+const cveKey = (s: string | null | undefined): string => String(s ?? "").trim().toUpperCase();
+
+/**
+ * A KEV-listed line whose version NVD places inside the affected range of at least one cited CVE: the "why" leads with
+ * that confirmed CVE. The other cited CVEs were not version-checked and are counted fail-closed (see
+ * scopeKevToVersion): the "why" says so, and names the CVE the due date or the EPSS comes from when it is one of them.
+ * `inside` lists the confirmed CVEs; without it, every cited CVE counts as confirmed.
+ */
+export function whyConfirmed(
+  line: PatchLine, policy: Policy, detail: { version: string | null; outside?: number; inside?: string[] },
+): string {
+  const name = productName(line);
+  const cves = line.kev?.cves ?? [];
+  const confirmedIds = new Set((detail.inside ?? cves.map((c) => c.cve_id)).map(cveKey));
+  const confirmed = cves.filter((c) => confirmedIds.has(cveKey(c.cve_id)));
+  const first = confirmed[0];
+  if (!first) return whyFor(line, null, policy);
+  const notChecked = cves.length - confirmed.length;
+  const what = detail.version ? `${name} ${detail.version}` : `every version of ${name}`;
+  const range = confirmed.length === 1
+    ? `the affected range of ${first.cve_id}`
+    : `the affected ranges of ${plural(confirmed.length, "KEV-listed CVE")}, most recently ${first.cve_id}`;
+  const others = [
+    notChecked > 0 ? `${plural(notChecked, "other cited KEV CVE")} ${notChecked === 1 ? "is" : "are"} not version-checked, counted fail-closed` : "",
+    detail.outside ? `it is outside the ranges of ${plural(detail.outside, "other KEV CVE")}` : "",
+  ].filter(Boolean);
+  const s1 = `NVD places ${what} inside ${range}, which CISA KEV lists as exploited in the wild (added ${first.date_added})${others.length ? `; ${others.join("; ")}` : ""}.`;
+  // which CVE the benchmark date comes from, when it is one counted fail-closed
+  const due = line.kev?.earliest_due ?? null;
+  const dueCve = due ? confirmed.find((c) => c.due_date === due) ?? cves.find((c) => c.due_date === due) : undefined;
+  const dueNote = dueCve && !confirmedIds.has(cveKey(dueCve.cve_id)) ? ` (${dueCve.cve_id}, not version-checked)` : "";
+  const e = line.epss;
+  const epss = e
+    ? `EPSS for ${e.cve_id}${confirmedIds.has(cveKey(e.cve_id)) ? "" : " (not version-checked)"} is ${e.max}${e.max < epssThreshold(line, policy) ? ", low, but the KEV listing decides under your rules" : ""}`
+    : "no EPSS score was found";
+  return `${s1} Patch by ${line.target_date} under your ${policy.sla_days.patch_now}-day rule; ${dueText(line)}${dueNote}, and ${epss}.`;
 }
 
 /** A matched row whose version NVD places outside every KEV-listed CVE of its family. */
