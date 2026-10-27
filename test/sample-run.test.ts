@@ -103,6 +103,11 @@ test("a judge's own rows run offline through run(): no model, no socket, real KE
     assert.ok(trace.some((e) => e.agent === "world_model" && e.action === "explain_audit"), "the World Model still runs");
     assert.ok(trace.some((e) => e.agent === "resolver_jury" && e.action === "deterministic_vote"), "the jury is the deterministic normaliser vote");
     assert.equal(trace.filter((e) => e.model).length, 0, "no event names a model");
+    // the NVD counts never claim a live read in a run with no network (snapshot misses are errors, not live calls)
+    const summary = trace.find((e) => e.action === "agents_summary") as unknown as { details: { nvd: Record<string, unknown> } };
+    assert.equal(summary.details.nvd.live_reads, 0);
+    assert.ok(!("live_calls" in summary.details.nvd));
+    assert.ok(Object.keys(summary.details.nvd.states as object).length > 0, "NVD was consulted (from the snapshot)");
     assert.ok(existsSync(join(OUT, `report-${id}.html`)));
     assert.match(readFileSync(join(OUT, `report-${id}.html`), "utf8"), /SAMPLE MODE/);
   } finally {
@@ -144,7 +149,19 @@ test("vendor-named KEV products resolve offline: never monitor or 'no KEV produc
     assert.notEqual(l.decision, "monitor", `${tag} is KEV-listed: never relaxed to monitor without proof`);
     assert.ok(["patch_now", "ask_owner"].includes(l.decision), `${tag}: ${l.decision}`);
     const cited = l.kev?.cves.map((c) => c.cve_id) ?? [];
-    for (const c of cves) assert.ok(cited.includes(c), `${tag} cites ${c} (cited: ${cited.join(", ")})`);
+    // every spelling's CVEs reach the line: cited (the confirmed ones and the ones not version-checked), or named in the
+    // evidence as not affected (NVD places the version outside its range)
+    const outside = l.evidence.find((e) => e.field === "kev_cves_version_not_affected")?.value ?? "";
+    const unchecked = l.evidence.find((e) => e.field === "kev_cves_not_version_checked")?.value ?? "";
+    for (const c of cves) assert.ok(cited.includes(c) || outside.includes(c), `${tag} cites ${c}, or names it as not affected (cited: ${cited.join(", ")}; ${outside})`);
+    if (row.row_id === "K9") {
+      // PHP 8.1.2: NVD places it inside CVE-2024-4577's range, so the line leads with that CVE; the 2012 CGI flaw has no
+      // NVD record in the snapshot (not version-checked), so it stays cited and counts toward the due date (fail-closed)
+      assert.deepEqual(cited, ["CVE-2024-4577", "CVE-2012-1823"]);
+      assert.match(unchecked, /counted fail-closed.*CVE-2012-1823/);
+      assert.equal(l.kev?.earliest_due, SNAP.kev_entries.find((e) => e.cve_id === "CVE-2012-1823")?.due_date);
+      assert.match(l.why, /^NVD places (PHP )?PHP 8\.1\.2 inside the affected range of CVE-2024-4577, .*1 other cited KEV CVE is not version-checked, counted fail-closed/);
+    }
     assert.doesNotMatch(l.why, /no CISA KEV product/i, `${tag} never claims KEV lists nothing`);
     const vote = l.resolution.votes.find((v) => v.juror === "normaliser");
     assert.ok(vote?.vendor && vote.product, `${tag}: the normaliser names the KEV product`);

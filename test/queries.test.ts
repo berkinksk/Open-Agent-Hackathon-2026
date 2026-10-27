@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 import type { QueryOptions, QueryResult, DdlResult } from "../src/adapters/zetaris.ts";
 import type { SqlClient } from "../src/adapters/queries.ts";
 import {
-  EPSS_BATCH_MAX, cleanCveIds, createZetarisQueries, elNames, epssTableName, toEpssScore,
+  EPSS_BATCH_MAX, cleanCveIds, createZetarisQueries, elNames, epssTableName, naiveJoinSql, toEpssScore,
 } from "../src/adapters/queries.ts";
-import { guardSql } from "../src/adapters/zetaris.ts";
+import { guardSql, SerialQueue, ZetarisClient } from "../src/adapters/zetaris.ts";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { memoryTracer } from "../src/trace.ts";
 
 interface Call { kind: "query" | "ddl"; sql: string; opts: any; }
@@ -181,4 +184,62 @@ test("helpers: cleanCveIds and toEpssScore", () => {
   assert.deepEqual(cleanCveIds(["cve-2021-44228", "CVE-2021-44228", "CVE-21-1", "x"]), { valid: ["CVE-2021-44228"], invalid: ["CVE-21-1", "x"] });
   assert.equal(toEpssScore({ cve_id: "CVE-2021-44228", epss: "abc", percentile: "1", score_date: "" }), null);
   assert.deepEqual(toEpssScore({ cve_id: "cve-2021-44228", epss: "0.5", percentile: "0.7", score_date: "2026-10-26" }), { cve_id: "CVE-2021-44228", epss: 0.5, percentile: 0.7, score_date: "2026-10-26" });
+});
+
+test("sourceStatus: a live read, then the client's cached copy after a failure (fromCache + cachedAt), with a real client", async () => {
+  let calls = 0;
+  const fakeFetch = (async () => {
+    calls++;
+    if (calls === 1) return new Response(JSON.stringify({ headers: ["vendor", "product"], data: [["Apache", "Log4j2"]], total: 1, timeUsed: 3 }), { status: 200 });
+    throw new TypeError("fetch failed");
+  }) as typeof fetch;
+  const dir = mkdtempSync(join(tmpdir(), "el-queries-cache-"));
+  try {
+    const client = new ZetarisClient({ restUrl: "http://zetaris.invalid/api/v1.0", orgId: "1", apiKey: "test-key-abcdef123456", fetchImpl: fakeFetch, retryDelayMs: 1, cacheDir: dir, queue: new SerialQueue() });
+    const q = createZetarisQueries({ client, tracer: memoryTracer(), prefix: "EL_" });
+    assert.deepEqual(await q.kevPairs(), [{ vendor: "Apache", product: "Log4j2" }]);
+    assert.deepEqual(await q.kevPairs(), [{ vendor: "Apache", product: "Log4j2" }]); // the live read failed: served from the cache
+    const st = q.sourceStatus();
+    assert.equal(st.length, 2);
+    assert.deepEqual(st.map((x) => [x.query, x.fromCache]), [["kevPairs", false], ["kevPairs", true]]);
+    assert.equal(st[0].cachedAt, undefined);
+    assert.match(st[1].cachedAt ?? "", /^\d{4}-\d{2}-\d{2}T/);
+    assert.equal(st[1].rows, 1);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("sourceStatus lists only cache-backed reads: the verifier's bypass reads are never listed", async () => {
+  const c = fakeClient((sql) => (sql.includes("epss") ? [{ cve_id: "CVE-2024-00001", epss: "0.1", percentile: "0.5", score_date: "2026-10-26" }] : []));
+  const q = createZetarisQueries({ client: c, tracer: memoryTracer(), prefix: "EL_" });
+  await q.epss(["CVE-2024-00001"]);
+  await q.epssVerify(["CVE-2024-00001"]);
+  await q.kevVerify(["CVE-2024-00001"]);
+  await q.inventory();
+  assert.deepEqual(q.sourceStatus().map((x) => [x.query, x.fromCache]), [["epss", false], ["inventory", false]]);
+});
+
+test("naiveJoinSql: inventory rows by id, or the request's rows as inline VALUES (quotes escaped); both pass the guards", () => {
+  const inv = naiveJoinSql({ from: "inventory", rowIds: ["R05", "R12", "R05"] });
+  assert.equal(inv, "SELECT i.row_id, k.vendor, k.product, count(DISTINCT k.cve_id) AS kev_cves FROM el.inventory i JOIN el.kev k ON instr(lower(i.software), lower(trim(k.product))) > 0 WHERE i.row_id IN ('R05', 'R12') GROUP BY i.row_id, k.vendor, k.product ORDER BY i.row_id, k.vendor, k.product");
+  const vals = naiveJoinSql({ from: "values", rows: [{ row_id: "Q1", software: "Bob's  WordPress 6.4" }] }, "EL_T1_");
+  assert.match(vals, /FROM \(VALUES \('Q1', 'Bob\\'s WordPress 6\.4'\)\) AS i\(row_id, software\) JOIN el_t1\.kev k ON/);
+  guardSql(inv);
+  guardSql(vals);
+});
+
+test("discover and naiveJoin: SHOW statements and the join, live (cache bypassed), parsed", async () => {
+  const c = fakeClient((sql) => {
+    if (sql === "SHOW LIGHTNING DATABASES") return [{ name: "EL_KEV" }, { name: "EL_INVENTORY" }, { name: "EL_T1_KEV" }, { name: "FZ_OTHER" }];
+    if (sql.startsWith("SHOW LIGHTNING TABLES")) return [{ name: sql.endsWith("EL_KEV") ? "el_kev_raw" : "el_inventory_raw", source_table: "https://raw.githubusercontent.com/x/y.json" }];
+    return [{ row_id: "R12", vendor: "TeamViewer", product: "Desktop", kev_cves: "1" }, { row_id: "R20", vendor: "Microsoft", product: "Word", kev_cves: "4" }];
+  });
+  const q = createZetarisQueries({ client: c, tracer: memoryTracer(), prefix: "EL_" });
+  const d = await q.discover();
+  assert.deepEqual(d.databases, ["EL_INVENTORY", "EL_KEV"]);
+  assert.deepEqual(d.tables.map((t) => `${t.db}.${t.name}`), ["EL_INVENTORY.el_inventory_raw", "EL_KEV.el_kev_raw"]);
+  assert.deepEqual(d.sql, ["SHOW LIGHTNING DATABASES", "SHOW LIGHTNING TABLES EL_INVENTORY", "SHOW LIGHTNING TABLES EL_KEV"]);
+  const j = await q.naiveJoin({ from: "inventory", rowIds: ["R12", "R20"] });
+  assert.deepEqual(j.rows, [{ row_id: "R12", vendor: "TeamViewer", product: "Desktop", kev_cves: 1 }, { row_id: "R20", vendor: "Microsoft", product: "Word", kev_cves: 4 }]);
+  assert.ok(c.calls.every((x) => x.opts.cache === "bypass"));
+  assert.deepEqual(q.sourceStatus(), [], "display reads are not cache-backed reads");
 });

@@ -743,3 +743,26 @@ test("vendor-named KEV entries: an exact brand name only; a neighbouring product
   // typo credit stays for every other KEV name
   assert.equal(voteFamily(vote("Exchnage Server 2016")), "microsoft:exchange-server");
 });
+
+test("a KEV vendor whose KEV product name is only generic words (WordPress / Core): unsure, never a confident none", () => {
+  const pairs = [
+    { vendor: "WordPress", product: "Core" }, { vendor: "WordPress", product: "Social Warfare Plugin" },
+    { vendor: "WebPros", product: "cPanel & WHM and WP2 (WordPress Squared)" }, { vendor: "Drupal", product: "Core" },
+    { vendor: "Notepad++", product: "Notepad++" },
+  ];
+  const vote = (software: string) => {
+    const row = { row_id: "W1", asset_id: "web-01", asset_name: "web-01", asset_type: "server", internet_facing: true, owner_team: "", software };
+    const p = parseSoftware(software);
+    return normaliserVote(row, p, topCandidates(p, pairs, 12));
+  };
+  for (const sw of ["WordPress 6.4.3 - public charity website", "Drupal 10.1 site"]) {
+    const v = vote(sw);
+    assert.equal(v.vendor, null, sw);
+    assert.ok(v.confidence < NORMALISER_THRESHOLDS.no_match_confidence_min, `${sw}: unsure (${v.confidence}), not a confident "no KEV product"`);
+  }
+  // a named plugin still matches its own KEV entry by name; a row naming no listed vendor stays a confident none
+  assert.equal(vote("WordPress Social Warfare Plugin 3.5.2").product, "Social Warfare Plugin");
+  const control = vote("Inkscape 1.3");
+  assert.equal(control.vendor, null);
+  assert.ok(control.confidence >= NORMALISER_THRESHOLDS.no_match_confidence_min);
+});

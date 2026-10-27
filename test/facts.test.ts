@@ -75,7 +75,9 @@ test("NVD: the cap counts live lookups only; today's cache is free; the rest is 
   assert.deepEqual(done, ["CVE-2000-0001", "CVE-2000-0003"]);
   assert.equal(f.nvdState.get("CVE-2000-0002"), "skipped_budget");
   assert.equal(f.nvdState.get("CVE-2000-0003"), "cached");
-  assert.equal(f.nvdCalls, 1);
+  assert.equal(f.nvdAttempts, 1);
+  assert.deepEqual(f.nvdCounts(true), { live_reads: 1, attempts: 1, errors: 0, fallback: 0, cached: 1, skipped: 1, dormant: 0 });
+  assert.equal(f.nvdCounts(false).live_reads, 0);
   assert.equal(f.nvdCachedHits, 1);
   assert.ok(f.nvdLooked("CVE-2000-0001") && f.nvdGivenUp("CVE-2000-0002"));
   assert.equal(f.rangesFor(["CVE-2000-0001", "CVE-2000-0002"]).length, 1);
@@ -90,7 +92,7 @@ test("NVD: a dormant helper marks every CVE dormant, once", async () => {
   await f.ensureNvd(["CVE-2000-0001", "CVE-2000-0002"], "test");
   assert.match(f.nvdDormant ?? "", /^dormant/);
   assert.equal(f.nvdState.get("CVE-2000-0002"), "dormant");
-  assert.equal(f.nvdCalls, 0);
+  assert.equal(f.nvdAttempts, 0);
 });
 
 test("NVD: an exhausted time budget skips the remaining CVEs", async () => {

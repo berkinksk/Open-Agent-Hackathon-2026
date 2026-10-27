@@ -611,7 +611,7 @@ function richTrace(): TraceEvent[] {
     ev("01:05.000", { agent: "Zetaris", action: "sql_query", latency_ms: 300, output_summary: "1 row(s) in 300 ms",
       details: { label: "kevVerify(1)", sql: "SELECT cve_id FROM el.kev WHERE cve_id IN ('CVE-2021-44228')", sql_hash: "ver1", rows: 1, fromCache: false, cache_mode: "bypass" } }),
     ev("01:06.000", { agent: "exposure_analyst", action: "decisions", output_summary: "2 patch_now, 1 this_cycle, 2 ask_owner, 1 monitor (as of 2026-10-26)" }),
-    ev("01:08.000", { agent: "verifier", action: "recheck", input_summary: "6 line(s); 2 KEV + 2 EPSS CVE(s), re-queried live", output_summary: "4/6 verified; 0 blocked" }),
+    ev("01:08.000", { agent: "verifier", action: "recheck", input_summary: "6 line(s); 2 KEV + 2 EPSS CVE(s), re-queried live", output_summary: "4 re-checked and matched, 2 with nothing to re-check, 0 blocked (of 6)" }),
     ev("01:10.000", { agent: "world_model", action: "ingest_run", output_summary: "+120 engine events; 1 merge reviews queued", details: { review_queue: ["Example CMS ~ Example CMS Pro (0.84)"] } }),
     ev("01:12.000", { agent: "pipeline", action: "agents_summary", output_summary: "jury 4 agreed, 1 split",
       details: { critic: { reviews: 8, rounds: 2, sent_back: 2, redecided: { lightning: 1, ultra: 0 }, nvd_sendbacks: 0, ultra_critiques: 1, match_checks: 1 }, nvd: { live_calls: 0, cached: 1, ms: 2, states: { "CVE-2021-44228": "cached" } } } }),
@@ -662,7 +662,7 @@ describe("trace facts (indexTrace)", () => {
     assert.deepEqual(f.pipeline[2].models.sort(), ["Bolt", "Lightning", "Ultra"]);
     assert.deepEqual(f.pipeline[2].text, ["6 rows: 4 agreed, 1 split (1 decided by Ultra)", "Ultra: 1 of 1 decided; 0 unresolved"]);
     assert.deepEqual(f.pipeline[3].text, ["8 reviews in 2 round(s); 2 send-back(s) (1 re-decided by Lightning, 0 by Ultra, 0 for NVD ranges); 1 Ultra critique(s); 1 same-product check(s)"]);
-    assert.deepEqual(f.pipeline[5].text, ["6 line(s); 2 KEV + 2 EPSS CVE(s), re-queried live", "4/6 verified; 0 blocked"]);
+    assert.deepEqual(f.pipeline[5].text, ["6 line(s); 2 KEV + 2 EPSS CVE(s), re-queried live", "4 re-checked and matched, 2 with nothing to re-check, 0 blocked (of 6)"]);
   });
 
   test("an empty or foreign trace gives empty facts", () => {
@@ -693,7 +693,7 @@ describe("renderReport: 1080p panels from the trace", () => {
     const order = ["Zetaris", "Normaliser", "Resolver jury", "Conflict critic", "Exposure analyst", "Verifier", "World Model"].map((a) => p.indexOf(`<div class="step-h">${a}`));
     assert.ok(order.every((i) => i > 0));
     assert.deepEqual([...order].sort((a, b) => a - b), order);
-    for (const s of ["6 row(s) from Zetaris el.inventory", "1756 distinct KEV (vendor, product) pairs", "Ultra: 1 of 1 decided; 0 unresolved", "4/6 verified; 0 blocked", "+120 engine events"]) {
+    for (const s of ["6 row(s) from Zetaris el.inventory", "1756 distinct KEV (vendor, product) pairs", "Ultra: 1 of 1 decided; 0 unresolved", "4 re-checked and matched, 2 with nothing to re-check, 0 blocked (of 6)", "+120 engine events"]) {
       assert.ok(p.includes(s), s);
     }
     assert.match(p, /Resolver jury <span class="badge m-bolt">Bolt<\/span><span class="badge m-lightning">Lightning<\/span><span class="badge m-ultra">Ultra<\/span>/);
@@ -960,5 +960,38 @@ describe("timing panel: counts from the run's own events (review round 1)", () =
     assert.deepEqual(nvdTile(sectionOf(renderReport(fixture(), { trace }), "timing")), ["2", "NVD lookups in the trace, 13.0 s"]);
     // no outcomes and no lookup events: no NVD tile at all
     assert.ok(!sectionOf(renderReport(fixture(), { trace: [summaryEvent({ calls: 0 })] }), "timing").includes("NVD"));
+  });
+});
+
+describe("federation and memory panels (from the run's own trace)", () => {
+  const extra: TraceEvent[] = [
+    { ts: "2026-10-26T20:00:00.500Z", run_id: "fixture-run-001", agent: "zetaris", action: "discovery", status: "ok",
+      output_summary: "sources discovered: 2 database(s) (EL_INVENTORY, EL_KEV); EL_KEV.el_kev_raw <- raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json" },
+    { ts: "2026-10-26T20:01:10.000Z", run_id: "fixture-run-001", agent: "zetaris", action: "naive_join", status: "ok", latency_ms: 1869,
+      output_summary: "a plain SQL join of the inventory and KEV inside Zetaris (KEV product name inside the software text) hits 2 of 6 row(s): 1 agree with the agents, 1 are look-alikes the agents found no KEV product for, 0 name another product than the agents' match; the agents resolve 3 row(s) the join misses",
+      details: { sql: "SELECT i.row_id, k.vendor, k.product FROM el.inventory i JOIN el.kev k ON instr(lower(i.software), lower(trim(k.product))) > 0", ms: 1869,
+        rows: [{ row_id: "r-001", naive: ["Apache / Log4j2"], agents: "Apache / Log4j2", outcome: "agree" }, { row_id: "r-002", naive: ["Microsoft / Word"], agents: null, outcome: "naive_only" }, { row_id: "r-003", naive: [], agents: null, outcome: "neither" }] } },
+    { ts: "2026-10-26T20:01:20.000Z", run_id: "fixture-run-001", agent: "world_model", action: "since_last_run", status: "ok",
+      output_summary: "since run prev-1 (2026-10-24): 6 row(s) compared, 0 new; 1 decision(s) changed; 0 line(s) cite new KEV CVEs (0 added to KEV after that run); 1 owner question(s) still open; 1 patch_now target(s) kept from the earlier run",
+      details: { previous: { run_id: "prev-1", as_of: "2026-10-24" }, changed: [{ row_id: "r-004", from: "monitor", to: "patch_now" }], newly_cited: [], still_open: [{ row_id: "r-005", since: "2026-10-24" }], anchored: [{ row_id: "r-001", target_date: "2026-10-31", was: "2026-11-02", since: "2026-10-24" }] } },
+  ];
+  test("the plain SQL join panel shows the SQL, the comparison and each row's outcome; the memory panel what changed", () => {
+    const html = renderReport(fixture(), { trace: [...sampleTrace(), ...extra] });
+    const fed = sectionOf(html, "federation");
+    assert.match(fed, /One SQL across the inventory and KEV, inside Zetaris/);
+    assert.match(fed, /instr\(lower\(i\.software\), lower\(trim\(k\.product\)\)\) &gt; 0/);
+    assert.match(fed, /look-alike \(agents: no KEV product\)/);
+    assert.match(fed, /sources discovered: 2 database\(s\)/);
+    assert.doesNotMatch(fed, /r-003/, "rows with no hit and nothing missed are left out");
+    const mem = sectionOf(html, "since-last-run");
+    assert.match(mem, /since run prev-1 \(2026-10-24\)/);
+    assert.match(mem, /the target stays 2026-10-31 \(not 2026-11-02\)/);
+    assert.match(mem, /owner question still open since 2026-10-24/);
+    assert.match(html, /href="#federation"/);
+    assert.match(html, /href="#since-last-run"/);
+    // without the events, neither panel appears
+    const plain = renderReport(fixture(), { trace: sampleTrace() });
+    assert.doesNotMatch(plain, /<section id="federation"/);
+    assert.doesNotMatch(plain, /<section id="since-last-run"/);
   });
 });

@@ -200,3 +200,18 @@ test("verifyLive re-queries in batches of <= 100, traces the re-check, and fails
   assert.equal(events2[1].action, "block_line");
   assert.equal(events2[1].status, "blocked");
 });
+
+test("verifyLive's summary counts a line with nothing cited apart: never as re-checked", async () => {
+  const cited = line({ row_id: "a", kev: { cves: [kev("CVE-2026-10001", "2026-10-29")], earliest_due: "2026-10-29", overdue_days: null }, epss: null, evidence: [] });
+  const none = line({ row_id: "b", decision: "monitor", kev: { cves: [], earliest_due: null, overdue_days: null }, epss: null, evidence: [] });
+  const queries: Pick<Queries, "kevVerify" | "epssVerify"> = {
+    async kevVerify(ids) { return ids.map((id) => kev(id, "2026-10-29")); },
+    async epssVerify() { return []; },
+  };
+  const events: Omit<TraceEvent, "ts" | "run_id">[] = [];
+  const res = await verifyLive([cited, none], queries, { tracer: { run_id: "t", file: "/dev/null", emit: (e) => { events.push(e); } } });
+  assert.ok(res.lines.every((l) => l.verified));
+  assert.equal(events[0].output_summary, "1 re-checked and matched, 1 with nothing to re-check, 0 blocked (of 2)");
+  assert.equal(events[0].details?.rechecked, 1);
+  assert.equal(events[0].details?.nothing_to_recheck, 1);
+});

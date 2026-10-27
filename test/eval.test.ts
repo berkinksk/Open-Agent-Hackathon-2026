@@ -18,6 +18,7 @@ import { buildBaselinePrompt, extractJson, parseBaselineReply, runBaseline, uniq
 import { createResolveArm, ultraRowsFromTrace } from "../src/eval/wiring.ts";
 import { devRowsOf, runUnlabelledEvaluation, sameAnswer, summariseUnlabelledArm } from "../src/eval/unlabelled.ts";
 import { ArmUnavailableError } from "../src/eval/types.ts";
+import { familiesOf } from "../src/resolve/normalise.ts";
 import type { AnswerRow, ArmName, ArmOutput, ArmPrediction, UnlabelledRow } from "../src/eval/types.ts";
 import { isUnlabelled, main as evalMain, parseEvalArgs, parseInventoryJson, UsageError } from "../scripts/eval.ts";
 import { main as compareMain, parseCompareArgs } from "../scripts/compare-answers.ts";
@@ -219,6 +220,18 @@ describe("scoring", () => {
     assert.equal(scoreRow(a, { row_id: "R02", vendor: "Citrix", product: "NetScaler Gateway Plus" }).outcome, "wrong_match");
     assert.equal(scoreRow(ans("R05"), { row_id: "R05", vendor: "Microsoft", product: "Windows " }).outcome, "match_ok");
     assert.equal(scoreRow(ans("R05"), { row_id: "R05", vendor: "Microsoft", product: "Win dows" }).outcome, "match_ok");
+  });
+  test("by KEV family: another KEV spelling of the answer's product is correct; a different product is still wrong", () => {
+    // the answer lists one spelling only; the prediction uses another KEV spelling of the same family
+    const a: AnswerRow = { ...ans("R02"), kev_vendors: ["Citrix"], kev_vendor: "Citrix", kev_products: ["NetScaler ADC and Gateway"] };
+    const other = { row_id: "R02", vendor: "Citrix", product: "NetScaler" };
+    assert.equal(scoreRow(a, other).outcome, "wrong_match", "listed spellings only: the unlisted spelling is not matched");
+    assert.equal(scoreRow(a, other, familiesOf).outcome, "match_ok", "by family: NetScaler and NetScaler ADC and Gateway are one family");
+    assert.equal(matchesAnswer({ vendor: "Citrix", product: "Workspace Application and Receiver for Windows" }, a, familiesOf), false);
+    const ff: AnswerRow = { ...ans("R02"), kev_vendors: ["Mozilla"], kev_vendor: "Mozilla", kev_products: ["Firefox"] };
+    assert.equal(matchesAnswer({ vendor: "Mozilla", product: "Firefox and Thunderbird" }, ff, familiesOf), true, "a combo spelling names the family");
+    assert.equal(matchesAnswer({ vendor: "Mozilla", product: "Firefox and Thunderbird" }, ff), false);
+    assert.equal(scoreRow(ans("R04"), { row_id: "R04", vendor: "Microsoft", product: "Exchange Server" }, familiesOf).outcome, "false_match", "none stays none");
   });
   test("the vendor must match too", () => {
     assert.equal(scoreRow(ans("R01"), { row_id: "R01", vendor: "Apache Foundation", product: "Log4j2" }).outcome, "wrong_match");

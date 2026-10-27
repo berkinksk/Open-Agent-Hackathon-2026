@@ -781,3 +781,26 @@ describe("CLI", () => {
     }
   });
 });
+
+describe("receipts on a fresh clone", () => {
+  test("no live trace in logs/: the committed example traces are audited instead, labelled; a bad one fails", () => {
+    const root = tmpRoot();
+    try {
+      mkdirSync(path.join(root, "output_examples"), { recursive: true });
+      writeFileSync(path.join(root, "output_examples", "example_1.trace.jsonl"), GOOD_TRACE);
+      writeFileSync(path.join(root, "output_examples", "example_2.trace.jsonl"), GOOD_TRACE);
+      const r = checkReceipts(root);
+      assert.equal(r.status, "PASS", r.detail);
+      assert.match(r.detail, /^no live trace in logs\/ yet, so the committed example traces in output_examples\/ were audited instead: example_1\.trace\.jsonl: 3\/3 model calls .*; example_2\.trace\.jsonl: 3\/3/);
+      // a live trace in logs/ always wins over the examples
+      mkdirSync(path.join(root, "logs"), { recursive: true });
+      writeFileSync(path.join(root, "logs", "trace-live-1.jsonl"), GOOD_TRACE);
+      assert.match(checkReceipts(root).detail, /^trace-live-1\.jsonl: 3\/3/);
+      rmSync(path.join(root, "logs"), { recursive: true, force: true });
+      writeFileSync(path.join(root, "output_examples", "example_3.trace.jsonl"), ev({ action: "jury_vote", model: MODELS.bolt, routed_model: null, receipt_id: null }) + "\n");
+      assert.equal(checkReceipts(root).status, "FAIL");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});

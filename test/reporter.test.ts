@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_POLICY } from "../src/contracts.ts";
 import type { InventoryRow, KevEntry, Resolution } from "../src/contracts.ts";
-import { whyFor } from "../src/agents/reporter.ts";
+import { whyConfirmed, whyFor, whyVersionUnconfirmed } from "../src/agents/reporter.ts";
 import { assessRow } from "../src/policy/analyst.ts";
 import type { AnalystContext } from "../src/policy/analyst.ts";
 import { familyKey } from "../src/resolve/candidates.ts";
@@ -88,4 +88,28 @@ test("this_cycle: the CVE, its EPSS and the threshold that applied", () => {
   const c = ctx({ nonKevByFamily: new Map([[familyKey("Apache Tomcat"), [{ cve_id: "CVE-2099-0001", epss: 0.07, percentile: 0.9, score_date: "2026-10-25" }]]]) });
   const { text } = why("Tomcat 9", res("matched", "Apache", "Tomcat"), c, true);
   assert.equal(text, "Apache Tomcat is not in KEV, but CVE-2099-0001 has EPSS 0.07, at or above your 0.05 threshold for internet-facing assets. Patch by 2026-11-25 under your 30-day rule.");
+});
+
+test("whyConfirmed leads with the CVE NVD places the version inside; whyVersionUnconfirmed counts the outside ones", () => {
+  const line = assessRow(row("R1", "Apache Log4j 2.14.1"), res("matched", "Apache", "Log4j2"), ctx()).line;
+  const one = { ...line, kev: { cves: [line.kev!.cves[1]], earliest_due: "2021-12-24", overdue_days: 1767 } };
+  const w = whyConfirmed(one, DEFAULT_POLICY, { version: "2.14.1", outside: 1 });
+  assert.match(w, /^NVD places Apache Log4j2 2\.14\.1 inside the affected range of CVE-2021-44228, which CISA KEV lists as exploited in the wild \(added 2021-12-10\); it is outside the ranges of 1 other KEV CVE\./);
+  assert.match(w, /the US federal due date \(2021-12-24\) passed 1767 days ago/);
+  assert.ok((w.match(/\. /g) ?? []).length <= 1, "at most two sentences");
+  assert.match(whyConfirmed(line, DEFAULT_POLICY, { version: null }), /^NVD places every version of Apache Log4j2 inside the affected ranges of 2 KEV-listed CVEs, most recently/);
+  assert.match(whyVersionUnconfirmed(line, DEFAULT_POLICY, { outside: 2 }), /; NVD places the version outside the ranges of 2 other KEV CVEs\./);
+  assert.doesNotMatch(whyVersionUnconfirmed(line, DEFAULT_POLICY), /outside/);
+});
+
+test("whyConfirmed with cited CVEs not version-checked: leads with the confirmed one and labels the others fail-closed", () => {
+  const line = assessRow(row("R1", "Apache Log4j 2.14.1"), res("matched", "Apache", "Log4j2"), ctx()).line;
+  // CVE-2021-45046 (newest) confirmed; CVE-2021-44228 not version-checked, with the earlier due date and the top EPSS
+  const w = whyConfirmed(line, DEFAULT_POLICY, { version: "2.14.1", inside: ["CVE-2021-45046"], outside: 1 });
+  assert.match(w, /^NVD places Apache Log4j2 2\.14\.1 inside the affected range of CVE-2021-45046, which CISA KEV lists as exploited in the wild \(added 2023-05-01\); 1 other cited KEV CVE is not version-checked, counted fail-closed; it is outside the ranges of 1 other KEV CVE\./);
+  assert.match(w, /the US federal due date \(2021-12-24\) passed \d+ days ago \(CVE-2021-44228, not version-checked\), and EPSS for CVE-2021-44228 \(not version-checked\) is 0\.99999\.$/);
+  assert.equal(sentences(w), 2);
+  // every cited CVE confirmed: no label
+  const all = whyConfirmed(line, DEFAULT_POLICY, { version: "2.14.1", inside: ["CVE-2021-45046", "CVE-2021-44228"] });
+  assert.doesNotMatch(all, /not version-checked/);
 });

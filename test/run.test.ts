@@ -9,7 +9,7 @@ import { DEFAULT_POLICY, MODELS } from "../src/contracts.ts";
 import type {
   ChatRequest, ChatResult, Deps, EpssScore, InventoryRow, KevEntry, KevPair, Llm, NvdRange, Queries, TraceEvent, Tracer,
 } from "../src/contracts.ts";
-import { notAffectedBlock, run, runOptionsFromEnv, runWith } from "../src/run.ts";
+import { compareNaiveJoin, notAffectedBlock, run, runOptionsFromEnv, runWith } from "../src/run.ts";
 import type { Pipeline, RunOptions } from "../src/run.ts";
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -313,8 +313,9 @@ describe("one family per row (combo KEV spellings)", () => {
       });
     }
     assert.deepEqual(seen[0], seen[1]);
-    // 16.4 is inside CVE-2099-1002's range: never "not affected" on the standalone spelling's CVE alone
-    assert.deepEqual(seen[0], { decision: "patch_now", family: "gladinet:triofox", cited: ["CVE-2099-1001", "CVE-2099-1002"], checked: ["CVE-2099-1001", "CVE-2099-1002"], version: "affected" });
+    // 16.4 is inside CVE-2099-1002's range: never "not affected" on the standalone spelling's CVE alone; both CVEs are
+    // checked, and only the one NVD places the version inside is cited (CVE-2099-1001 is outside: version not affected)
+    assert.deepEqual(seen[0], { decision: "patch_now", family: "gladinet:triofox", cited: ["CVE-2099-1002"], checked: ["CVE-2099-1001", "CVE-2099-1002"], version: "affected" });
   });
 
   test("Ultra's objection to a match on a combo's second product stays while the resolver repeats it", async () => {
@@ -385,6 +386,262 @@ describe("version evidence (NVD)", () => {
     assert.equal(l.target_date, "2027-01-24");
     assert.match(l.why, /NVD's version ranges place version 2\.14\.1 outside all of them/);
     assert.ok(!l.evidence.some((e) => e.query === "policy" && /^patch_now/.test(e.value)));
+  });
+});
+
+describe("the cited CVEs follow NVD's per-CVE version check", () => {
+  const TOMCAT = "Apache Tomcat v9.0.54";
+  const CPE = "cpe:2.3:a:apache:tomcat:*:*:*:*:*:*:*:*";
+  // newest first: 3001 outside (only 10.x), 3002 inside (< 9.0.99), 3003 and 3004 older (the family has 4 CVEs, so the
+  // NVD plan checks the 2 newest); the older ones have the earliest due dates and the top EPSS
+  const entries = [
+    kev("CVE-2099-3001", "Apache", "Tomcat", "2026-04-01", "2026-04-22"),
+    kev("CVE-2099-3002", "Apache", "Tomcat", "2025-04-01", "2025-04-22"),
+    kev("CVE-2099-3003", "Apache", "Tomcat", "2022-03-03", "2022-03-17"),
+    kev("CVE-2099-3004", "Apache", "Tomcat", "2021-11-03", "2022-05-03"),
+  ];
+  const ranges: Record<string, NvdRange[]> = {
+    "CVE-2099-3001": [{ cve_id: "CVE-2099-3001", criteria: CPE, vulnerable: true, version_start_including: "10.0.0", version_end_excluding: "10.1.40" }],
+    "CVE-2099-3002": [{ cve_id: "CVE-2099-3002", criteria: CPE, vulnerable: true, version_start_including: "9.0.0", version_end_excluding: "9.0.99" }],
+  };
+  // NVD records for the two older CVEs: 3003 only 8.5.x (9.0.54 outside), 3004 up to 9.0.60 (9.0.54 inside)
+  const olderRanges: Record<string, NvdRange[]> = {
+    "CVE-2099-3003": [{ cve_id: "CVE-2099-3003", criteria: CPE, vulnerable: true, version_start_including: "8.5.0", version_end_excluding: "8.5.80" }],
+    "CVE-2099-3004": [{ cve_id: "CVE-2099-3004", criteria: CPE, vulnerable: true, version_start_including: "9.0.0", version_end_excluding: "9.0.60" }],
+  };
+  const scores: EpssScore[] = [
+    { cve_id: "CVE-2099-3001", epss: 0.5, percentile: 0.97, score_date: "2026-10-25" },
+    { cve_id: "CVE-2099-3002", epss: 0.3, percentile: 0.96, score_date: "2026-10-25" },
+    { cve_id: "CVE-2099-3003", epss: 0.97, percentile: 0.999, score_date: "2026-10-25" },
+    { cve_id: "CVE-2099-3004", epss: 0.99, percentile: 1, score_date: "2026-10-25" },
+  ];
+  const q = (nvd: Record<string, NvdRange[]> = ranges, looked: string[][] = []): Queries => mockQueries({
+    kevByProducts: async (p) => entries.filter((e) => p.some((x) => x.vendor === e.vendor && x.product === e.product)),
+    kevVerify: async (ids) => entries.filter((e) => ids.includes(e.cve_id)),
+    epss: async (ids) => scores.filter((s) => ids.includes(s.cve_id)),
+    epssVerify: async (ids) => scores.filter((s) => ids.includes(s.cve_id)),
+    nvdCves: async (ids) => { looked.push(ids); return ids.flatMap((c) => nvd[c] ?? []); },
+  });
+  const ans: Record<string, Ans> = { [TOMCAT]: ["Apache", "Tomcat"] };
+
+  test("only the CVE NVD places outside is dropped; the ones not version-checked stay cited and set the date and EPSS (fail-closed)", async () => {
+    const d = deps({ llm: mockLlm([], { bolt: ans, lightning: ans }), queries: q() });
+    // completion off: the two older CVEs are never looked up
+    const r = await runWith({ inventory: [inv("T1", "web-01", "server", true, TOMCAT)] }, d, { ...NO_FILES, completeVersionCheck: false });
+    const l = r.lines[0];
+    assert.equal(l.decision, "patch_now");
+    assert.equal(l.critic?.verdict, "approve");
+    assert.deepEqual(l.kev?.cves.map((c) => c.cve_id), ["CVE-2099-3002", "CVE-2099-3003", "CVE-2099-3004"]);
+    assert.equal(l.kev?.earliest_due, "2022-03-17", "the unchecked CVE's older due date counts");
+    assert.equal(l.kev?.overdue_days, 1684); // 2022-03-17 -> 2026-10-26
+    assert.equal(l.epss?.cve_id, "CVE-2099-3004");
+    assert.equal(l.epss?.max, 0.99);
+    assert.doesNotMatch(l.why, /CVE-2099-3001/);
+    assert.match(l.why, /^NVD places Apache Tomcat 9\.0\.54 inside the affected range of CVE-2099-3002, which CISA KEV lists as exploited in the wild \(added 2025-04-01\); 2 other cited KEV CVEs are not version-checked, counted fail-closed; it is outside the ranges of 1 other KEV CVE\./);
+    assert.match(l.why, /\(2022-03-17\) passed 1684 days ago \(CVE-2099-3003, not version-checked\), and EPSS for CVE-2099-3004 \(not version-checked\) is 0\.99\.$/);
+    const ev = (f: string) => l.evidence.find((e) => e.field === f);
+    assert.match(ev("kev_cves_version_not_affected")?.value ?? "", /outside .*CVE-2099-3001/);
+    assert.equal(ev("kev_cves_version_not_affected")?.source, "zetaris:nvd");
+    assert.match(ev("kev_cves_not_version_checked")?.value ?? "", /2 other cited KEV CVE\(s\).*counted fail-closed.*CVE-2099-3003, CVE-2099-3004/);
+    assert.ok(!l.evidence.some((e) => e.source === "zetaris:kev" && e.field === "cve_id" && e.value === "CVE-2099-3001"));
+    assert.equal(l.evidence.filter((e) => e.source === "zetaris:epss" && e.field === "epss").map((e) => e.value).join(), "0.99");
+    // the first NVD range shown as evidence is the confirmed CVE's
+    assert.match(l.evidence.find((e) => e.field === "version_range")?.value ?? "", /^CVE-2099-3002:/);
+    // the verifier re-derives the due date from the cited list and agrees
+    assert.equal(l.verified, true, l.verifier_notes.join(" | "));
+    const dec = d.tracer.events.find((e) => e.action === "decisions");
+    const scoped = dec?.details?.version_scoped as { row_id: string; basis: string; inside: string[]; outside: string[]; unchecked_cited: string[] }[];
+    assert.deepEqual(scoped.map((x) => [x.row_id, x.basis, x.inside, x.outside, x.unchecked_cited]), [["T1", "inside", ["CVE-2099-3002"], ["CVE-2099-3001"], ["CVE-2099-3003", "CVE-2099-3004"]]]);
+    // the same row with NVD failing on the confirmed CVE: the same date (more evidence never makes a line less urgent)
+    const failing = q({ "CVE-2099-3001": ranges["CVE-2099-3001"] });
+    const r0 = await runWith({ inventory: [inv("T1", "web-01", "server", true, TOMCAT)] }, deps({ llm: mockLlm([], { bolt: ans, lightning: ans }), queries: failing }), { ...NO_FILES, completeVersionCheck: false });
+    assert.equal(r0.lines[0].kev?.earliest_due, l.kev?.earliest_due);
+    assert.equal(r0.lines[0].kev?.overdue_days, l.kev?.overdue_days);
+  });
+
+  test("once one CVE is inside, the other cited CVEs are looked up too: one outside is dropped on evidence, one inside confirmed", async () => {
+    const looked: string[][] = [];
+    const d = deps({ llm: mockLlm([], { bolt: ans, lightning: ans }), queries: q({ ...ranges, ...olderRanges }, looked) });
+    const r = await runWith({ inventory: [inv("T1", "web-01", "server", true, TOMCAT)] }, d, NO_FILES);
+    const l = r.lines[0];
+    assert.equal(l.decision, "patch_now");
+    // the most urgent first: 3003 (due 2022-03-17), then 3004 (due 2022-05-03)
+    const after = looked.flat().slice(-2);
+    assert.deepEqual(after, ["CVE-2099-3003", "CVE-2099-3004"]);
+    assert.deepEqual(l.kev?.cves.map((c) => c.cve_id), ["CVE-2099-3002", "CVE-2099-3004"]);
+    assert.equal(l.kev?.earliest_due, "2022-05-03");
+    assert.equal(l.kev?.overdue_days, 1637);
+    assert.equal(l.epss?.cve_id, "CVE-2099-3004");
+    assert.match(l.why, /^NVD places Apache Tomcat 9\.0\.54 inside the affected ranges of 2 KEV-listed CVEs, most recently CVE-2099-3002, .*; it is outside the ranges of 2 other KEV CVEs\./);
+    assert.doesNotMatch(l.why, /not version-checked/);
+    assert.match(l.evidence.find((e) => e.field === "kev_cves_version_not_affected")?.value ?? "", /2 KEV CVE\(s\) .*CVE-2099-3001, CVE-2099-3003/);
+    assert.ok(!l.evidence.some((e) => e.field === "kev_cves_not_version_checked"));
+    assert.equal(l.verified, true, l.verifier_notes.join(" | "));
+    const done = d.tracer.events.find((e) => e.action === "version_check_completed");
+    assert.match(done?.output_summary ?? "", /^2 looked up in NVD: 1 now inside, 1 now outside \(dropped on evidence\), 0 still unchecked/);
+    const summary = d.tracer.events.find((e) => e.action === "agents_summary");
+    assert.deepEqual((summary?.details?.critic as { version_completion: unknown }).version_completion, { rows: 1, requested: 2, looked_up: 2, now_inside: 1, now_outside: 1, still_unchecked: 0 });
+  });
+
+  test("with no CVE inside, the not-version-checked CVEs carry the line (version unconfirmed); the outside ones are dropped", async () => {
+    const sw = "Apache Tomcat 10.1.50";
+    const ans: Record<string, Ans> = { [sw]: ["Apache", "Tomcat"] };
+    const d = deps({ llm: mockLlm([], { bolt: ans, lightning: ans }), queries: q() });
+    const r = await runWith({ inventory: [inv("T2", "web-02", "server", false, sw)] }, d, NO_FILES);
+    const l = r.lines[0];
+    // 10.1.50 is outside both looked-up CVEs; the two older ones were not looked up: patch_now, version unconfirmed
+    assert.equal(l.decision, "patch_now");
+    assert.ok(l.evidence.some((e) => e.field === "version_unconfirmed"));
+    assert.deepEqual(l.kev?.cves.map((c) => c.cve_id), ["CVE-2099-3003", "CVE-2099-3004"]);
+    assert.equal(l.kev?.earliest_due, "2022-03-17");
+    assert.equal(l.epss?.cve_id, "CVE-2099-3004");
+    assert.doesNotMatch(l.why, /CVE-2099-3001|CVE-2099-3002/);
+    assert.match(l.why, /outside the ranges of 2 other KEV CVEs/);
+    assert.match(l.evidence.find((e) => e.field === "kev_basis")?.value ?? "", /not version-checked/);
+    assert.equal(l.verified, true, l.verifier_notes.join(" | "));
+
+    // no version at all: nothing is placed inside or outside, so every cited CVE stays
+    const sw2 = "Apache Tomcat (version not recorded)";
+    const ans2: Record<string, Ans> = { [sw2]: ["Apache", "Tomcat"] };
+    const r2 = await runWith({ inventory: [inv("T3", "web-03", "server", false, sw2)] }, deps({ llm: mockLlm([], { bolt: ans2, lightning: ans2 }), queries: q() }), NO_FILES);
+    assert.equal(r2.lines[0].decision, "patch_now");
+    assert.deepEqual(r2.lines[0].kev?.cves.map((c) => c.cve_id), ["CVE-2099-3001", "CVE-2099-3002", "CVE-2099-3003", "CVE-2099-3004"]);
+    assert.ok(!r2.lines[0].evidence.some((e) => e.field === "kev_basis"));
+  });
+});
+
+describe("Zetaris discovery and the naive federated join (display only)", () => {
+  test("live: discovery first, then the plain join set against the agents' answers; the decisions are unchanged", async () => {
+    const joinCalls: unknown[] = [];
+    const fed = {
+      discover: async () => ({ databases: ["EL_INVENTORY", "EL_KEV"], tables: [{ db: "EL_KEV", name: "el_kev_raw", source: "https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json" }], sql: ["SHOW LIGHTNING DATABASES"], ms: 5 }),
+      naiveJoin: async (input: unknown) => {
+        joinCalls.push(input);
+        return { sql: "SELECT ...", ms: 7, rows: [
+          { row_id: "R01", vendor: "Apache", product: "Log4j2", kev_cves: 1 },            // agrees? "log4j2" is not in "log4j-core": no hit in reality; here a hit
+          { row_id: "R04", vendor: "Microsoft", product: "Exchange", kev_cves: 1 },       // the cloud look-alike
+          { row_id: "R03", vendor: "Notepad++", product: "Notepad++", kev_cves: 1 },      // the agents found no KEV product
+        ] };
+      },
+    };
+    const plain = await runWith({}, deps(), NO_FILES);
+    const d = deps({ queries: Object.assign(mockQueries(), fed) });
+    const r = await runWith({}, d, NO_FILES);
+    assert.deepEqual(r.lines.map((l) => [l.row_id, l.decision]), plain.lines.map((l) => [l.row_id, l.decision]), "never a decision input");
+    assert.deepEqual(joinCalls, [{ from: "inventory", rowIds: ["R01", "R02", "R03", "R04", "R05", "R06"] }]);
+    const acts = d.tracer.events.map((e) => e.action);
+    assert.ok(acts.indexOf("discovery") < acts.indexOf("inventory_loaded"));
+    const j = d.tracer.events.find((e) => e.action === "naive_join");
+    assert.match(j?.output_summary ?? "", /^a plain SQL join of the inventory and KEV inside Zetaris .* hits 3 of 6 row\(s\): 1 agree with the agents, 2 are look-alikes the agents found no KEV product for/);
+    assert.equal(j?.details?.agents_only, 3);
+    assert.ok(r.manifest.helpers_live.includes("zetaris.naive_join") && r.manifest.helpers_live.includes("zetaris.discovery"));
+    assert.equal(typeof r.timing_ms.federated_join, "number");
+    // request rows go in as inline VALUES
+    const d2 = deps({ queries: Object.assign(mockQueries(), fed) });
+    await runWith({ inventory: [inv("Q1", "web-01", "server", true, "PAN-OS 10.2.7")] }, d2, NO_FILES);
+    assert.deepEqual(joinCalls[1], { from: "values", rows: [inv("Q1", "web-01", "server", true, "PAN-OS 10.2.7")] });
+  });
+
+  test("a failing join or discovery is traced and never fails the run; sample mode runs neither", async () => {
+    const bad = { discover: async () => { throw new Error("HTTP 400"); }, naiveJoin: async () => { throw new Error("MISSING_ATTRIBUTES"); } };
+    const d = deps({ queries: Object.assign(mockQueries(), bad) });
+    const r = await runWith({ row_ids: ["R01"] }, d, NO_FILES);
+    assert.equal(r.status, "success");
+    assert.ok(d.tracer.events.some((e) => e.action === "naive_join" && e.status === "error"));
+    let called = 0;
+    const s = deps({ mode: "sample", llm: null, queries: Object.assign(mockQueries(), { discover: async () => { called++; throw new Error("x"); }, naiveJoin: async () => { called++; throw new Error("x"); } }) });
+    await runWith({ row_ids: ["R01"] }, s, NO_FILES);
+    assert.equal(called, 0);
+  });
+
+  test("compareNaiveJoin: agree, look-alike, other product, missed by the join, left to the owner", () => {
+    const rows = ["A", "B", "C", "D", "E"].map((id) => inv(id, "h", "server", false, "x"));
+    const m = (vendor: string, product: string, family: string) => ({ row_id: "", status: "matched" as const, vendor, product, family, version: null, product_type: "unknown" as const, votes: [], adjudicated_by: null, confidence: 1 });
+    const res: Record<string, ReturnType<typeof m> | { row_id: string; status: "no_match" | "unresolved"; vendor: null; product: null; family: null; version: null; product_type: "unknown"; votes: []; adjudicated_by: null; confidence: number }> = {
+      A: m("Citrix", "NetScaler ADC and Gateway", "citrix:netscaler"),
+      B: { row_id: "B", status: "no_match", vendor: null, product: null, family: null, version: null, product_type: "unknown", votes: [], adjudicated_by: null, confidence: 1 },
+      C: m("Apache", "Tomcat", "apache:tomcat"),
+      D: m("Fortinet", "FortiOS", "fortinet:fortios"),
+      E: { row_id: "E", status: "unresolved", vendor: null, product: null, family: null, version: null, product_type: "unknown", votes: [], adjudicated_by: null, confidence: 0 },
+    };
+    const hits = [{ row_id: "A", vendor: "Citrix", product: "NetScaler" }, { row_id: "B", vendor: "Microsoft", product: "Word" }, { row_id: "C", vendor: "Apache", product: "Apache" }];
+    const fams = (p: KevPair) => [`${p.vendor.toLowerCase()}:${/netscaler/i.test(p.product) ? "netscaler" : p.product.toLowerCase()}`];
+    const c = compareNaiveJoin(rows, hits, (id) => res[id] as never, fams);
+    assert.deepEqual(c.rows.map((x) => x.outcome), ["agree", "naive_only", "naive_other", "agents_only", "owner"]);
+    assert.deepEqual({ ...c.counts }, { rows: 5, rows_hit: 3, agree: 1, naive_only: 1, naive_other: 1, agents_only: 1, neither: 0, owner: 1 });
+  });
+});
+
+describe("memory across runs (World Model)", () => {
+  test("two runs on the same rows: the second recalls the first from its saved world; the patch_now clock is kept", async () => {
+    const dir = join(TMP, `memory-${Date.now()}`);
+    const day = (d: string) => ({ now: () => new Date(`${d}T12:00:00Z`) });
+    const r1 = await runWith({ row_ids: ["R02", "R03"] }, deps({ clock: day("2026-10-26"), tracer: memTracer("mem-run-1") }), { outputDir: dir, logsDir: null });
+    assert.equal(by(r1).R02.decision, "patch_now");
+    assert.equal(by(r1).R02.target_date, "2026-11-02");
+    // two days later, the same rows: the first run's world is reopened read-only
+    const d2 = deps({ clock: day("2026-10-28"), tracer: memTracer("mem-run-2") });
+    const r2 = await runWith({ row_ids: ["R02", "R03"] }, d2, { outputDir: dir, logsDir: null });
+    const L = by(r2);
+    assert.equal(L.R02.decision, "patch_now");
+    assert.equal(L.R02.target_date, "2026-11-02", "the 7-day clock started with the first run, so re-running does not push it back");
+    assert.match(L.R02.why, /Patch by 2026-11-02 under your 7-day rule \(the date run mem-run-1 of 2026-10-26 already set\)/);
+    assert.match(L.R02.evidence.find((e) => e.field === "patch_now_since")?.value ?? "", /already patch_now in run mem-run-1 of 2026-10-26: the target stays 2026-11-02, not 2026-11-04/);
+    assert.equal(L.R03.target_date, "2027-01-26", "monitor dates are not anchored");
+    const ev = d2.tracer.events.find((e) => e.action === "since_last_run");
+    assert.match(ev?.output_summary ?? "", /^since run mem-run-1 \(2026-10-26\): 2 row\(s\) compared, 0 new; 0 decision\(s\) changed; .* 1 patch_now target\(s\) kept/);
+    assert.ok(r2.manifest.helpers_live.includes("world_model.since_last_run"));
+    // the first run's world file is unchanged by the second run (read-only)
+    const w1 = join(dir, "world", ".world", "mem-run-1.json");
+    const before = readFileSync(w1, "utf8");
+    // a third run whose answer for R02 changes: the decision change is reported, and nothing is anchored for it
+    const d3 = deps({ clock: day("2026-10-29"), tracer: memTracer("mem-run-3"), llm: mockLlm([], { bolt: { "PAN-OS 10.2.7 (GlobalProtect gw)": [null, null] }, lightning: { "PAN-OS 10.2.7 (GlobalProtect gw)": [null, null] } }) });
+    const r3 = await runWith({ row_ids: ["R02", "R03"] }, d3, { outputDir: dir, logsDir: null });
+    const ev3 = d3.tracer.events.find((e) => e.action === "since_last_run");
+    const changed = (ev3?.details?.changed as { row_id: string; from: string; to: string }[]) ?? [];
+    assert.ok(changed.some((c) => c.row_id === "R02" && c.from === "patch_now" && c.to !== "patch_now"), JSON.stringify(changed));
+    assert.ok(!by(r3).R02.evidence.some((e) => e.field === "patch_now_since"));
+    assert.equal(readFileSync(w1, "utf8"), before);
+    // sample mode and runs that save nothing never use memory
+    const s = deps({ mode: "sample", llm: null, clock: day("2026-10-30"), tracer: memTracer("mem-sample") });
+    await runWith({ row_ids: ["R02"] }, s, { outputDir: dir, logsDir: null });
+    assert.ok(!s.tracer.events.some((e) => e.action === "since_last_run"));
+    const n = deps({ clock: day("2026-10-30") });
+    await runWith({ row_ids: ["R02"] }, n, NO_FILES);
+    assert.ok(!n.tracer.events.some((e) => e.action === "since_last_run"));
+  });
+
+  test("memory is kept per row: a run on another subset never resets the clock of the rows it left out", async () => {
+    const dir = join(TMP, `memory-subset-${Date.now()}`);
+    const day = (d: string) => ({ now: () => new Date(`${d}T12:00:00Z`) });
+    const go = (id: string, d: string, req: Parameters<typeof runWith>[0]) => {
+      const dd = deps({ clock: day(d), tracer: memTracer(id) });
+      return runWith(req, dd, { outputDir: dir, logsDir: null }).then((r) => ({ r, d: dd }));
+    };
+    // A: R02 (patch_now) and R03; B: R03 only; then A again
+    const a1 = await go("mem-a1", "2026-10-26", { row_ids: ["R02", "R03"] });
+    assert.equal(by(a1.r).R02.target_date, "2026-11-02");
+    const b = await go("mem-b", "2026-10-27", { row_ids: ["R03"] });
+    assert.match(b.d.tracer.events.find((e) => e.action === "since_last_run")?.output_summary ?? "", /^since run mem-a1 \(2026-10-26\): 1 row\(s\) compared, 0 new/);
+    const a2 = await go("mem-a2", "2026-10-28", { row_ids: ["R02", "R03"] });
+    assert.equal(by(a2.r).R02.target_date, "2026-11-02", "R02's clock is kept from run A although run B ran on R03 alone");
+    const ev = a2.d.tracer.events.find((e) => e.action === "since_last_run");
+    assert.match(ev?.output_summary ?? "", /^since each row's last run \(mem-b of 2026-10-27: 1 row\(s\); mem-a1 of 2026-10-26: 1 row\(s\)\): 2 row\(s\) compared, 0 new; .* 1 patch_now target\(s\) kept/);
+    assert.deepEqual((ev?.details?.previous as { run_id: string; rows: string[] }[]).map((p) => [p.run_id, p.rows]), [["mem-b", ["R03"]], ["mem-a1", ["R02"]]]);
+    assert.deepEqual((ev?.details?.anchored as { row_id: string; run_id: string }[]).map((x) => [x.row_id, x.run_id]), [["R02", "mem-a1"]]);
+    // the index points every row at its last run, and keeps only the runs some row still points at
+    const idx = JSON.parse(readFileSync(join(dir, "world", "last-runs.json"), "utf8")) as { version: number; runs: Record<string, unknown>; rows: Record<string, string> };
+    assert.equal(idx.version, 2);
+    assert.deepEqual(Object.keys(idx.runs), ["mem-a2"]);
+    assert.deepEqual([...new Set(Object.values(idx.rows))], ["mem-a2"]);
+    // the same text sent as request rows is another list: it never shares the registered inventory's memory
+    const R02 = INVENTORY.find((x) => x.row_id === "R02") as InventoryRow;
+    const q1 = await go("mem-q1", "2026-10-29", { inventory: [R02] });
+    assert.match(q1.d.tracer.events.find((e) => e.action === "since_last_run")?.output_summary ?? "", /^no earlier run on these 1 row\(s\)/);
+    assert.equal(by(q1.r).R02.target_date, "2026-11-05");
+    // a row whose software text changed is a new row: a new clock
+    const q2 = await go("mem-q2", "2026-10-30", { inventory: [{ ...R02, software: "PAN-OS 10.2.9 (GlobalProtect gw)" }] });
+    assert.match(q2.d.tracer.events.find((e) => e.action === "since_last_run")?.output_summary ?? "", /^no earlier run/);
   });
 });
 
@@ -513,6 +770,34 @@ describe("failures degrade, never crash", () => {
     assert.ok(l.evidence.some((e) => e.field === "rule" && /FIRST EPSS could not be read \(FIRST API 503\)/.test(e.value) && /fail-closed/.test(e.value)));
     const q = r.owner_questions.find((x) => x.row_id === "R01");
     assert.match(q?.question ?? "", /Log4j2 2\.14\.1, outside NVD's affected ranges for CVE-2021-44228\? Otherwise re-run when FIRST EPSS can be read/);
+  });
+
+  test("KEV served from the Zetaris client's cached copy: not live, partial, and no line relaxed to monitor", async () => {
+    const status = [
+      { query: "inventory", label: "inventory", fromCache: false, rows: 6 },
+      { query: "kevPairs", label: "kevPairs", fromCache: true, cachedAt: "2026-10-27T02:15:00.000Z", rows: PAIRS.length },
+    ];
+    const d = deps({ queries: Object.assign(mockQueries(), { sourceStatus: () => status }) });
+    const r = await runWith({ row_ids: ["R01", "R03"] }, d, NO_FILES);
+    assert.equal(r.status, "partial");
+    const kevSrc = r.manifest.sources.find((x) => x.name === "CISA KEV");
+    assert.equal(kevSrc?.live, false);
+    assert.equal(kevSrc?.as_of, "2026-10-27");
+    assert.match(kevSrc?.object ?? "", /cached copy saved 2026-10-27; the live read failed/);
+    assert.equal(r.manifest.sources.find((x) => x.name === "FIRST EPSS")?.live, true);
+    const L = by(r);
+    // "No CISA KEV product matches" would rest on a stale KEV name list: the owner is asked instead (fail-closed)
+    assert.equal(L.R03.decision, "ask_owner");
+    assert.match(r.owner_questions.find((q) => q.row_id === "R03")?.reason ?? "", /CISA KEV \(served from a cached copy saved 2026-10-27\) could not be read live/);
+    assert.equal(L.R01.decision, "patch_now");
+    assert.ok(r.lines.every((l) => l.evidence.filter((e) => e.source === "zetaris:kev").every((e) => e.live === false)));
+    assert.ok(r.lines.every((l) => l.evidence.some((e) => e.field === "cached_copy")));
+    assert.ok(d.tracer.events.some((e) => e.action === "zetaris_fallback" && e.status === "fallback"));
+    // the same run with every read live stays success, with KEV labelled live
+    const ok = await runWith({ row_ids: ["R01", "R03"] }, deps({ queries: Object.assign(mockQueries(), { sourceStatus: () => status.map((x) => ({ ...x, fromCache: false })) }) }), NO_FILES);
+    assert.equal(ok.status, "success");
+    assert.equal(by(ok).R03.decision, "monitor");
+    assert.equal(ok.manifest.sources.find((x) => x.name === "CISA KEV")?.live, true);
   });
 
   test("notAffectedBlock: relax only with KEV and EPSS read, and every cited CVE checked", () => {
